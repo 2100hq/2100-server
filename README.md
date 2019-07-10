@@ -1,6 +1,13 @@
 # 2100 Server
 In the centralized formulation of the 2100 protocol this is the server which would run the bulk of business logic.
 
+## Responsibilities
+- syncronize app with blockchain
+- calculate staking rewards
+- maintain user balances
+- create responsive public api
+- allow proper transactions and withdraw/deposits from blockchain
+
 ## Starting
 Install [rethinkdb](https://hub.docker.com/_/rethinkdb/).
 
