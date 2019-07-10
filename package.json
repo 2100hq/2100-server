@@ -1,0 +1,26 @@
+{
+  "name": "2100-fake-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node start",
+    "test": "node test"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "fastest-validator": "^0.6.17",
+    "highland": "^2.13.4",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "pad": "^3.2.0",
+    "rethink-table": "^0.0.5",
+    "rethinkdb": "^2.3.3",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "tape": "^4.11.0",
+    "uuid": "^3.3.2"
+  }
+}
