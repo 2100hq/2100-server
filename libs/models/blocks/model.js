@@ -16,6 +16,11 @@ module.exports = function(config,table,emit=x=>x) {
     return result
   }
 
+  async function has(id){
+    id = blockid(id)
+    return table.has(id)
+  }
+
   async function get(id) {
     id = blockid(id)
     assert(await table.has(id), 'That block does not exist')
@@ -33,6 +38,7 @@ module.exports = function(config,table,emit=x=>x) {
     ...table,
     set,
     get,
+    has,
     create,
   }
 }

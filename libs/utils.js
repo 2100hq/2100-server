@@ -16,10 +16,9 @@ exports.parseError = err => {
 exports.blockid = (number)=>{
   return pad(16,number,'0')
 }
-exports.eventid = (address,number,index)=>{
+exports.eventid = (address,number,index=0)=>{
   assert(address,'requires contract address')
   assert(number,'requires block number')
-  assert(index,'requires log index')
   return [pad(16,number,'0'),pad(16,number,'0'),address].join('!')
 }
 

@@ -19,7 +19,7 @@ module.exports = async (config,{},emit=x=>x) => {
     return log => {
       return {
         ...meta,
-        ...iface.parseLog(x)
+        ...iface.parseLog(log)
       }
     }
   }

@@ -16,19 +16,40 @@ const Joins = require('../../models/joins')
 const Queries = require('../../models/queries')
 const Events = require('../../models/events')
 
+const contracts = [
+  require('2100-contracts/build/contracts/Controller'),
+]
+
 module.exports = async (config)=>{
   assert(config.mintingTickRate,'reqeuires a mintingTickRate')
   assert(config.txTickRate,'reqeuires a transactionTickRate')
   assert(config.confirmations,'requires confirmations')
   assert(config.primaryToken,'requires primary token symbol')
 
+  //set a default for now to our dev chain id
+  config.chainid = config.chainid || '2100'
+
   const emitter = new Emitter()
 
+
+  config.contracts = contracts.map((json)=>{
+    return {
+      contractName:json.contractName,
+      contractAddress:json.networks[config.chainid].address,
+      abi:json.abi,
+    }
+  })
 
   const con = await RethinkConnection(config.rethink)
 
   //starting libs with models
   const libs = await RethinkModels(config,{con},(...args)=>emitter.emit('models',args))
+
+  //we need to init this with our last processed block
+  const lastBlock = await libs.blocks.latest()
+  if(lastBlock){
+    config.ethers.defaultStartBlock = lastBlock.number
+  }
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
 
@@ -56,9 +77,10 @@ module.exports = async (config)=>{
       switch(type){
         case 'block':{
           const block = await libs.ethers.getBlock(data)
-          console.log(block)
-          await libs.commands.createType('processBlock',{number:data,hash:block.hash})
-          await libs.blocks.create(block)
+          if(! await libs.blocks.has(data)){
+            await libs.commands.createType('processBlock',{number:data,hash:block.hash})
+            await libs.blocks.create(block)
+          }
           return
         }
       }
@@ -90,6 +112,7 @@ module.exports = async (config)=>{
 
   loop(async x=>{
     const commands = await libs.commands.getDone(false)
+    if(commands.length) console.log('processing',commands.length,'commands')
     return highland(commands)
       .map(libs.engines.commands.runToDone)
       .flatMap(highland)

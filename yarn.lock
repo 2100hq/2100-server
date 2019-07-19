@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"2100-contracts@github:2100hq/2100-contracts#v0.1.0":
+  version "0.1.0"
+  resolved "https://codeload.github.com/2100hq/2100-contracts/tar.gz/7dae976ea8c5d6659b185572d701dcc68b090deb"
+
 "@types/node@^10.3.2":
   version "10.14.12"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.12.tgz#0eec3155a46e6c4db1f27c3e588a205f767d622f"
