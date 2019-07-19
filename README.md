@@ -8,6 +8,10 @@ In the centralized formulation of the 2100 protocol this is the server which wou
 - create responsive public api
 - allow proper transactions and withdraw/deposits from blockchain
 
+Other notes
+- Final database tech no decided, currently using rethink for prototyping
+- API design is open
+
 ## Starting
 Install [rethinkdb](https://hub.docker.com/_/rethinkdb/).
 
@@ -23,15 +27,24 @@ The idea being you can reconstruct this as a json object. Uses lodash set to set
 Just slightly less friction for adding new envs.
 
 ```
-  service=2100
+  service=2100     //internal name of service to run
   rethink.db=2100  //set your database name
+  socket.port=9312 //set the public socket api port
+
   txTickRate=1000 //set your block speed for processing transactions
   mintingTickRate=15000  //set your minting tick rate for generating staking rewards
-  socket.port=9312 //set the public socket api port
+  confirmations=20 //confirmations before accepting deposit
+
+  ethers.provider.type=JsonRpcProvider
+  ethers.provider.url= //provider url
+  ethers.provider.network=homestead //or ropstein, etc
+
+  defaultStartBlock=8182562  //optional
+  primaryToken=DAI  //symbol for default staking token
 ```
 
 ## Directories
-General directory structure of project as of now.
+General directory structure of project as of now. This may get out of date quickly as we iterate.
 
 - test - high level e2e tests if any
 - scripts - misc files for anything

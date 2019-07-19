@@ -60,6 +60,7 @@ module.exports = async (config, libs) => {
           if (cb) cb(e.message)
         })
     })
+
     socket.on('private',async function(action,args,cb){
       console.log('calling private',socket.user,action,...args)
       if(socket.user) socket.user = await users.get(socket.user.id)
@@ -73,6 +74,7 @@ module.exports = async (config, libs) => {
           if (cb) cb(e.message)
         })
     })
+
     socket.on('admin',async function(action,args,cb){
       if(!socket.admin) return cb(new Error('You are not admin'))
       if(socket.user) socket.user = await users.get(socket.user.id)
@@ -86,6 +88,7 @@ module.exports = async (config, libs) => {
           if (cb) cb(e.message)
         })
     })
+
     socket.on('public', async function(action, args, cb) {
       // console.log('socket call', action, args, socket.token)
       actions.public(undefined,action, ...args)

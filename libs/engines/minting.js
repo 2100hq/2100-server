@@ -29,10 +29,11 @@ module.exports = (config,{wallets})=>{
 
     const transactions = stakes.map(({balance,userid})=>{
         return {
-          type:'mint',
-          token:token.id,
-          from:token.id,
-          to:userid,
+          tokenid:token.id,
+          fromAddress:token.id,
+          toAddress:userid,
+          fromWallet:'internal',
+          toWallet:'internal',
           userid:'2100',
           value:publicReward/total * reward
         }
@@ -42,10 +43,11 @@ module.exports = (config,{wallets})=>{
     //add owner reward transaction only if there are stakers
     if(transactions.length){
       transactions.push({
-        type:'mint',
-        token:token.id,
-        from:token.id,
-        to:'owner',
+        tokenid:token.id,
+        fromAddress:token.id,
+        toAddress:token.ownerAddress,
+        fromWallet:'internal',
+        toWallet:'internal',
         userid:'2100',
         value:ownerReward,
       })

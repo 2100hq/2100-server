@@ -5,6 +5,7 @@ module.exports = () => {
       id:props.name,
       supply:2100,
       reward:.0021,
+      ownerAddress:'owner',
       ...props
     }
   }

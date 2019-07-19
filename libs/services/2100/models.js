@@ -1,6 +1,7 @@
 const Wallets = require('../../models/wallets')
 const Tokens = require('../../models/tokens')
 const Transactions = require('../../models/transactions')
+const Cache = require('../../models/cache')
 
 module.exports = async (config,{con},emit=x=>x)=>{
   assert(con,'requires rethink connection')

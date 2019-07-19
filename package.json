@@ -10,10 +10,11 @@
   "dependencies": {
     "bluebird": "^3.5.5",
     "dotenv": "^8.0.0",
+    "ethers": "^4.0.33",
     "express": "^4.17.1",
     "fastest-validator": "^0.6.17",
     "highland": "^2.13.4",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "moment": "^2.24.0",
     "pad": "^3.2.0",
     "rethink-table": "^0.0.5",

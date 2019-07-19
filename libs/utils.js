@@ -13,15 +13,27 @@ exports.parseError = err => {
   }
 }
 
-exports.blockid = function ID(number){
+exports.blockid = (number)=>{
   return pad(16,number,'0')
 }
+exports.eventid = (address,number,index)=>{
+  assert(address,'requires contract address')
+  assert(number,'requires block number')
+  assert(index,'requires log index')
+  return [pad(16,number,'0'),pad(16,number,'0'),address].join('!')
+}
 
-exports.IncreasingId = (start=0)=>{
+exports.stringifyValues = (object)=>{
+  return lodash.mapValues(object,val=>{
+    return val.toString()
+  })
+}
+
+exports.IncreasingId = (start=0,max=10000000)=>{
   let nonce = start
   return (now=Date.now())=>{
     const id = [now,pad(8,nonce,'0')].join('!')
-    nonce++
+    nonce = (nonce + 1) % max
     return id
   }
 }

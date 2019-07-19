@@ -5,6 +5,7 @@ module.exports = () => {
   return (props = {}) => {
     return {
       id:blockid(props.number),
+      state:'New',
       ...props
     }
   }
