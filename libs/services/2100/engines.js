@@ -5,6 +5,7 @@ module.exports = (config,libs,emit=x=>x)=>{
     // transactions:Engines.Transactions(config,libs),
     minting:Engines.Minting(config,libs),
     commands:Engines.Commands(config,libs),
+    eventlogs:Engines.EventLogs(config,libs),
   }
 }
 

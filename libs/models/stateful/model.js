@@ -28,6 +28,7 @@ module.exports = (config, table, emit=x=>x) => {
     assert(state, 'requires state')
     const val = await get(id)
     val.state = state
+    val.yield = false
     return set({ ...val, ...props })
   }
 
@@ -35,6 +36,7 @@ module.exports = (config, table, emit=x=>x) => {
     const val = await get(id)
     val.state = 'Success'
     val.done = true
+    val.yield = false
     val.resolve = resolve
     return set({ ...val, ...props })
   }
@@ -42,6 +44,7 @@ module.exports = (config, table, emit=x=>x) => {
     const val = await get(id)
     val.state = 'Failure'
     val.done = true
+    val.yield = false
     val.reject = reject
     return set({ ...val, ...props })
   }
@@ -55,6 +58,11 @@ module.exports = (config, table, emit=x=>x) => {
     failure,
     setState,
     defaults,
-    validate
+    validate,
+    async yield(id){
+      const cmd = await get(id)
+      cmd.yield = true
+      return set(cmd)
+    }
   }
 }

@@ -1,6 +1,6 @@
 const assert = require('assert')
-module.exports = (config,{wallets,getWallets,commands,log})=>{
-  assert(wallets,'requires wallets')
+module.exports = (config,{getWallets,commands})=>{
+  assert(getWallets,'requires wallets')
   assert(commands,'requires commands')
   return {
     async Start(cmd){

@@ -1,6 +1,7 @@
 const assert = require('assert')
 const Emitter = require('events')
 const highland = require('highland')
+const lodash = require('lodash')
 const Promise = require('bluebird')
 
 const Socket = require('../../socket')
@@ -8,7 +9,7 @@ const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
 
-const {RethinkConnection,loop} = require('../../utils')
+const {RethinkConnection,loop,GetWallets} = require('../../utils')
 const RethinkModels = require('./models-rethink')
 const Ethers = require('../../ethers')
 
@@ -22,7 +23,7 @@ const contracts = [
 
 module.exports = async (config)=>{
   assert(config.mintingTickRate,'reqeuires a mintingTickRate')
-  assert(config.txTickRate,'reqeuires a transactionTickRate')
+  assert(config.cmdTickRate,'reqeuires a transactionTickRate')
   assert(config.confirmations,'requires confirmations')
   assert(config.primaryToken,'requires primary token symbol')
 
@@ -45,6 +46,8 @@ module.exports = async (config)=>{
   //starting libs with models
   const libs = await RethinkModels(config,{con},(...args)=>emitter.emit('models',args))
 
+  libs.getWallets = GetWallets(libs.wallets)
+
   //we need to init this with our last processed block
   const lastBlock = await libs.blocks.latest()
   if(lastBlock){
@@ -53,7 +56,7 @@ module.exports = async (config)=>{
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
 
-  const commandTypes = ['processBlock']
+  const commandTypes = ['processBlock','pendingDeposit','deposit','withdraw']
   libs.handlers = Handlers({...config,commandTypes},libs)
 
   //adding engines
@@ -118,8 +121,23 @@ module.exports = async (config)=>{
       .flatMap(highland)
       .collect()
       .toPromise(Promise)
-  },config.txTickRate).catch(err=>{
+  },config.cmdTickRate).catch(err=>{
     console.log('command engine error',err)
+    process.exit(1)
+  })
+
+  loop(async x=>{
+    const events = await libs.eventlogs.getDone(false)
+    highland(lodash.orderBy(events,['id'],['asc']))
+    .map(async event=>{
+      const result = await libs.engines.eventlogs.tick(event)
+      return libs.eventlogs.setDone(event.id)
+    })
+    .flatMap(highland)
+    .collect()
+    .toPromise(Promise)
+  },1000).catch(err=>{
+    console.log('event engine error',err)
     process.exit(1)
   })
 

@@ -6,6 +6,7 @@ module.exports = async (config, con) => {
 
   const schema = {
     table: config.table,
+    indices:['name','done'],
   }
 
   const table = await Table(con, schema)
@@ -14,6 +15,9 @@ module.exports = async (config, con) => {
     ...table,
     set(id,data){
       return table.upsert(data)
+    },
+    getDone(done=false){
+      return table.getBy('done',done)
     },
     list(){
       return table.run(table.table().getorderBy('id').slice(from).coerceTo('array'))

@@ -25,6 +25,7 @@ module.exports = async (config,{},emit=x=>x) => {
   }
 
   provider.decodeLog = decodeLog
+  provider.utils = ethers.utils
 
   return provider
 

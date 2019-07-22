@@ -1,3 +1,4 @@
+const assert = require('assert')
 module.exports = (config,{commands,wallets,getWallets})=>{
   assert(wallets,'requires wallets')
   assert(commands,'requires commands')

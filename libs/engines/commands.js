@@ -14,6 +14,7 @@ module.exports = (config,{handlers,commands})=>{
     if(command.done) return command
     if(stepLimit) assert(steps < stepLimit,'Command failed to complete in ' + stepLimit + ' steps')
     const next = await tick(command)
+    if(command.yield) return command
     // assert(next.state !== command.state,'Command must transition state')
     await new Promise(res=>setTimeout(res,tickRate))
     return runToDone(next,steps+1)

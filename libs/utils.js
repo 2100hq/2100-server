@@ -4,6 +4,13 @@ const pad = require('pad')
 const Rethink = require('rethinkdb')
 
 
+exports.GetWallets = wallets => type =>{
+  assert(wallets,'requires wallet type tables')
+  assert(type,'requires wallet type')
+  assert(wallets[type],'No wallets by type: ' + type)
+  return wallets[type]
+}
+
 exports.parseError = err => {
   assert(err.message,'error requires message')
   assert(err.stack, 'error requires stack')

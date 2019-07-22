@@ -3,4 +3,5 @@ module.exports = {
   // Blocks:require('./blocks'),
   Minting:require('./minting'),
   Commands:require('./commands'),
+  EventLogs:require('./eventlogs'),
 }
