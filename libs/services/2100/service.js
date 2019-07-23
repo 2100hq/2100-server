@@ -81,7 +81,6 @@ module.exports = async (config)=>{
         case 'block':{
           const block = await libs.ethers.getBlock(data)
           if(! await libs.blocks.has(data)){
-            await libs.commands.createType('processBlock',{number:data,hash:block.hash})
             await libs.blocks.create(block)
           }
           return
@@ -125,6 +124,24 @@ module.exports = async (config)=>{
     console.log('command engine error',err)
     process.exit(1)
   })
+
+  //loop over unprocessed blocks
+  loop(async x=>{
+    const blocks = await libs.blocks.getDone(false)
+    // console.log(blocks)
+    highland(lodash.orderBy(blocks,['id'],['asc']))
+    .map(async block=>{
+      // console.log(block)
+      const result = await libs.engines.blocks.tick(block)
+      // console.log('completed block')
+      return libs.blocks.setDone(block.id)
+    })
+    .collect()
+    .toPromise(Promise)
+  },1000).catch(err=>{
+    console.log('block engine error',err)
+    process.exit(1)
+  })                    
 
   loop(async x=>{
     const events = await libs.eventlogs.getDone(false)

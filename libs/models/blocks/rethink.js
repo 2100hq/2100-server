@@ -6,6 +6,7 @@ module.exports = async (config, con) => {
 
   const schema = {
     table: config.table,
+    indices:['done'],
   }
 
   const table = await Table(con, schema)
@@ -17,6 +18,9 @@ module.exports = async (config, con) => {
     },
     list(from=0){
       return table.run(table.table().orderBy('id').slice(from).coerceTo('array'))
+    },
+    getDone(done=false){
+      return table.getBy('done',done)
     },
     latest(){
       const query = table.table().max({index:'id'})

@@ -3,6 +3,7 @@ module.exports = () => {
     id: 'string',
     number:'number',
     hash:'string',
+    done:'boolean',
   }
 }
 

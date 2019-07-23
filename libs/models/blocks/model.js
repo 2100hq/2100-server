@@ -33,6 +33,11 @@ module.exports = function(config,table,emit=x=>x) {
     return set(result)
   }
 
+  async function setDone(id){
+    const result = await get(id)
+    result.done = true
+    return set(result)
+  }
 
   return {
     ...table,
@@ -40,6 +45,7 @@ module.exports = function(config,table,emit=x=>x) {
     get,
     has,
     create,
+    setDone,
   }
 }
 
