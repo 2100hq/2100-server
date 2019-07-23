@@ -56,7 +56,7 @@ module.exports = async (config)=>{
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
 
-  const commandTypes = ['processBlock','pendingDeposit','deposit','withdraw']
+  const commandTypes = ['processBlock','pendingDeposit','withdrawPrimary','deposit','withdraw']
   libs.handlers = Handlers({...config,commandTypes},libs)
 
   //adding engines

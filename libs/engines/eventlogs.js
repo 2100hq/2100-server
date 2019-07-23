@@ -13,7 +13,17 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
         toAddress:event.values.account,
         tokenid:config.primaryToken,
         confirmations:Number(config.confirmations),
+        balance:Number(ethers.utils.formatEther(event.values.balance)),
         value:Number(ethers.utils.formatEther(event.values.amount)),
+      })
+    },
+    async Withdraw(event){
+      return commands.createType('withdrawPrimary',{
+        blockNumber:event.blockNumber,
+        fromAddress:event.values.account,
+        tokenid:config.primaryToken,
+        balance:ethers.utils.formatEther(event.values.balance),
+        value:ethers.utils.formatEther(event.values.amount),
       })
     }
   }
