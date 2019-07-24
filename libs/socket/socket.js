@@ -17,48 +17,66 @@ module.exports = async (config, libs) => {
   // assert(services.admin, 'requires admin service')
   assert(config.port, 'requires socket port')
 
+  console.log('port',config)
   var server = Http.createServer()
   var io = Socket(server, {})
 
   io.listen(config.port)
   const batching = new Map()
 
-  io.on('connection', async socket => {
-    console.log('connected',socket.id)
+  io.on('connection', socket => {
+
+    socket.token = libs.ethers.utils.hashMessage(socket.id)
+
+    // console.log('connected',socket.id,socket.token)
     socket.on('disconnect', function() {
       console.log('disconnect',socket.user)
     })
 
     //send user public state snapshot
-    io.emit('public',[],await query.publicState())
+    // io.emit('public',[],await query.publicState())
 
-    socket.on('auth',async function(action,args,cb){
-      console.log('authing',action)
-      actions.auth(socket.user,action,...args)
-        .then(async result => {
-          if(action == 'login'){
-            console.log('login',result)
-            //join private channel
-            socket.join(result.id)
-            io.to(result.id).emit('private',[],await query.privateState(result.id))
-            //join admin channel
-            socket.join('admin')
-            io.to('admin').emit('admin',[],await query.adminState(result.id))
+    socket.on('auth',(action,args,cb=x=>x)=>{
+      console.log('auth message',socket.id,action,args)
+      switch(action){
+          case 'token':
+            return cb(null,socket.token)
+          case 'authenticate':
+            const [signed,address] = args
+            const valid = libs.authenticate(socket.token,signed,address)
+            if(valid){
+              socket.userid = args[1]
+              return cb(null,args[1])
+            }else{
+              return cb('Authentication Failed')
+            }
+      }
+      //console.log('authing',action)
+      //actions.auth(socket.user,action,...args)
+      //  .then(async result => {
+      //    if(action == 'login'){
+      //      console.log('login',result)
+      //      //join private channel
+      //      socket.join(result.id)
+      //      io.to(result.id).emit('private',[],await query.privateState(result.id))
+      //      //join admin channel
+      //      socket.join('admin')
+      //      io.to('admin').emit('admin',[],await query.adminState(result.id))
 
-            //attach user to state
-            socket.user = result
-            socket.admin = true
-          }
-          if(action == 'logout'){
-            socket.user = null
-            socket.admin = false
-          }
-          if (cb) cb(null, result)
-        })
-        .catch(e => {
-          console.log('auth err', e,action, args)
-          if (cb) cb(e.message)
-        })
+      //      //attach user to state
+      //      socket.user = result
+      //      socket.admin = true
+      //    }
+      //    if(action == 'logout'){
+      //      socket.user = null
+      //      socket.admin = false
+      //    }
+      //    if (cb) cb(null, result)
+      //  })
+      //  .catch(e => {
+      //    console.log('auth err', e,action, args)
+      //    if (cb) cb(e.message)
+      //  })
     })
 
     socket.on('private',async function(action,args,cb){
@@ -112,6 +130,8 @@ module.exports = async (config, libs) => {
     },
     admin(...args){
       io.to('admin').emit('admin',...args)
-    }
+    },
+    authenticate(){
+    },
   }
 }

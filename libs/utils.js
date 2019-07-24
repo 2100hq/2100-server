@@ -4,6 +4,7 @@ const pad = require('pad')
 const Rethink = require('rethinkdb')
 
 
+
 exports.GetWallets = wallets => type =>{
   assert(wallets,'requires wallet type tables')
   assert(type,'requires wallet type')

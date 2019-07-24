@@ -56,6 +56,15 @@ module.exports = async (config)=>{
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
 
+  //authentication with ethers
+  libs.authenticate = function(token,signed,address){
+    assert(token,'requires session token')
+    assert(signed,'requires signed token')
+    assert(address,'requires public address')
+    console.log({token,signed,address})
+    return libs.ethers.utils.verifyMessage(token,signed) === address
+  }
+
   const commandTypes = ['processBlock','pendingDeposit','withdrawPrimary','deposit','withdraw']
   libs.handlers = Handlers({...config,commandTypes},libs)
 
@@ -76,20 +85,20 @@ module.exports = async (config)=>{
   //events from ethers block chain
   emitter.on('eth',async ([type,data])=>{
     console.log(type,data)
-    try{
-      switch(type){
-        case 'block':{
-          const block = await libs.ethers.getBlock(data)
-          if(! await libs.blocks.has(data)){
-            await libs.blocks.create(block)
-          }
-          return
-        }
-      }
-    }catch(err){
-      console.log('eth event error',err)
-      process.exit(1)
-    }
+    // try{
+    //   switch(type){
+    //     case 'block':{
+    //       const block = await libs.ethers.getBlock(data)
+    //       if(! await libs.blocks.has(data)){
+    //         await libs.blocks.create(block)
+    //       }
+    //       return
+    //     }
+    //   }
+    // }catch(err){
+    //   console.log('eth event error',err)
+    //   process.exit(1)
+    // }
   })
 
   //write model events to the event reducer, this will output api events

@@ -6,6 +6,7 @@ module.exports = async (config,{},emit=x=>x) => {
   assert(config.provider.type,'requires provider type')
 
 
+  console.log({defaultStartBlock})
   // assert(defaultStartBlock,'requires starting block')
 
   const provider = new ethers.providers[config.provider.type](config.provider.url,config.provider.network)
