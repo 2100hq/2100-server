@@ -43,12 +43,14 @@ module.exports = async (config, libs) => {
             return cb(null,socket.token)
           case 'authenticate':
             const [signed,address] = args
-            const valid = libs.authenticate(socket.token,signed,address)
-            if(valid){
-              socket.userid = args[1]
-              return cb(null,args[1])
-            }else{
-              return cb('Authentication Failed')
+            let valid = false
+            try{
+              valid = libs.authenticate(socket.token,signed,address)
+              assert(valid,'Authentication Failed')
+              socket.userid = address
+              return cb(null, address)
+            }catch(err){
+              return cb(err.message)
             }
       }
       //console.log('authing',action)
