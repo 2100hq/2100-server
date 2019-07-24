@@ -3,25 +3,24 @@ const lodash = require('lodash')
 const Promise = require('bluebird')
 module.exports = (config,libs)=>{
 
-  async function getBlock(blocknumber){
-    const block = await libs.blocks.get(blocknumber)
-    block.transactions = await Promise.map(block.transactionids,getTransaction)
-    return block
-  }
+  // async function getBlock(blocknumber){
+  //   const block = await libs.blocks.get(blocknumber)
+  //   return block
+  // }
   function latestBlock(){
-    return libs.blocks.latest().then(x=>getBlock(x.number))
+    return libs.blocks.latest()
   }
-  async function listBlocks(from){
-    return libs.blocks.list(from).then(blocks=>Promise.map(blocks,block=>getBlock(block.number)))
-  }
+  // async function listBlocks(from){
+  //   return libs.blocks.list(from).then(blocks=>Promise.map(blocks,block=>getBlock(block.number)))
+  // }
 
   function getStakesByUser(userid){
     return libs.stakes.getByUser(userid)
   }
 
-  function getTransaction(transactionid){
-    return libs.transactions.get(transactionid)
-  }
+  // function getTransaction(transactionid){
+  //   return libs.transactions.get(transactionid)
+  // }
   async function getToken(tokenid){
     const token = await libs.tokens.get(tokenid)
     const stakes = await libs.stakes.get(tokenid)
@@ -31,12 +30,12 @@ module.exports = (config,libs)=>{
       stakes,
     }
   }
-  function getTransactionsToUser(userid){
-    return libs.transactions.byToUser(userid)
-  }
-  function getTransactionsFromUser(userid){
-    return libs.transactions.byFromUser(userid)
-  }
+  // function getTransactionsToUser(userid){
+  //   return libs.transactions.byToUser(userid)
+  // }
+  // function getTransactionsFromUser(userid){
+  //   return libs.transactions.byFromUser(userid)
+  // }
   function listTokens(){
     return libs.tokens.list()
   }
@@ -51,6 +50,12 @@ module.exports = (config,libs)=>{
     const wallet = await libs.wallets.get(token)
     assert(wallet,'no such wallet for token: ' + token)
     return wallet
+  }
+
+  async function getUserWallets(type,userid){
+    assert(type,'requires wallet type')
+    assert(userid,'requires userid')
+    return libs.getWallets(type).getByUser(userid)
   }
 
   async function listWalletTypes(){
@@ -72,55 +77,53 @@ module.exports = (config,libs)=>{
     return libs.stakes.list()
   }
 
-  async function privateState(userid){
-    const walletTypes = await listWalletTypes()
-    // console.log({walletTypes})
+  async function userCommands(userid,done=false){
+    return libs.commands.getUserDone(userid,done)
+  }
 
-    const tables = {
-      myWallets:await Promise.reduce(walletTypes,async (result,token)=>{
-        result[token]=await getBalance(token,userid)
-        result[token].token = token
-        return result
-      },{}),     
-      myStakes:lodash.keyBy((await getStakesByUser(userid)),'id')
-    }
+  async function privateState(userid){
     return {
-      private:tables,
-      myWallets:lodash.values(tables.myWallets),
-      myStakes:lodash.values(tables.myStakes),
-      me:await getUser(userid),
+      myWallets:{
+        internal:lodash.keyBy(await getUserWallets('internal',userid),'id'),
+        locked:lodash.keyBy(await getUserWallets('locked',userid),'id')
+      },
+      myCommands: lodash.keyBy(await userCommands(userid),'id')
     }
+    // const walletTypes = await listWalletTypes()
+    // // console.log({walletTypes})
+
+    // const tables = {
+    //   myWallets:await Promise.reduce(walletTypes,async (result,token)=>{
+    //     result[token]=await getBalance(token,userid)
+    //     result[token].token = token
+    //     return result
+    //   },{}),     
+    //   myStakes:lodash.keyBy((await getStakesByUser(userid)),'id')
+    // }
+    // return {
+    //   private:tables,
+    //   myWallets:lodash.values(tables.myWallets),
+    //   myStakes:lodash.values(tables.myStakes),
+    //   me:await getUser(userid),
+    // }
   }
   function adminState(){
     return {
     }
   }
   async function publicState(){
-    const latest = await latestBlock()
-    const previous = Math.max(0,latest.number-20)
-    const tables = {
-      tokens:lodash.keyBy((await listTokens()),'id'),
-      blocks:lodash.keyBy((await listBlocks(previous)),'id'),
-      stakes:lodash.keyBy((await listStakes()),'id'),
-    }
     return {
-      public:tables,
-      tokens:lodash.values(tables.tokens),
-      blocks:lodash.values(tables.blocks),
-      stakes:lodash.values(tables.stakes),
-      // tokens:lodash.keyBy((await listTokens()),'id'),
-      // blocks:lodash.keyBy((await listBlocks(previous)),'id'),
-      latestBlock ,
+      latestBlock:await latestBlock() ,
     }
   }
 
   return {
-    getBlock,
+    // getBlock,
     latestBlock,
     getStakesByUser,
-    getTransaction,
-    getTransactionsToUser,
-    getTransactionsFromUser,
+    // getTransaction,
+    // getTransactionsToUser,
+    // getTransactionsFromUser,
     getToken,
     listTokens,
     listUsers,

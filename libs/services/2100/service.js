@@ -84,21 +84,20 @@ module.exports = async (config)=>{
 
   //events from ethers block chain
   emitter.on('eth',async ([type,data])=>{
-    console.log(type,data)
-    // try{
-    //   switch(type){
-    //     case 'block':{
-    //       const block = await libs.ethers.getBlock(data)
-    //       if(! await libs.blocks.has(data)){
-    //         await libs.blocks.create(block)
-    //       }
-    //       return
-    //     }
-    //   }
-    // }catch(err){
-    //   console.log('eth event error',err)
-    //   process.exit(1)
-    // }
+    try{
+      switch(type){
+        case 'block':{
+          const block = await libs.ethers.getBlock(data)
+          if(! await libs.blocks.has(data)){
+            await libs.blocks.create(block)
+          }
+          return
+        }
+      }
+    }catch(err){
+      console.log('eth event error',err)
+      process.exit(1)
+    }
   })
 
   //write model events to the event reducer, this will output api events
@@ -114,6 +113,7 @@ module.exports = async (config)=>{
   //take api events and write to socket channels
   emitter.on('api',async ([channel,...args])=>{
     try{
+      // console.log('api update',channel,...args)
       return libs.socket[channel](args)
     }catch(err){
       console.log('socket event error',err)

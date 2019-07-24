@@ -17,6 +17,7 @@ module.exports = (config, table, emit=x=>x) => {
     validate(defaults(value))
     value.updated = Date.now()
     await table.set(value.id, value)
+    emit('change',value)
     return value
   }
 

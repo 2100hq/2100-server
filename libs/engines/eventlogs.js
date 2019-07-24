@@ -9,8 +9,9 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
   const handlers = {
     async Deposit(event){
       return commands.createType('pendingDeposit',{
+        userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
-        toAddress:event.values.account,
+        toAddress:event.values.account.toLowerCase(),
         tokenid:config.primaryToken,
         confirmations:Number(config.confirmations),
         balance:Number(ethers.utils.formatEther(event.values.balance)),
@@ -19,8 +20,9 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
     },
     async Withdraw(event){
       return commands.createType('withdrawPrimary',{
+        userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
-        fromAddress:event.values.account,
+        fromAddress:event.values.account.toLowerCase(),
         tokenid:config.primaryToken,
         balance:ethers.utils.formatEther(event.values.balance),
         value:ethers.utils.formatEther(event.values.amount),

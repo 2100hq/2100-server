@@ -26,11 +26,20 @@ module.exports = (config,table,emit) => {
     return result
   }
 
+  async function getOrCreate(id){
+    try{
+      return await get(id)
+    }catch(err){
+      return create({id})
+    }
+  }
+
   return {
     ...table,
     create,
     set,
     get,
+    getOrCreate,
   }
 }
 

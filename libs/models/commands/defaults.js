@@ -4,7 +4,6 @@ module.exports = config =>{
   return props => {
     return {
       id: id(),
-      userid:'default',
       ...props
     }
   }

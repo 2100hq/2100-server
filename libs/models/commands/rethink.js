@@ -8,7 +8,8 @@ module.exports = async (config, con) => {
     table: config.table,
     indices:['type','done'],
     compound:[
-      {name:'typeDone',fields:['type','done']}
+      {name:'typeDone',fields:['type','done']},
+      {name:'userDone',fields:['userid','done']}
     ]
   }
 
@@ -21,6 +22,10 @@ module.exports = async (config, con) => {
     },
     getDone(done=false){
       return table.getBy('done',done)
+    },
+    getUserDone(userid,done=false){
+      assert(userid,'requires userid')
+      return table.getBy('userDone',[userid,done])
     },
     getTypeDone(type,done=false){
       assert(type,'requires command type')

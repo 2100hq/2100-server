@@ -33,11 +33,12 @@ module.exports = async (config, libs) => {
       console.log('disconnect',socket.user)
     })
 
-    //send user public state snapshot
-    // io.emit('public',[],await query.publicState())
+    query.publicState().then(state=>io.emit('public',[],state)).catch(err=>{
+      console.log('error getting public state',err)
+    })
 
     socket.on('auth',(action,args,cb=x=>x)=>{
-      console.log('auth message',socket.id,action,args)
+      // console.log('auth message',socket.id,action,args)
       switch(action){
           case 'token':
             return cb(null,socket.token)
@@ -47,67 +48,44 @@ module.exports = async (config, libs) => {
             try{
               valid = libs.authenticate(socket.token,signed,address)
               assert(valid,'Authentication Failed')
-              socket.userid = address
-              return cb(null, address)
+              socket.userid = address.toLowerCase()
+              socket.join(socket.userid)
+              query.privateState(socket.userid).then(state=>{
+                io.to(socket.userid).emit('private',[],state)
+              }).catch(err=>{
+                console.log('err getting private state',err)
+              })
+              return cb(null, socket.userid)
             }catch(err){
               return cb(err.message)
             }
       }
-      //console.log('authing',action)
-      //actions.auth(socket.user,action,...args)
-      //  .then(async result => {
-      //    if(action == 'login'){
-      //      console.log('login',result)
-      //      //join private channel
-      //      socket.join(result.id)
-      //      io.to(result.id).emit('private',[],await query.privateState(result.id))
-      //      //join admin channel
-      //      socket.join('admin')
-      //      io.to('admin').emit('admin',[],await query.adminState(result.id))
-
-      //      //attach user to state
-      //      socket.user = result
-      //      socket.admin = true
-      //    }
-      //    if(action == 'logout'){
-      //      socket.user = null
-      //      socket.admin = false
-      //    }
-      //    if (cb) cb(null, result)
-      //  })
-      //  .catch(e => {
-      //    console.log('auth err', e,action, args)
-      //    if (cb) cb(e.message)
-      //  })
     })
 
-    socket.on('private',async function(action,args,cb){
-      console.log('calling private',socket.user,action,...args)
-      if(socket.user) socket.user = await users.get(socket.user.id)
-      actions.private(socket.user,action, ...args)
-        .then(result => {
-          // console.log('result', result)
-          if (cb) cb(null, result)
-        })
-        .catch(e => {
-          console.log('private err', action, args,e)
-          if (cb) cb(e.message)
-        })
+    socket.on('private',function(action,args,cb=x=>x){
+      if(socket.userid == null) return cb('Please Login')
+      libs.users.getOrCreate(socket.userid).then(async user=>{
+        console.log('calling private',user,action,...args)
+        cb(null, await actions.private(user,action, ...args))
+      }).catch(err=>{
+        console.log('private err', action, args,err)
+        if (cb) cb(err.message)
+      })
     })
 
-    socket.on('admin',async function(action,args,cb){
-      if(!socket.admin) return cb(new Error('You are not admin'))
-      if(socket.user) socket.user = await users.get(socket.user.id)
-      actions.admin(socket.user,action, ...args)
-        .then(result => {
-          // console.log('result', result)
-          if (cb) cb(null, result)
-        })
-        .catch(e => {
-          console.log('admin err', action, args,e)
-          if (cb) cb(e.message)
-        })
-    })
+    // socket.on('admin',async function(action,args,cb){
+    //   if(!socket.admin) return cb(new Error('You are not admin'))
+    //   if(socket.user) socket.user = await users.get(socket.user.id)
+    //   actions.admin(socket.user,action, ...args)
+    //     .then(result => {
+    //       // console.log('result', result)
+    //       if (cb) cb(null, result)
+    //     })
+    //     .catch(e => {
+    //       console.log('admin err', action, args,e)
+    //       if (cb) cb(e.message)
+    //     })
+    // })
 
     socket.on('public', async function(action, args, cb) {
       // console.log('socket call', action, args, socket.token)
@@ -125,6 +103,7 @@ module.exports = async (config, libs) => {
 
   return {
     private(userid,...args){
+      console.log('emitting private',userid,...args)
       io.to(userid).emit('private',...args)
     },
     public(...args){
