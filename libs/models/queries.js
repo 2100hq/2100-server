@@ -87,7 +87,11 @@ module.exports = (config,libs)=>{
         available:lodash.keyBy(await getUserWallets('available',userid),'id'),
         locked:lodash.keyBy(await getUserWallets('locked',userid),'id')
       },
-      myCommands: lodash.keyBy(await userCommands(userid),'id')
+      myCommands: lodash.keyBy(await userCommands(userid),'id'),
+      me:{
+        id:userid,
+        publicAddress:userid,
+      }
     }
     // const walletTypes = await listWalletTypes()
     // // console.log({walletTypes})
