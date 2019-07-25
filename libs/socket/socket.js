@@ -103,7 +103,7 @@ module.exports = async (config, libs) => {
 
   return {
     private(userid,...args){
-      console.log('emitting private',userid,...args)
+      // console.log('emitting private',userid,...args)
       io.to(userid).emit('private',...args)
     },
     public(...args){

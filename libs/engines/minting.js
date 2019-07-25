@@ -2,10 +2,8 @@ const lodash = require('lodash')
 const Promise = require('bluebird')
 const highland = require('highland')
 const assert = require('assert')
-module.exports = (config,{wallets})=>{
-  const {stakes,internal} = wallets 
-  assert(stakes,'requires stakes wallet')
-  assert(internal,'requires internal wallet')
+module.exports = (config,{getWallets})=>{
+  assert(getWallets,'requires getWallets')
 
   //token:{
   //id:,

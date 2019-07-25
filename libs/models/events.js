@@ -15,13 +15,14 @@ module.exports = (config,libs,emit)=>{
     //   //   return emit('private',data.id,[token],data)
     //   // }
     // }
+    console.log(table,method,data)
     switch(table){
       case 'commands':{
         return emit('private',data.userid,['myCommands',data.id],data)
       }
       //internal/locked wallets
-      case 'internal':{
-        return emit('private',data.userid,['myWallets','internal',data.id],data)
+      case 'available':{
+        return emit('private',data.userid,['myWallets','available',data.id],data)
       }
       case 'locked':{
         return emit('private',data.userid,['myWallets','locked',data.id],data)

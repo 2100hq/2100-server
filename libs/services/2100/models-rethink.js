@@ -14,7 +14,7 @@ module.exports = async (config,{con},emit)=>{
 
   const models = {
     wallets:{
-      internal:Wallets.Model({},await Wallets.Rethink({table:'internal'},con),(...args)=>emit('internal',...args)),
+      available:Wallets.Model({},await Wallets.Rethink({table:'available'},con),(...args)=>emit('available',...args)),
       locked:Wallets.Model({},await Wallets.Rethink({table:'locked'},con),(...args)=>emit('locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
       stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('stakes',...args)),

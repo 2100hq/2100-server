@@ -114,7 +114,7 @@ module.exports = async (config)=>{
   emitter.on('api',async ([channel,...args])=>{
     try{
       // console.log('api update',channel,...args)
-      return libs.socket[channel](args)
+      return libs.socket[channel](...args)
     }catch(err){
       console.log('socket event error',err)
       process.exit(1)
@@ -167,23 +167,16 @@ module.exports = async (config)=>{
     process.exit(1)
   })
 
+  // disable for now
   // loop(async x=>{
-  //   const transactions = await libs.transactions.pending.list()
-  //   return libs.engines.transactions.tick(transactions)
-  // },config.txTickRate).catch(err=>{
-  //   console.log('transaction engine error',err)
+  //   const tokens = await libs.tokens.list()
+  //   const commands = await libs.engines.minting.tick(tokens)
+  //   return Promise.map(commands,props=>libs.commands.createType('transaction',props))
+
+  // },config.mintingTickRate).catch(err=>{
+  //   console.log('minting engine error',err)
   //   process.exit(1)
   // })
-
-  loop(async x=>{
-    const tokens = await libs.tokens.list()
-    const commands = await libs.engines.minting.tick(tokens)
-    return Promise.map(commands,props=>libs.commands.createType('transaction',props))
-
-  },config.mintingTickRate).catch(err=>{
-    console.log('minting engine error',err)
-    process.exit(1)
-  })
 
   return libs
 }

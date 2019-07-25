@@ -25,10 +25,10 @@ module.exports = (config,{commands,blocks,getWallets})=>{
     },
     async 'Credit Deposit'(cmd){
       const locked = await getWallets('locked')
-      const internal = await getWallets('internal')
+      const available = await getWallets('available')
 
       const userLocked = await locked.getOrCreate(cmd.toAddress,cmd.tokenid)
-      const userInternal = await internal.getOrCreate(cmd.toAddress,cmd.tokenid)
+      const userAvailable = await available.getOrCreate(cmd.toAddress,cmd.tokenid)
       
       //its possible locked balance may be below what was initially set, in the case where
       //withdraws happened. so we just transfer the minimum between desired deposit and whats in locked.
@@ -39,7 +39,7 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       //rely on statemachines it requires a more complex infrastructure which will take more time. 
       try{
         await locked.withdraw(cmd.toAddress,cmd.tokenid,transferAmount)
-        const wallet = await internal.deposit(cmd.toAddress,cmd.tokenid,transferAmount)
+        const wallet = await available.deposit(cmd.toAddress,cmd.tokenid,transferAmount)
         return commands.success(cmd.id,'Deposit Success',{balance:wallet.balance})
       }catch(err){
         return commands.failure(cmd.id,err.message)

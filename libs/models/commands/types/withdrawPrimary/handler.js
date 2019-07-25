@@ -11,20 +11,20 @@ module.exports = (config,{commands,blocks,getWallets})=>{
     },
     async 'Withdraw Funds'(cmd){
       const locked = await (await getWallets('locked')).getOrCreate(cmd.fromAddress,config.primaryToken)
-      const internal = await (await getWallets('internal')).getOrCreate(cmd.fromAddress,config.primaryToken)
-      const total = locked.balance + internal.balance
+      const available = await (await getWallets('available')).getOrCreate(cmd.fromAddress,config.primaryToken)
+      const total = locked.balance + available.balance
 
-      console.log({locked,internal,total})
+      console.log({locked,available,total})
       const lockRemove = bn.min(locked.balance,cmd.value)
       const remainder = new bn(cmd.value).minus(lockRemove)
-      const internalRemove = bn.min(remainder,internal.balance)
+      const availableRemove = bn.min(remainder,available.balance)
 
-      console.log(lockRemove.toString(),remainder.toString(),internalRemove.toString())
+      console.log(lockRemove.toString(),remainder.toString(),availableRemove.toString())
       if(lockRemove.isPositive()){
         await (await getWallets('locked')).withdraw(cmd.fromAddress,config.primaryToken,lockRemove.toNumber())
       }
-      if(internalRemove.isPositive()){
-        await (await getWallets('internal')).withdraw(cmd.fromAddress,config.primaryToken,internalRemove.toNumber())
+      if(availableRemove.isPositive()){
+        await (await getWallets('available')).withdraw(cmd.fromAddress,config.primaryToken,availableRemove.toNumber())
       }
 
       if(bn(cmd.value).isGreaterThan(total)){
