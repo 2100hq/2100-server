@@ -85,7 +85,7 @@ module.exports = (config,libs)=>{
     return {
       myWallets:{
         available:lodash.keyBy(await getUserWallets('available',userid),'id'),
-        locked:lodash.keyBy(await getUserWallets('locked',userid),'id')
+        locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
       me:{

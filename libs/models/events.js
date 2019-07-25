@@ -15,7 +15,7 @@ module.exports = (config,libs,emit)=>{
     //   //   return emit('private',data.id,[token],data)
     //   // }
     // }
-    console.log(table,method,data)
+    // console.log(table,method,data)
     switch(table){
       case 'commands':{
         return emit('private',data.userid,['myCommands',data.id],data)

@@ -3,7 +3,7 @@ module.exports = () => {
     id: 'string',
     tokenid:'string',
     userid:'string',
-    balance:{type:'number', min:0},
+    balance:'string',
     updated:'number',
   }
 }

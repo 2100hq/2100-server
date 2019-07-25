@@ -4,7 +4,9 @@ const Defaults = require('./defaults')
 const Schema = require('./schema')
 const Validate = require('../validate')
 const {walletId} = require('../../utils')
+const bn = require('bignumber.js')
 
+//wallets should be processed in wei strings
 module.exports = function(config,table,emit=x=>x) {
   const validate = Validate(Schema(config))
   const defaults = Defaults(config)
@@ -39,29 +41,32 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function canWithdraw(userid,tokenid,amount){
     const wallet = await get(userid,tokenid)
-    assert(lodash.isFinite(amount),'Amount must be a finite number')
-    assert(amount > 0,'Amount must be above 0')
-    assert(wallet.balance >=amount,'Amount exceeds balance')
+    amount = bn(amount)
+    assert(amount.isInteger(),'Withdraw amount must be a number')
+    assert(amount.isGreaterThan(0),'Withdraw amount must be above 0')
+    assert(amount.isLessThanOrEqualTo(wallet.balance),'Withdraw amount exceeds balance')
     return wallet
   }
 
   async function deposit(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
-    var total = wallet.balance + amount
+    const total = bn(wallet.balance).plus(amount).toString()
     return setBalance(userid,tokenid, total)
   }
 
   async function withdraw(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
-    var total = wallet.balance - amount
+    const total = bn(wallet.balance).minus(amount).toString()
     return setBalance(userid,tokenid, total)
   }
 
   async function setBalance(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
-    assert(lodash.isFinite(amount), 'amount required to be a number!')
-    assert(amount >= 0, 'amount withdrawn is greater than balance')
-    wallet.balance = amount
+    amount = bn(amount)
+    assert(amount.isInteger(), 'amount required to be a number!')
+    // going to allow balances to be negative for now....
+    // assert(amount.isGreaterThanOrEqualTo(0), 'balance must be 0 or greater')
+    wallet.balance = amount.toString()
     return set(wallet)
   }
 

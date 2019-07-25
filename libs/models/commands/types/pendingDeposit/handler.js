@@ -1,4 +1,5 @@
 const assert = require('assert')
+const bn = require('bignumber.js')
 
 module.exports = (config,{commands,blocks,getWallets})=>{
   assert(getWallets,'requires getWallets')
@@ -32,7 +33,7 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       
       //its possible locked balance may be below what was initially set, in the case where
       //withdraws happened. so we just transfer the minimum between desired deposit and whats in locked.
-      const transferAmount = Math.min(userLocked.balance,cmd.value)
+      const transferAmount = bn.minimum(userLocked.balance,cmd.value).toString()
       // console.log('transfering deposit',transferAmount)
 
       //this should be handled in a transfer state machine, but when state machines

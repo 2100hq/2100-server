@@ -61,7 +61,7 @@ module.exports = async (config)=>{
     assert(token,'requires session token')
     assert(signed,'requires signed token')
     assert(address,'requires public address')
-    console.log({token,signed,address})
+    // console.log({token,signed,address})
     return libs.ethers.utils.verifyMessage(token,signed) === address
   }
 
