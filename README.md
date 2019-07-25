@@ -31,16 +31,15 @@ Just slightly less friction for adding new envs.
   rethink.db=2100  //set your database name
   socket.port=9312 //set the public socket api port
 
-  txTickRate=1000 //set your block speed for processing transactions
+  cmdTickRate=1000 //set your block speed for processing transactions
   mintingTickRate=15000  //set your minting tick rate for generating staking rewards
   confirmations=20 //confirmations before accepting deposit
 
   ethers.provider.type=JsonRpcProvider
   ethers.provider.url= //provider url
-  ethers.provider.network=homestead //or ropstein, etc
 
   defaultStartBlock=8182562  //optional
-  primaryToken=DAI  //symbol for default staking token
+  primaryToken=DAI  //symbol for default staking token, can use address too
 ```
 
 ## Directories
