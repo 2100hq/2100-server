@@ -22,10 +22,10 @@ module.exports = (config,libs,emit)=>{
       }
       //internal/locked wallets
       case 'available':{
-        return emit('private',data.userid,['myWallets','available',data.id],data)
+        return emit('private',data.userid,['myWallets','available',data.tokenid],data)
       }
       case 'locked':{
-        return emit('private',data.userid,['myWallets','locked',data.id],data)
+        return emit('private',data.userid,['myWallets','locked',data.tokenid],data)
       }
       // case 'stakes':{
       //   console.log('private event',table,method,data)
