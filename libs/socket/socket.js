@@ -43,7 +43,7 @@ module.exports = async (config, libs) => {
           case 'token':
             return cb(null,socket.token)
           case 'authenticate':
-            const [signed,address] = args[0]
+            const [signed,address] = args
             let valid = false
             try{
               valid = libs.authenticate(socket.token,signed,address)
