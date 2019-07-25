@@ -31,7 +31,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
   }
 
   async function tick(event){
-    console.log('starting event',event)
+    // console.log('starting event',event)
     assert(handlers[event.name],'no handler for event name')
     return handlers[event.name](event)
   }

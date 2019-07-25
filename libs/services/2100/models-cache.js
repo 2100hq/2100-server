@@ -19,7 +19,7 @@ module.exports = async (config={},libs,emit=x=>x) => {
       stakes:Wallets.Model({},Cache(),(...args)=>emit('stakes',...args)),
     },
     //all tokens we knwo of
-    tokens:Tokens.Model({},Cache(),(...args)=>emit('tokens',...args)),
+    tokens:Tokens.Model(config.tokens,Cache(),(...args)=>emit('tokens',...args)),
     transactions:{
       success:Transactions.Model({},Cache(),(...args)=>emit('success',...args)),
       //pending and failures do not get persisted

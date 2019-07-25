@@ -1,11 +1,16 @@
+const bn = require('bignumber.js')
+const assert = require('assert')
 module.exports = () => {
   return {
     id: 'string',
-    name:'string',
-    supply:'number',
+    contractAddress:'string',
+    name:{type:'string',optional:true},
+    supply:'string',
     ownerShare:{type:'number',max:1,min:0},
     ownerAddress:'string',
-    reward:'number',
+    creatorAddress:'string',
+    creatorReward:'string',
+    reward:'string',
     createdBlock:'number',
   }
 }

@@ -22,7 +22,6 @@ const contracts = [
 ]
 
 module.exports = async (config)=>{
-  assert(config.mintingTickRate,'reqeuires a mintingTickRate')
   assert(config.cmdTickRate,'reqeuires a transactionTickRate')
   assert(config.confirmations,'requires confirmations')
   assert(config.primaryToken,'requires primary token symbol')

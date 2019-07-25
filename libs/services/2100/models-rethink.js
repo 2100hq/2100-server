@@ -10,7 +10,7 @@ const Events = require('../../models/eventlogs')
 
 //please ignore absurdity of this code, but its just a helper to essentially wire
 //stores with models and listen for events
-module.exports = async (config,{con},emit)=>{
+module.exports = async (config={},{con},emit)=>{
 
   const models = {
     wallets:{
@@ -20,7 +20,7 @@ module.exports = async (config,{con},emit)=>{
       stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('stakes',...args)),
     },
     //all tokens we knwo of
-    tokens:Tokens.Model({},await Tokens.Rethink({table:'tokens'},con),(...args)=>emit('tokens',...args)),
+    tokens:Tokens.Model(config.tokens,await Tokens.Rethink({table:'tokens'},con),(...args)=>emit('tokens',...args)),
     commands:Commands.Model(config, 
       Stateful.Model(config,
         await Commands.Rethink({table:'commands'},con),

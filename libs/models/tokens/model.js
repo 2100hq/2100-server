@@ -3,6 +3,7 @@ var assert = require('assert')
 const Defaults = require('./defaults')
 const Schema = require('./schema')
 const Validate = require('../validate')
+const bn = require('bignumber.js')
 
 module.exports = function(config,table,emit=x=>x) {
   const validate = Validate(Schema(config))
@@ -10,6 +11,12 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function set(props) {
     const result = validate(defaults(props))
+
+    //we need additional validation because of string numbers
+    assert(bn(result.supply).isInteger(),'Supply amount must be a integer')
+    assert(bn(result.reward).isInteger(),'Supply amount must be a integer')
+    assert(bn(result.creatorReward).isInteger(),'Supply amount must be a integer')
+
     await table.set(result.id,result)
     emit('set',result)
     return result
@@ -25,10 +32,10 @@ module.exports = function(config,table,emit=x=>x) {
     return set(props)
   }
 
-  async function mint(id,amount){
-    assert(amount >0,'Can only mint amount above 0')
+  async function updateOwner(id,userid){
+    assert(userid,'requires a user id')
     const token = await get(id)
-    token.minted += amount
+    token.ownerAddress = userid
     return set(token)
   }
 
@@ -37,7 +44,7 @@ module.exports = function(config,table,emit=x=>x) {
     set,
     get,
     create,
-    mint,
+    updateOwner,
   }
 }
 

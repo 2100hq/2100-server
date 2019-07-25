@@ -1,8 +1,14 @@
 module.exports = () => {
   return {
-    address:'string',
-    symbol:'string',
-    creatorid:'string',
+    contractAddress: 'string',
+    name:'string',
+    supply:'number',
+    ownerShare:{type:'number',max:1,min:0},
+    ownerAddress:'string',
+    creatorAddress:'string',
+    creatorReward:'string',
+    reward:'number',
+    createdBlock:'number',
   }
 }
 
