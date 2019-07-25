@@ -62,7 +62,8 @@ module.exports = async (config)=>{
     assert(signed,'requires signed token')
     assert(address,'requires public address')
     // console.log({token,signed,address})
-    return libs.ethers.utils.verifyMessage(token,signed) === address
+    const prefix = "2100 Login: "
+    return libs.ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === address.toLowerCase()
   }
 
   const commandTypes = ['processBlock','pendingDeposit','withdrawPrimary','deposit','withdraw']
@@ -78,7 +79,7 @@ module.exports = async (config)=>{
 
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
-  
+
   libs.socket = await Socket(config.socket,libs)
 
 
@@ -150,7 +151,7 @@ module.exports = async (config)=>{
   },1000).catch(err=>{
     console.log('block engine error',err)
     process.exit(1)
-  })                    
+  })
 
   loop(async x=>{
     const events = await libs.eventlogs.getDone(false)
