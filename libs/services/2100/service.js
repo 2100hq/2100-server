@@ -33,6 +33,10 @@ module.exports = async (config)=>{
 
 
   config.contracts = contracts.map((json)=>{
+    assert(json.contractName,'contract abi requires contractName')
+    assert(json.networks,'contract abi requires networks')
+    assert(json.networks[config.chainid],'contract networks requires chainid: ' + config.chainid)
+    assert(json.abi,'contract abi requires abi')
     return {
       contractName:json.contractName,
       contractAddress:json.networks[config.chainid].address,

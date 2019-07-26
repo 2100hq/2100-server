@@ -1,16 +1,16 @@
-const bn = require('bignumber.js')
-const assert = require('assert')
+const {regexTwitter,regexLowerNum}  = require('../../utils')
 module.exports = () => {
   return {
-    id: 'string',
-    contractAddress:'string',
-    name:{type:'string',optional:true},
-    supply:'string',
+    id: {type:'string',pattern:regexLowerNum},
+    contractAddress:{type:'string',pattern:regexLowerNum},
+    name:{type:'string',pattern:regexTwitter},
+    supply:{type:'string',numeric:true},
+    decimals:{type:'number',min:0,max:18},
     ownerShare:{type:'number',max:1,min:0},
-    ownerAddress:'string',
-    creatorAddress:'string',
-    creatorReward:'string',
-    reward:'string',
+    ownerAddress:{type:'string',pattern:regexLowerNum},
+    creatorAddress:{type:'string',pattern:regexLowerNum},
+    creatorReward:{type:'string',numeric:true},
+    reward:{type:'string',numeric:true},
     createdBlock:'number',
   }
 }

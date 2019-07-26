@@ -84,7 +84,7 @@ module.exports = (config,libs)=>{
   async function privateState(userid){
     return {
       myWallets:{
-        available:lodash.keyBy(await getUserWallets('available',userid),'id'),
+        available:lodash.keyBy(await getUserWallets('available',userid),'tokenid'),
         locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),

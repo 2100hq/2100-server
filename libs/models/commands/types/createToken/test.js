@@ -11,6 +11,7 @@ const config = {
     ownerShare:.1                 ,
     ownerAddress:'0'                ,
     reward:'210000000000000'        ,
+    decimals:18        ,
   }
 }
 test('createToken',t=>{
@@ -37,21 +38,26 @@ test('createToken',t=>{
     // })
     t.test('createToken',async t=>{
       command = await libs.commands.createType('createToken',{
+        contractAddress:'0xabcdef',
+        creatorAddress:'0xabcd123',
+        name:'test',
+        createdBlock:10,
+        userid:'userid',
       })
       t.ok(command)
+      console.log(command)
       t.end()
     })
-    // t.test('step',async t=>{
-    //   command = await handler[command.state](command)
-    //   console.log(command)
-    //   command = await handler[command.state](command)
-    //   console.log(command)
-    //   const internal = await libs.getWallets('internal').get('test','DAI')
-    //   const locked = await libs.getWallets('locked').get('test','DAI')
-    //   t.equal(locked.balance,0)
-    //   t.equal(internal.balance,.5)
-    //   t.end()
-    // })
+    t.test('step',async t=>{
+      command = await handler[command.state](command)
+      command = await handler[command.state](command)
+      t.ok(command.done)
+      const available = await libs.getWallets('available').get(command.contractAddress,command.contractAddress)
+      t.equal(command.supply,available.balance)
+      t.ok(await libs.getWallets('available').get(command.creatorAddress,command.contractAddress))
+      t.ok(await libs.getWallets('available').get(command.ownerAddress,command.contractAddress))
+      t.end()
+    })
   })
 })
 

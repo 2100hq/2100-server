@@ -27,26 +27,44 @@ The idea being you can reconstruct this as a json object. Uses lodash set to set
 Just slightly less friction for adding new envs.
 
 ```
-  service=2100           //internal name of service to run
-  rethink.db=2100        //set your database name
-  socket.port=9312       //set the public socket api port
+# internal name of service to run
+service=2100           
+# set your database name
+rethink.db=2100        
+# set the public socket api port
+socket.port=9312       
 
-  cmdTickRate=1000       //set your block speed for processing transactions
-  mintingTickRate=15000  //set your minting tick rate for generating staking rewards
-  confirmations=20       //confirmations before accepting deposit
+# set your rate speed for processing all commands 
+cmdTickRate=1000       
 
-  ethers.provider.type=JsonRpcProvider //usually this is what you want but see ethers docs
-  ethers.provider.url=                 //provider url
+# set your minting tick rate for generating staking rewards
+mintingTickRate=15000  
 
-  defaultStartBlock=8182562  //optional, otherwise start at latest block on chain
-  primaryToken=DAI           //symbol for default staking token, can use address too
+# confirmations before accepting deposit
+confirmations=20       
 
-  #token defaults when creating new token
-  tokens.supply=2100000000000000000000 //measured in wei
-  tokens.creatorReward=0               //reward given to creator of token in wei (experimental)
-  tokens.ownerShare=.1                 //fraction of share of mining reward issued to owner, from 0-1
-  tokens.ownerAddress=0                //default owner address, can be anything really, claimed through another process
-  tokens.reward=210000000000000        //mining rewards in wei, split between stakers every block
+# usually this is what you want but see ethers docs
+ethers.provider.type=JsonRpcProvider 
+# provider url, see ethers docs
+ethers.provider.url=                 
+
+# optional, otherwise start at latest block on chain
+defaultStartBlock=8182562  
+# symbol for default staking token, can use address too
+primaryToken=DAI           
+
+# default total supply measured in eth
+tokens.supply=2100 
+# default token decimal points
+token.decimals=18
+# default reward given to creator of token in wei (experimental)
+tokens.creatorReward=0               
+# default fraction of share of mining reward issued to owner, from 0-1
+tokens.ownerShare=.1                 
+# default default owner address, can be anything really, claimed through another process
+tokens.ownerAddress=0                
+# default mining rewards in wei, split between stakers every block
+tokens.reward=210000000000000        
 ```
 
 ## API

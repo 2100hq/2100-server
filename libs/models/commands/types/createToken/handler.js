@@ -1,4 +1,5 @@
 const assert = require('assert')
+const bn = require('bignumber.js')
 
 //keep this simple for now
 module.exports = (config,{commands,tokens,getWallets})=>{
@@ -7,9 +8,11 @@ module.exports = (config,{commands,tokens,getWallets})=>{
   assert(tokens,'requires tokens')
   return {
     async Start(cmd){
+      await tokens.has(cmd.contractAddress)
       return commands.setState(cmd.id,'Create Token')
     },
     //this can only happen once, create will throw if anything already exists
+    //this assume the commands initilalized with all valid numbers.
     async 'Create Token'(cmd){
       //create token
       const token = await tokens.create({
@@ -22,19 +25,20 @@ module.exports = (config,{commands,tokens,getWallets})=>{
         supply:cmd.supply,
         name:cmd.name,
         createdBlock:cmd.createdBlock,
+        decimals:cmd.decimals,
         reward:cmd.reward,
       })
 
       //set token suppply
-      await getWallets('internal').create({
+      await getWallets('available').create({
         userid:token.contractAddress,
         tokenid:token.contractAddress,
         balance:token.supply
       })
 
       //create the creator and owner wallets if they dont exist
-      await getWallets('internal').getOrCreate(token.ownerAddress,token.id)
-      await getWallets('internal').getOrCreate(token.creatorAddress,token.id)
+      await getWallets('available').getOrCreate(token.ownerAddress,token.id)
+      await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
       return commands.success(cmd.id,'Token Created')
     }

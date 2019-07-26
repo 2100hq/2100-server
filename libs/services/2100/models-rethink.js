@@ -7,6 +7,7 @@ const Commands = require('../../models/commands')
 const Stateful = require('../../models/stateful')
 const Blocks = require('../../models/blocks')
 const Events = require('../../models/eventlogs')
+const Coupons = require('../../models/coupons')
 
 //please ignore absurdity of this code, but its just a helper to essentially wire
 //stores with models and listen for events
@@ -20,7 +21,12 @@ module.exports = async (config={},{con},emit)=>{
       stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('stakes',...args)),
     },
     //all tokens we knwo of
-    tokens:Tokens.Model(config.tokens,await Tokens.Rethink({table:'tokens'},con),(...args)=>emit('tokens',...args)),
+    //tokens are now stateful, they are pending, confirmed, disabled
+    tokens:Tokens.Model(config.tokens,
+      Stateful.Model(config,await Tokens.Rethink({table:'tokens'},con),
+        (...args)=>emit('tokens',...args)
+      )
+    ),
     commands:Commands.Model(config, 
       Stateful.Model(config,
         await Commands.Rethink({table:'commands'},con),
@@ -35,7 +41,12 @@ module.exports = async (config={},{con},emit)=>{
     //  pending:Transactions.Model({},Cache(),(...args)=>emit('pending',...args)),
     //  failure:Transactions.Model({},Cache(),(...args)=>emit('failure',...args)),
     //},
-    users:Users.Model({},await Users.Rethink({table:'users'},con),(...args)=>emit('users',...args))
+    users:Users.Model({},await Users.Rethink({table:'users'},con),(...args)=>emit('users',...args)),
+    //these are signed receipts for users to submit on chain
+    coupons:{
+      create:Coupons.Model({},await Coupons.Rethink({table:'create_coupons'},con),(...args)=>emit('create_coupons',...args)),
+      withdraw:Coupons.Model({},await Coupons.Rethink({table:'withdraw_coupons'},con),(...args)=>emit('withdraw_coupons',...args)),
+    }
   }
 
   return models

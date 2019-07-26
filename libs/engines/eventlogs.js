@@ -27,7 +27,17 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
         balance:event.values.balance,
         value:event.values.amount,
       })
-    }
+    } ,
+    //token creation event
+    async Create(event){
+      return commands.createType('createToken',{
+        userid:event.values.creator.toLowerCase(),
+        createdBlock:event.blockNumber,
+        creatorAddress:event.values.creator.toLowerCase(),
+        contractAddress:event.values.token.toLowerCase(),
+        name:event.values.username,
+      })
+    },
   }
 
   async function tick(event){
