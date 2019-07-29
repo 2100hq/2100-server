@@ -59,6 +59,14 @@ module.exports = async (config, libs) => {
             }catch(err){
               return cb(err.message)
             }
+          case 'unauthenticate':
+            if(socket.userid == null) return cb(null, {})
+            io.to(socket.userid).emit('private',[],{})
+            socket.leave(socket.userid)
+            delete socket.userid
+            return cb(null, {})
+          default:
+            return cb(`${action} is not recognized`)
       }
     })
 
