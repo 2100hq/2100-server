@@ -124,6 +124,13 @@ listening to the private channel.
   }
 }
 ```
+### Private Actions
+Private actions are scoped the the socket private channel and can only be called once authenticated
+
+** createToken(name:string) **
+- this generates a pending token which needs confirmation on blockchain
+- string must be a valid twitter name or action will fail
+- this generates a command for the user which can be monitored in private.myCommands
 
 ### Authentication
 Authentication is done through privatekey signatures. Authentication methods happen on the auth channel.
