@@ -30,18 +30,18 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
     } ,
     //token creation event
     async Create(event){
-      return commands.createType('createToken',{
+      return commands.createType('createActiveToken',{
         userid:event.values.creator.toLowerCase(),
+        name:event.values.name.toLowerCase(),
         createdBlock:event.blockNumber,
         creatorAddress:event.values.creator.toLowerCase(),
         contractAddress:event.values.token.toLowerCase(),
-        name:event.values.username,
       })
     },
   }
 
   async function tick(event){
-    // console.log('starting event',event)
+    console.log('starting event',event.name)
     assert(handlers[event.name],'no handler for event name')
     return handlers[event.name](event)
   }

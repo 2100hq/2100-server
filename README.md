@@ -37,9 +37,6 @@ socket.port=9312
 # set your rate speed for processing all commands 
 cmdTickRate=1000       
 
-# set your minting tick rate for generating staking rewards
-mintingTickRate=15000  
-
 # confirmations before accepting deposit
 confirmations=20       
 
@@ -50,8 +47,6 @@ ethers.provider.url=
 
 # optional, otherwise start at latest block on chain
 defaultStartBlock=8182562  
-# symbol for default staking token, can use address too
-primaryToken=DAI           
 
 # default total supply measured in eth
 tokens.supply=2100 
@@ -65,20 +60,78 @@ tokens.ownerShare=.1
 tokens.ownerAddress=0                
 # default mining rewards in wei, split between stakers every block
 tokens.reward=210000000000000        
+
+# secret private key of signer. this will sign all coupons to be issued to users
+signerKey=
+# public address of the system user, this is the first user who can create admins
+# it will be assigned when authenticated
+systemAddress=
 ```
 
 ## API
 Describes the public api. Currently only socket io is used for frontend backend communication. 
-
-### Authentication
-Authentication is done through privatekey signatures. Authentication methods happen on the auth channel.
+Api is split between state and actions. State is not queried, but pused to user through socket.
+Actions are request/response from user to server.
 
 ### Public State 
 Public data follows this general schema and comes in through the private channel.
 
+```js
+{
+  latestBlock:blockSchema,  //current ethereum block
+  tokens:{
+    active:{
+      [token.id]:tokenSchema  //list of all tokens availble to be staked on
+    },
+    pending:{
+      [token.id]:pendingTokenSchema //list of all tokens which need to be confirmed on chain
+    },
+    disabled:{
+      [token.id]:tokenSchema  //list of all disabled tokens
+    },
+  }
+}
+```
+
 ### Private State
 Private state is data scoped to a particular public address. You will get private data once authenticated and 
 listening to the private channel.
+
+```js
+{
+  myWallets:{
+    available:{
+      [wallet.tokenid]:walletSchema,  //funds available for staking or withdraw
+    },
+    locked:{
+      [wallet.tokenid]:walletSchema,  //locked funds due to deposit/withdrwa confirm
+    }
+  },
+  myCommands:{
+    [commands.id]:commandSchema, //all commands/types issued by user
+  },
+  myCoupons:{
+    create:{  
+      [coupon.id]:couponSchema,  //signed coupons for creating a token
+    },
+    withdraw:{
+      [coupon.id]:couponSchema,  //signed coupons for withdrawing tokens
+    }
+  },
+  me:{
+    id:string,
+    publicAddress:string,
+  }
+}
+```
+
+### Authentication
+Authentication is done through privatekey signatures. Authentication methods happen on the auth channel.
+
+- request a token from the server
+- sign with metamask `2100 Login: ${token}` and submit to server using the "authenticate" function
+- wait for private data to come in through socket
+
 
 ## Development
 Notes for developing and maintaining code base.

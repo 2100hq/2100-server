@@ -16,6 +16,7 @@ module.exports = (config={}) => {
       ownerAddress:config.ownerAddress,
       reward:config.reward,
       decimals:config.decimals,
+      created:Date.now(),
       ...props
     }
   }

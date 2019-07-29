@@ -6,6 +6,7 @@ module.exports = () => {
     blockHash:'string',
     contractName:'string',
     contractAddress:'string',
+    transactionHash:'string',
     name:'string',
     signature:'string',
     topic:'string',

@@ -36,8 +36,18 @@ module.exports = (config,libs)=>{
   // function getTransactionsFromUser(userid){
   //   return libs.transactions.byFromUser(userid)
   // }
-  function listTokens(){
-    return libs.tokens.list()
+  function listActiveTokens(){
+    return libs.tokens.active.list()
+  }
+  function listPendingTokens(){
+    return libs.tokens.pending.list()
+  }
+  function listDisabledTokens(){
+    return libs.tokens.disabled.list()
+  }
+  function hasPendingToken(name){
+    assert(name,'requires name to check')
+    return libs.tokens.pending.has(name)
   }
   function listUsers(){
     return libs.users.list()
@@ -81,6 +91,14 @@ module.exports = (config,libs)=>{
     return libs.commands.getUserDone(userid,done)
   }
 
+  async function userCreateCoupons(userid){
+    return libs.coupons.create.byUser(userid)
+  }
+
+  async function userWithdrawCoupons(userid){
+    return libs.coupons.withdraw.byUser(userid)
+  }
+
   async function privateState(userid){
     return {
       myWallets:{
@@ -88,6 +106,10 @@ module.exports = (config,libs)=>{
         locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
+      myCoupons:{
+        create:lodash.keyBy(await userCreateCoupons(userid),'id'),
+        withdraw:lodash.keyBy(await userWithdrawCoupons(userid),'id'),
+      },
       me:{
         id:userid,
         publicAddress:userid,
@@ -118,6 +140,11 @@ module.exports = (config,libs)=>{
   async function publicState(){
     return {
       latestBlock:await latestBlock() ,
+      tokens: {
+        active:lodash.keyBy((await listActiveTokens()),'id'),
+        pending:lodash.keyBy((await listPendingTokens()),'id'),
+        disabled:lodash.keyBy((await listDisabledTokens()),'id'),
+      }
     }
   }
 
@@ -129,12 +156,17 @@ module.exports = (config,libs)=>{
     // getTransactionsToUser,
     // getTransactionsFromUser,
     getToken,
-    listTokens,
+    listActiveTokens,
+    listPendingTokens,
+    listDisabledTokens,
+    hasPendingToken,
     listUsers,
     getWallet,
     getBalance,
     publicState,
     privateState,
-    adminState
+    adminState,
+    userWithdrawCoupons,
+    userCreateCoupons,
   }
 }

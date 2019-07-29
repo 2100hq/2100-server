@@ -9,8 +9,9 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
     assert(user,'You must be logged in')
 
     async function createToken({name}){
-      const find = await tokens.byName(name)
-      assert(!find.length,'Token by that name already exists')
+      assert(name,'requires token name')
+      assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
+      return commands.createType('createPendingToken',{name,userid:user.id})
     }
 
     // async function stake({token,value}){
@@ -34,6 +35,7 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
     // }
 
     return {
+      createToken
     }
   }
 }

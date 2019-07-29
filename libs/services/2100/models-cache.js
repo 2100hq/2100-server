@@ -13,19 +13,30 @@ module.exports = async (config={},libs,emit=x=>x) => {
 
   return {
     wallets:{
-      available:Wallets.Model({},Cache(),(...args)=>emit('available',...args)),
+      available:Wallets.Model({},Cache(),(...args)=>emit('wallets.available',...args)),
       // external:Wallets.Model({},Cache(),(...args)=>emit('external',...args)),
-      locked:Wallets.Model({},Cache(),(...args)=>emit('locked',...args)),
+      locked:Wallets.Model({},Cache(),(...args)=>emit('wallets.locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
-      stakes:Wallets.Model({},Cache(),(...args)=>emit('stakes',...args)),
+      stakes:Wallets.Model({},Cache(),(...args)=>emit('wallets.stakes',...args)),
     },
     //all tokens we knwo of
-    tokens:Tokens.Model(config.tokens,
-      Stateful.Model(config,
+    tokens:{
+      active:Tokens.Model(
+        config.tokens,
         Cache(),
-        (...args)=>emit('tokens',...args)
-      )
-    ),
+        (...args)=>emit('tokens.active',...args)
+      ),
+      pending:Tokens.Model(
+        {...config.tokens,type:'Pending'},
+        Cache(),
+        (...args)=>emit('tokens.pending',...args)
+      ),          
+      disabled:Tokens.Model(
+        config.tokens,
+        Cache(),
+        (...args)=>emit('tokens.disabled',...args)
+      )          
+    },
     commands:Commands.Model(config, 
       Stateful.Model(config,
         Cache(),
@@ -36,8 +47,8 @@ module.exports = async (config={},libs,emit=x=>x) => {
     eventlogs:Events.Model({},Cache(),(...args)=>emit('eventlogs',...args)),
     users:Users.Model({},Cache(),(...args)=>emit('users',...args)),
     coupons:{
-      create:Coupons.Model({},Cache(),(...args)=>emit('create_coupons',...args)),
-      withdraw:Coupons.Model({},Cache(),(...args)=>emit('withdraw_coupons',...args)),
+      create:Coupons.Model({},Cache(),(...args)=>emit('coupons.create',...args)),
+      withdraw:Coupons.Model({},Cache(),(...args)=>emit('coupons.withdraw',...args)),
     }
   }
 }

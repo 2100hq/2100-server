@@ -37,7 +37,7 @@ test('createToken',t=>{
     //   t.end()
     // })
     t.test('createToken',async t=>{
-      command = await libs.commands.createType('createToken',{
+      command = await libs.commands.createType('createActiveToken',{
         contractAddress:'0xabcdef',
         creatorAddress:'0xabcd123',
         name:'test',

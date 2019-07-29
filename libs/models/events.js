@@ -21,11 +21,17 @@ module.exports = (config,libs,emit)=>{
         return emit('private',data.userid,['myCommands',data.id],data)
       }
       //internal/locked wallets
-      case 'available':{
+      case 'wallets.available':{
         return emit('private',data.userid,['myWallets','available',data.tokenid],data)
       }
-      case 'locked':{
+      case 'wallets.locked':{
         return emit('private',data.userid,['myWallets','locked',data.tokenid],data)
+      }
+      case 'coupons.create':{
+        return emit('private',data.userid,['myCoupons','create',data.id],data)
+      }
+      case 'coupons.withdraw':{
+        return emit('private',data.userid,['myCoupons','withdraw',data.id],data)
       }
       // case 'stakes':{
       //   console.log('private event',table,method,data)
@@ -47,6 +53,15 @@ module.exports = (config,libs,emit)=>{
     if(table == 'transactions') return 
     if(table == 'blocks'){
       emit('public',['latestBlock'],data)
+    }
+    if(table === 'tokens.pending'){
+      emit('public',['tokens','pending',data.id],data)
+    }
+    if(table === 'tokens.active'){
+      emit('public',['tokens','active',data.id],data)
+    }
+    if(table === 'tokens.disabled'){
+      emit('public',['tokens','disabled',data.id],data)
     }
     // emit('public',[table,data.id],data)
   }

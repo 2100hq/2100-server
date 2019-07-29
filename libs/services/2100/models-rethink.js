@@ -15,18 +15,30 @@ module.exports = async (config={},{con},emit)=>{
 
   const models = {
     wallets:{
-      available:Wallets.Model({},await Wallets.Rethink({table:'available'},con),(...args)=>emit('available',...args)),
-      locked:Wallets.Model({},await Wallets.Rethink({table:'locked'},con),(...args)=>emit('locked',...args)),
+      available:Wallets.Model({},await Wallets.Rethink({table:'available'},con),(...args)=>emit('wallets.available',...args)),
+      locked:Wallets.Model({},await Wallets.Rethink({table:'locked'},con),(...args)=>emit('wallets.locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
-      stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('stakes',...args)),
+      stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('wallets.stakes',...args)),
     },
     //all tokens we knwo of
-    //tokens are now stateful, they are pending, confirmed, disabled
-    tokens:Tokens.Model(config.tokens,
-      Stateful.Model(config,await Tokens.Rethink({table:'tokens'},con),
-        (...args)=>emit('tokens',...args)
-      )
-    ),
+    //tokens are now stateful, they are pending, active, disabled
+    tokens:{
+      active:Tokens.Model(
+        config.tokens,
+        await Tokens.Rethink({table:'available_tokens'},con),
+        (...args)=>emit('tokens.active',...args)
+      ),
+      pending:Tokens.Model(
+        {...config.tokens,type:'Pending'},
+        await Tokens.Rethink({table:'pending_tokens'},con),
+        (...args)=>emit('tokens.pending',...args)
+      ),          
+      disabled:Tokens.Model(
+        config.tokens,
+        await Tokens.Rethink({table:'disabled_tokens'},con),
+        (...args)=>emit('tokens.disabled',...args)
+      )          
+    },
     commands:Commands.Model(config, 
       Stateful.Model(config,
         await Commands.Rethink({table:'commands'},con),
@@ -44,8 +56,8 @@ module.exports = async (config={},{con},emit)=>{
     users:Users.Model({},await Users.Rethink({table:'users'},con),(...args)=>emit('users',...args)),
     //these are signed receipts for users to submit on chain
     coupons:{
-      create:Coupons.Model({},await Coupons.Rethink({table:'create_coupons'},con),(...args)=>emit('create_coupons',...args)),
-      withdraw:Coupons.Model({},await Coupons.Rethink({table:'withdraw_coupons'},con),(...args)=>emit('withdraw_coupons',...args)),
+      create:Coupons.Model({},await Coupons.Rethink({table:'create_coupons'},con),(...args)=>emit('coupons.create',...args)),
+      withdraw:Coupons.Model({},await Coupons.Rethink({table:'withdraw_coupons'},con),(...args)=>emit('coupons.withdraw',...args)),
     }
   }
 

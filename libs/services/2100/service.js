@@ -17,17 +17,25 @@ const Joins = require('../../models/joins')
 const Queries = require('../../models/queries')
 const Events = require('../../models/events')
 
+const ControllerContract = require('2100-contracts/build/contracts/Controller')
+
+//contracts we want to listen for events on
 const contracts = [
-  require('2100-contracts/build/contracts/Controller'),
+  ControllerContract,
 ]
 
 module.exports = async (config)=>{
-  assert(config.cmdTickRate,'reqeuires a transactionTickRate')
-  assert(config.confirmations,'requires confirmations')
-  assert(config.primaryToken,'requires primary token symbol')
-
   //set a default for now to our dev chain id
   config.chainid = config.chainid || '2100'
+
+  assert(config.cmdTickRate,'reqeuires a transactionTickRate')
+  assert(config.confirmations,'requires confirmations')
+
+
+  config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
+
+  assert(config.primaryToken,'requires primary token address or symbol')
+
 
   const emitter = new Emitter()
 
@@ -69,7 +77,12 @@ module.exports = async (config)=>{
     return libs.ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === address.toLowerCase()
   }
 
-  const commandTypes = ['processBlock','pendingDeposit','withdrawPrimary','deposit','withdraw']
+  const commandTypes = [
+    'pendingDeposit',   //handle blockchain pending deposits
+    'withdrawPrimary',  //handle blockchain withdraws
+    'createPendingToken',  //handle pending tokens created from api
+    'createActiveToken',  //handle blockchain tokens created from blockchain
+  ]
   libs.handlers = Handlers({...config,commandTypes},libs)
 
   //adding engines

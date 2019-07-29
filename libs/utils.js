@@ -6,6 +6,7 @@ const Rethink = require('rethinkdb')
 
 exports.regexAddress = /^0x[a-f0-9]+$/
 exports.regexLowerNum = /^[a-z0-9]+$/
+exports.regexLowerUrl = /^[a-z0-9_-]+$/
 exports.regexTwitter = /^[a-z0-9_]{1,15}$/
 
 exports.GetWallets = wallets => type =>{

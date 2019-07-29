@@ -25,6 +25,7 @@ module.exports = (config,{eventlogs,ethers})=>{
             blockNumber:block.number,
             contractName:contract.contractName,
             contractAddress:contract.contractAddress,
+            transactionHash:contract.transactionHash,
             index,
           })(log)
           result.values = stringifyValues(result.values)
