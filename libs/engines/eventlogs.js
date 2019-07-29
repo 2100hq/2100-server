@@ -15,6 +15,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
         toAddress:event.values.account.toLowerCase(),
         tokenid:config.primaryToken,
         confirmations:Number(config.confirmations),
+        transactionHash:event.transactionHash.toLowerCase(),
         balance:event.values.balance,
         value:event.values.amount,
       })
@@ -24,6 +25,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
         fromAddress:event.values.account.toLowerCase(),
+        transactionHash:event.transactionHash.toLowerCase(),
         balance:event.values.balance,
         value:event.values.amount,
       })
@@ -33,6 +35,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
       return commands.createType('createActiveToken',{
         userid:event.values.creator.toLowerCase(),
         name:event.values.name.toLowerCase(),
+        transactionHash:event.transactionHash.toLowerCase(),
         createdBlock:event.blockNumber,
         creatorAddress:event.values.creator.toLowerCase(),
         contractAddress:event.values.token.toLowerCase(),

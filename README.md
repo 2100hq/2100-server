@@ -48,17 +48,17 @@ ethers.provider.url=
 # optional, otherwise start at latest block on chain
 defaultStartBlock=8182562  
 
-# default total supply measured in eth
-tokens.supply=2100 
+# default total supply measured in wei (will change to eth in future)
+tokens.supply=2100000000000000000000
 # default token decimal points
 token.decimals=18
-# default reward given to creator of token in wei (experimental)
+# default reward given to creator of token in wei (not implemented)
 tokens.creatorReward=0               
 # default fraction of share of mining reward issued to owner, from 0-1
 tokens.ownerShare=.1                 
 # default default owner address, can be anything really, claimed through another process
 tokens.ownerAddress=0                
-# default mining rewards in wei, split between stakers every block
+# default mining rewards in wei, split between stakers every block (will be updated to eth)
 tokens.reward=210000000000000        
 
 # secret private key of signer. this will sign all coupons to be issued to users
@@ -128,6 +128,7 @@ listening to the private channel.
 Private actions are scoped the the socket private channel and can only be called once authenticated
 
 ** createToken(name:string) **
+
 - this generates a pending token which needs confirmation on blockchain
 - string must be a valid twitter name or action will fail
 - this generates a command for the user which can be monitored in private.myCommands

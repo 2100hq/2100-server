@@ -31,7 +31,6 @@ module.exports = async (config)=>{
   assert(config.cmdTickRate,'reqeuires a transactionTickRate')
   assert(config.confirmations,'requires confirmations')
 
-
   config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
 
   assert(config.primaryToken,'requires primary token address or symbol')

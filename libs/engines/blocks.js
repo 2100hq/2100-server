@@ -17,7 +17,6 @@ module.exports = (config,{eventlogs,ethers})=>{
         const logs = await ethers.getLogs({blockHash:block.hash,address:contract.contractAddress})
         // console.log('logs',logs)
         return logs.map((log,index)=>{
-          // console.log({log,contract})
           //decode logs and add meta data for the event
           const result = ethers.decodeLog(contract.abi,{
             //meta data with log
@@ -25,8 +24,8 @@ module.exports = (config,{eventlogs,ethers})=>{
             blockNumber:block.number,
             contractName:contract.contractName,
             contractAddress:contract.contractAddress,
-            transactionHash:contract.transactionHash,
             index,
+            transactionHash:log.transactionHash,
           })(log)
           result.values = stringifyValues(result.values)
           return lodash.omit(result,['decode'])
