@@ -6,9 +6,9 @@ module.exports = (config,{users}) => {
   return user =>{
     assert(user,'You must be logged in')
 
-    async function setAdmin(userid,isAdmin){
+    async function setAdmin({userid,isAdmin}){
       // assert(userid !== user.id,'You cannot change your admin status')
-      return users.setAdmin(userid,isAdmin)
+      return users.setAdmin(userid.toLowerCase(),isAdmin)
     }
 
     return {

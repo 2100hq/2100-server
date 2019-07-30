@@ -62,7 +62,7 @@ tokens.ownerAddress=0
 tokens.reward=210000000000000        
 
 # secret private key of signer. this will sign all coupons to be issued to users
-signerKey=
+signer.privateKey=
 # public address of the system user, this is the first user who can create admins
 # it will be assigned when authenticated
 systemAddress=
@@ -89,6 +89,11 @@ Public data follows this general schema and comes in through the private channel
     disabled:{
       [token.id]:tokenSchema  //list of all disabled tokens
     },
+  },
+  coupons:{
+    create:{  
+      [coupon.id]:couponSchema,  //signed coupons for creating a token
+    },
   }
 }
 ```
@@ -111,9 +116,6 @@ listening to the private channel.
     [commands.id]:commandSchema, //all commands/types issued by user
   },
   myCoupons:{
-    create:{  
-      [coupon.id]:couponSchema,  //signed coupons for creating a token
-    },
     withdraw:{
       [coupon.id]:couponSchema,  //signed coupons for withdrawing tokens
     }
@@ -121,17 +123,39 @@ listening to the private channel.
   me:{
     id:string,
     publicAddress:string,
+    isAdmin:string,  //is the user admin? will not exist if not
   }
 }
 ```
 ### Private Actions
 Private actions are scoped the the socket private channel and can only be called once authenticated
 
-** createToken(name:string) **
+**me**
+- returns your user. Its already avaialble in your private state, but here for testing.
 
-- this generates a pending token which needs confirmation on blockchain
+### Admin Actions
+Special routes only admins can call.
+
+**createTokenWithOwner({name:string,signature:string})**
+- generates a pending token with a pre-set owner address
+- signed coupon will be created for submission on block chain to create
 - string must be a valid twitter name or action will fail
 - this generates a command for the user which can be monitored in private.myCommands
+
+**createToken({name:string})**
+- creates ownerless token
+
+**setAdmin({userid:string,isAdmin:boolean})**
+- user ids are identical to user addresses
+- sets a public address to be admin or not. isAdmin = true makes them an admin, isAdmin = false revokes.
+- you cannot mess with your own admin status
+
+#### System Actions
+Only system user can take these actions. System address is specified in the .env file.
+
+**setAdmin({userid:string,isAdmin:boolean})**
+- sets a public address to be admin or not. isAdmin = true makes them an admin, isAdmin = false revokes.
+- you can set yourself to be admin or not, it wont matter you will still have access to system route
 
 ### Authentication
 Authentication is done through privatekey signatures. Authentication methods happen on the auth channel.

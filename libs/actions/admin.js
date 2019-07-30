@@ -30,12 +30,12 @@ module.exports = (config,{query,commands,users,signer}) => {
 
     async function createToken({name}){
       assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
-      return commands.createType('createPendingToken',{name,userid:user.id,ownerAddress})
+      return commands.createType('createPendingToken',{name,userid:user.id})
     }
 
     async function setAdmin({userid,isAdmin}){
       assert(userid !== user.id,'You cannot change your admin status')
-      return users.setAdmin(userid,isAdmin)
+      return users.setAdmin(userid.toLowerCase(),isAdmin)
     }
 
     return {
