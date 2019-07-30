@@ -2,14 +2,31 @@ const assert = require('assert')
 const bn = require('bignumber.js')
 
 //keep this simple for now
-module.exports = (config,{commands,tokens})=>{
+module.exports = (config,{commands,tokens,signer,coupons})=>{
   assert(commands,'requires commands')
   assert(tokens,'requires tokens')
+  assert(signer,'requires signer')
+  assert(coupons,'requires coupons')
+  assert(coupons.create,'requires creat token coupons')
   return {
     async Start(cmd){
       if(await tokens.pending.has(cmd.name)){
         return commands.failure(cmd.id,'Token is already pending')
       }
+      return commands.setState(cmd.id,'Sign Create Coupon')
+    },
+    async 'Sign Create Coupon'(cmd){
+      const message = await signer.createTokenMessage(cmd.name)
+      const data = await signer.sign(message)
+
+      const coupon = await coupons.create.create({
+        id:cmd.name,
+        data,
+        userid:cmd.userid,
+        name:cmd.name,
+        description:`Submit to chain to create 2100 for @${cmd.name}`
+      })
+
       return commands.setState(cmd.id,'Create Pending Token')
     },
     //this can only happen once, create will throw if anything already exists
@@ -19,6 +36,7 @@ module.exports = (config,{commands,tokens})=>{
       const token = await tokens.pending.create({
         id:cmd.name,
         name:cmd.name,
+        ownerAddress:cmd.ownerAddress || null,
       })
 
       return commands.success(cmd.id,'Token Created Pending Confirmation')

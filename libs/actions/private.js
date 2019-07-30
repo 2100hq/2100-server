@@ -8,11 +8,10 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
   return user =>{
     assert(user,'You must be logged in')
 
-    async function createToken({name}){
-      assert(name,'requires token name')
-      assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
-      return commands.createType('createPendingToken',{name,userid:user.id})
+    function me(){
+      return user
     }
+
 
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
@@ -35,7 +34,7 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
     // }
 
     return {
-      createToken
+      me,
     }
   }
 }

@@ -34,12 +34,19 @@ module.exports = (config,table,emit) => {
     }
   }
 
+  async function setAdmin(id,isAdmin=true){
+    const user = await get(id)
+    user.isAdmin = isAdmin
+    return set(user)
+  }
+
   return {
     ...table,
     create,
     set,
     get,
     getOrCreate,
+    setAdmin,
   }
 }
 

@@ -12,6 +12,7 @@ const Handlers = require('./handlers')
 const {RethinkConnection,loop,GetWallets} = require('../../utils')
 const RethinkModels = require('./models-rethink')
 const Ethers = require('../../ethers')
+const Signer = require('../../signer')
 
 const Joins = require('../../models/joins')
 const Queries = require('../../models/queries')
@@ -65,6 +66,7 @@ module.exports = async (config)=>{
   }
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
+  libs.signer = await Signer(config.signer,{provider:libs.ethers})
 
   //authentication with ethers
   libs.authenticate = function(token,signed,address){
@@ -95,7 +97,7 @@ module.exports = async (config)=>{
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
 
-  libs.socket = await Socket(config.socket,libs)
+  libs.socket = await Socket(config,libs)
 
 
   //events from ethers block chain

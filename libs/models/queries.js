@@ -91,8 +91,8 @@ module.exports = (config,libs)=>{
     return libs.commands.getUserDone(userid,done)
   }
 
-  async function userCreateCoupons(userid){
-    return libs.coupons.create.byUser(userid)
+  async function listCreateCoupons(){
+    return libs.coupons.create.list()
   }
 
   async function userWithdrawCoupons(userid){
@@ -107,12 +107,13 @@ module.exports = (config,libs)=>{
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
       myCoupons:{
-        create:lodash.keyBy(await userCreateCoupons(userid),'id'),
         withdraw:lodash.keyBy(await userWithdrawCoupons(userid),'id'),
       },
       me:{
         id:userid,
         publicAddress:userid,
+        ...(await getUser(userid))
+
       }
     }
     // const walletTypes = await listWalletTypes()
@@ -144,6 +145,9 @@ module.exports = (config,libs)=>{
         active:lodash.keyBy((await listActiveTokens()),'id'),
         pending:lodash.keyBy((await listPendingTokens()),'id'),
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
+      },
+      coupons:{
+        create:lodash.keyBy(await listCreateCoupons(),'id'),
       }
     }
   }
@@ -167,6 +171,6 @@ module.exports = (config,libs)=>{
     privateState,
     adminState,
     userWithdrawCoupons,
-    userCreateCoupons,
+    listCreateCoupons,
   }
 }

@@ -6,6 +6,7 @@ module.exports = (config,libs,emit=x=>x)=>{
     private:Actions('private',config,libs),
     admin:Actions('admin',config,libs),
     auth:Actions('auth',config,libs),
+    system:Actions('system',config,libs),
   }
 }
 

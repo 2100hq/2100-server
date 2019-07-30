@@ -27,9 +27,6 @@ module.exports = (config,libs,emit)=>{
       case 'wallets.locked':{
         return emit('private',data.userid,['myWallets','locked',data.tokenid],data)
       }
-      case 'coupons.create':{
-        return emit('private',data.userid,['myCoupons','create',data.id],data)
-      }
       case 'coupons.withdraw':{
         return emit('private',data.userid,['myCoupons','withdraw',data.id],data)
       }
@@ -62,6 +59,9 @@ module.exports = (config,libs,emit)=>{
     }
     if(table === 'tokens.disabled'){
       emit('public',['tokens','disabled',data.id],data)
+    }
+    if(table === 'coupons.create'){
+      return emit('public',['coupons','create',data.id],data)
     }
     // emit('public',[table,data.id],data)
   }

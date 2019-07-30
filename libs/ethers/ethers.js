@@ -25,6 +25,12 @@ module.exports = async (config,{},emit=x=>x) => {
     }
   }
 
+  function signData(hash){
+  }
+
+  function verifySignature(hash){
+  }
+
   provider.decodeLog = decodeLog
   provider.utils = ethers.utils
 
