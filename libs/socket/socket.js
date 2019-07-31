@@ -51,7 +51,7 @@ module.exports = async (config, libs) => {
               socket.userid = address.toLowerCase()
               socket.join(socket.userid)
               libs.users.getOrCreate(socket.userid).then(user=>{
-                query.privateState(socket.userid)
+                return query.privateState(socket.userid)
               }).then(state=>{
                 io.to(socket.userid).emit('private',[],state)
               }).catch(err=>{
