@@ -51,7 +51,7 @@ defaultStartBlock=8182562
 # default total supply measured in wei (will change to eth in future)
 tokens.supply=2100000000000000000000
 # default token decimal points
-token.decimals=18
+tokens.decimals=18
 # default reward given to creator of token in wei (not implemented)
 tokens.creatorReward=0               
 # default fraction of share of mining reward issued to owner, from 0-1
