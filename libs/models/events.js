@@ -27,8 +27,8 @@ module.exports = (config,libs,emit)=>{
       case 'wallets.locked':{
         return emit('private',data.userid,['myWallets','locked',data.tokenid],data)
       }
-      case 'coupons.withdraw':{
-        return emit('private',data.userid,['myCoupons','withdraw',data.id],data)
+      case 'coupons.mint':{
+        return emit('private',data.userid,['myCoupons','mint',data.id],data)
       }
       // case 'stakes':{
       //   console.log('private event',table,method,data)

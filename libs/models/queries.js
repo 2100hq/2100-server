@@ -95,8 +95,8 @@ module.exports = (config,libs)=>{
     return libs.coupons.create.list()
   }
 
-  async function userWithdrawCoupons(userid){
-    return libs.coupons.withdraw.byUser(userid)
+  async function userMintCoupons(userid){
+    return libs.coupons.mint.byUser(userid)
   }
 
   async function privateState(userid){
@@ -107,7 +107,7 @@ module.exports = (config,libs)=>{
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
       myCoupons:{
-        withdraw:lodash.keyBy(await userWithdrawCoupons(userid),'id'),
+        mint:lodash.keyBy(await userMintCoupons(userid),'id'),
       },
       me:{
         id:userid,
@@ -170,7 +170,7 @@ module.exports = (config,libs)=>{
     publicState,
     privateState,
     adminState,
-    userWithdrawCoupons,
+    userMintCoupons,
     listCreateCoupons,
   }
 }

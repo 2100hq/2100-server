@@ -48,7 +48,7 @@ module.exports = async (config={},libs,emit=x=>x) => {
     users:Users.Model({},Cache(),(...args)=>emit('users',...args)),
     coupons:{
       create:Coupons.Model({},Cache(),(...args)=>emit('coupons.create',...args)),
-      withdraw:Coupons.Model({},Cache(),(...args)=>emit('coupons.withdraw',...args)),
+      mint:Coupons.Model({},Cache(),(...args)=>emit('coupons.mint',...args)),
     }
   }
 }

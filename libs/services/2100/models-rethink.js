@@ -57,7 +57,7 @@ module.exports = async (config={},{con},emit)=>{
     //these are signed receipts for users to submit on chain
     coupons:{
       create:Coupons.Model({},await Coupons.Rethink({table:'create_coupons'},con),(...args)=>emit('coupons.create',...args)),
-      withdraw:Coupons.Model({},await Coupons.Rethink({table:'withdraw_coupons'},con),(...args)=>emit('coupons.withdraw',...args)),
+      mint:Coupons.Model({},await Coupons.Rethink({table:'mint_coupons'},con),(...args)=>emit('coupons.mint',...args)),
     }
   }
 
