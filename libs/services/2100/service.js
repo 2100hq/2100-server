@@ -156,9 +156,9 @@ module.exports = async (config)=>{
   loop(async x=>{
     const blocks = await libs.blocks.getDone(false)
     // console.log(blocks)
-    highland(lodash.orderBy(blocks,['id'],['asc']))
+    return highland(lodash.orderBy(blocks,['id'],['asc']))
     .map(async block=>{
-      // console.log(block)
+      // console.log('processing block',block.number)
       const result = await libs.engines.blocks.tick(block)
       // console.log('completed block')
       return libs.blocks.setDone(block.id)
@@ -172,7 +172,7 @@ module.exports = async (config)=>{
 
   loop(async x=>{
     const events = await libs.eventlogs.getDone(false)
-    highland(lodash.orderBy(events,['id'],['asc']))
+    return highland(lodash.orderBy(events,['id'],['asc']))
     .map(async event=>{
       const result = await libs.engines.eventlogs.tick(event)
       return libs.eventlogs.setDone(event.id)

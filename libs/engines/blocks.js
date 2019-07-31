@@ -17,6 +17,7 @@ module.exports = (config,{eventlogs,ethers})=>{
         const logs = await ethers.getLogs({blockHash:block.hash,address:contract.contractAddress})
         // console.log('logs',logs)
         return logs.map((log,index)=>{
+          // console.log('log index',index,block.number)
           //decode logs and add meta data for the event
           const result = ethers.decodeLog(contract.abi,{
             //meta data with log
@@ -28,13 +29,14 @@ module.exports = (config,{eventlogs,ethers})=>{
             transactionHash:log.transactionHash,
           })(log)
           result.values = stringifyValues(result.values)
+          // console.log('eventlog',result)
           return lodash.omit(result,['decode'])
         })
       })
       .flatMap(highland)
       .flatten()
       // .doto(x=>{
-      //   console.log('log',x)
+      //   console.log('eventlog',x)
       // })
       .map(eventlogs.create)
       .flatMap(highland)

@@ -158,7 +158,8 @@ module.exports = (config,libs)=>{
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
-      }
+      },
+
     }
   }
 

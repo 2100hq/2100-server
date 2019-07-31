@@ -31,7 +31,7 @@ exports.blockid = (number)=>{
 exports.eventid = (address,number,index=0)=>{
   assert(address,'requires contract address')
   assert(number,'requires block number')
-  return [pad(16,number,'0'),pad(16,number,'0'),address].join('!')
+  return [pad(16,number,'0'),pad(16,index,'0'),address].join('!')
 }
 
 exports.stringifyValues = (object)=>{

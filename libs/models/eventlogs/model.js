@@ -28,7 +28,7 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function create(props) {
     const result = validate(defaults(props))
-    assert(!(await table.has(result.id)), 'block with that ID already exists')
+    assert(!(await table.has(result.id)), 'Event with that ID already exists')
     return set(result)
   }
 

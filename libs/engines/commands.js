@@ -12,8 +12,8 @@ module.exports = (config,{handlers,commands})=>{
 
   async function runToDone(command,steps=0,now=Date.now()){
     if(command.done) return command
-    if(lodash.isBoolean(command.yield) && command.yield) return command
-    if(lodash.isNumber(command.yield) && command.yield > now) return command
+    // if(lodash.isBoolean(command.yield) && command.yield) return command
+    // if(lodash.isNumber(command.yield) && command.yield > now) return command
 
     if(stepLimit) assert(steps < stepLimit,'Command failed to complete in ' + stepLimit + ' steps')
     const next = await tick(command)

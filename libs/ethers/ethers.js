@@ -19,8 +19,8 @@ module.exports = async (config,{},emit=x=>x) => {
     const iface = new ethers.utils.Interface(abi)
     return log => {
       return {
+        ...iface.parseLog(log),
         ...meta,
-        ...iface.parseLog(log)
       }
     }
   }
