@@ -11,11 +11,11 @@ module.exports = (config={}) => {
     return {
       id:props.contractAddress,
       supply:config.supply,
-      ownerShare:config.ownerShare,
+      ownerShare:Number(config.ownerShare),
       creatorReward:config.creatorReward,
       ownerAddress:config.ownerAddress,
       reward:config.reward,
-      decimals:config.decimals,
+      decimals:Number(config.decimals),
       created:Date.now(),
       ...props
     }
