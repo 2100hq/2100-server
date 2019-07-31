@@ -23,7 +23,7 @@ module.exports = (config ,{provider})=>{
   async function sign(hash){
     //we have to arrayify for some reason to get this
     //to pass signature check on chain
-    return ethers.utils.splitSignature(wallet.signMessage(await ethers.utils.arrayify(hash)))
+    return ethers.utils.splitSignature(await wallet.signMessage(ethers.utils.arrayify(hash)))
   }
 
   async function verifyHash(message,signed){
