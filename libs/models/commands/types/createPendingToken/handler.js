@@ -28,7 +28,7 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
         description:`Submit to chain to create 2100 for @${cmd.name}`
       })
 
-      return commands.setState(cmd.id,'Create Pending Token')
+      return commands.setState(cmd.id,'Create Pending Token', {couponid: coupon.id})
     },
     //this can only happen once, create will throw if anything already exists
     //this assume the commands initilalized with all valid numbers.
@@ -36,6 +36,7 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       //create token
       const token = await tokens.pending.create({
         id:cmd.name,
+        couponid: cmd.couponid,
         name:cmd.name,
         ownerAddress:cmd.ownerAddress || null,
       })
