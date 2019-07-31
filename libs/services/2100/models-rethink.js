@@ -25,7 +25,7 @@ module.exports = async (config={},{con},emit)=>{
     tokens:{
       active:Tokens.Model(
         config.tokens,
-        await Tokens.Rethink({table:'available_tokens'},con),
+        await Tokens.Rethink({table:'active_tokens'},con),
         (...args)=>emit('tokens.active',...args)
       ),
       pending:Tokens.Model(

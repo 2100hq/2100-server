@@ -4,15 +4,13 @@ module.exports = (config,libs) => user =>{
   function echo(x){
     return x
   }
-  function logout(){
-  }
-  function token(){
+  function state(){
+    return libs.query.publicState()
   }
 
   return {
     echo,
-    logout,
-    token
+    state,
   }
 }
 

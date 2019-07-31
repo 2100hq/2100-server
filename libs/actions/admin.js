@@ -1,9 +1,10 @@
 const assert = require('assert')
 
-module.exports = (config,{query,commands,users,signer}) => {
+module.exports = (config,{query,commands,users,signer,coupons}) => {
   assert(query,'requires query model')
   assert(commands,'requires commands model')
   assert(users,'requires users model')
+  assert(coupons,'requires coupons model')
 
   return user =>{
     assert(user,'You must be logged in')
@@ -11,8 +12,10 @@ module.exports = (config,{query,commands,users,signer}) => {
 
     async function createToken({name,ownerAddress}){
       assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
+      assert(!(await coupons.create.has(name.toLowerCase())),'Coupon already exists')
+      assert(ownerAddress,'requires owners address to create token')
       const data = {name,userid:user.id}
-      if (ownerAddress) data.ownerAddress = ownerAddress.toLowerCase()
+      data.ownerAddress = ownerAddress.toLowerCase()
       return commands.createType('createPendingToken',data)
     }
 

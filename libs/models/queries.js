@@ -49,11 +49,15 @@ module.exports = (config,libs)=>{
     assert(name,'requires name to check')
     return libs.tokens.pending.has(name)
   }
+  async function hasActiveTokenByName(name){
+    const tokens = await libs.tokens.active.getByName(name)
+    return tokens.length > 0
+  }
   function listUsers(){
     return libs.users.list()
   }
   function getTokenByName(token){
-    return libs.tokens.getByName(token)
+    return libs.tokens.active.getByName(token)
   }
   async function getWallet(token){
     assert(token,'requires token name')
@@ -184,5 +188,6 @@ module.exports = (config,libs)=>{
     userMintCoupons,
     listCreateCoupons,
     userCommandHistory,
+    hasActiveTokenByName,
   }
 }
