@@ -12,7 +12,7 @@ module.exports = (config ,{provider})=>{
       ['CREATE', str]
     )
   }
-  
+
   function mintTokenMessage(token,account,amount,salt){
     return ethers.utils.solidityKeccak256(
       ['string', 'address', 'uint256', 'uint256'],
@@ -22,12 +22,12 @@ module.exports = (config ,{provider})=>{
 
   async function sign(hash){
     //we have to arrayify for some reason to get this
-    //to pass signature check on chain 
-    return wallet.signMessage(await ethers.utils.arrayify(hash))
+    //to pass signature check on chain
+    return ethers.utils.splitSignature(wallet.signMessage(await ethers.utils.arrayify(hash)))
   }
 
   async function verifyHash(message,signed){
-    //we have to arrayify message to pass signature check on chain 
+    //we have to arrayify message to pass signature check on chain
     message = await ethers.utils.arrayify(message)
     return ethers.utils.verifyMessage(message,signed)
   }

@@ -2,7 +2,7 @@ module.exports = () => {
   return {
     id: 'string',
     userid:'string',
-    data:'string',
+    data:'object',
     description:'string',
   }
 }

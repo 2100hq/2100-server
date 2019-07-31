@@ -16,18 +16,19 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       return commands.setState(cmd.id,'Sign Create Coupon')
     },
     async 'Sign Create Coupon'(cmd){
-      const message = await signer.createTokenMessage(cmd.name)
-      const data = await signer.sign(message)
+      const messageId = await signer.createTokenMessage(cmd.name)
+      const { v, r, s } = await signer.sign(messageId)
+      const data = { symbol: cmd.name, messageId, v, r, s }
 
       const coupon = await coupons.create.create({
-        id:cmd.name,
+        id:messageId,
         data,
         userid:cmd.userid,
         name:cmd.name,
         description:`Submit to chain to create 2100 for @${cmd.name}`
       })
 
-      return commands.setState(cmd.id,'Create Pending Token')
+      return commands.setState(cmd.id,'Create Pending Token', {couponid: coupon.id})
     },
     //this can only happen once, create will throw if anything already exists
     //this assume the commands initilalized with all valid numbers.
@@ -35,6 +36,7 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       //create token
       const token = await tokens.pending.create({
         id:cmd.name,
+        couponid: cmd.couponid,
         name:cmd.name,
         ownerAddress:cmd.ownerAddress || null,
       })
