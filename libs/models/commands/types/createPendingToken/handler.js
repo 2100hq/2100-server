@@ -21,7 +21,7 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       const data = { symbol: cmd.name, messageId, v, r, s }
 
       const coupon = await coupons.create.create({
-        id:cmd.name,
+        id:messageId,
         data,
         userid:cmd.userid,
         name:cmd.name,
