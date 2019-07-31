@@ -34,7 +34,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
     async Create(event){
       return commands.createType('createActiveToken',{
         userid:event.values.creator.toLowerCase(),
-        name:event.values.name.toLowerCase(),
+        name:event.values.username.toLowerCase(),
         transactionHash:event.transactionHash.toLowerCase(),
         createdBlock:event.blockNumber,
         creatorAddress:event.values.creator.toLowerCase(),
