@@ -18,6 +18,9 @@ module.exports = (config,libs,emit)=>{
     // console.log(table,method,data)
     switch(table){
       case 'commands':{
+        if(data.done){
+          return emit('private',data.userid,['myCommandHistory',data.id],data)
+        }
         return emit('private',data.userid,['myCommands',data.id],data)
       }
       //internal/locked wallets

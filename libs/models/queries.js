@@ -91,6 +91,11 @@ module.exports = (config,libs)=>{
     return libs.commands.getUserDone(userid,done)
   }
 
+  async function userCommandHistory(userid,start=0,length){
+    return libs.commands.getUserDone(userid,true,start,length)
+  }
+
+
   async function listCreateCoupons(){
     return libs.coupons.create.list()
   }
@@ -106,6 +111,7 @@ module.exports = (config,libs)=>{
         locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
+      myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,50),'id'),
       myCoupons:{
         mint:lodash.keyBy(await userMintCoupons(userid),'id'),
       },
