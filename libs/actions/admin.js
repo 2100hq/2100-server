@@ -9,15 +9,6 @@ module.exports = (config,{query,commands,users,signer}) => {
     assert(user,'You must be logged in')
     assert(user.isAdmin,'You must be an admin')
 
-    // async function createToken({name}){
-    //   assert(name,'requires a token name')
-    //   const latest = await libs.blocks.latest()
-    //   const result = await libs.tokens.create({id:name,name,createdBlock:latest.number})
-    //   await libs.stakes.create({id:name})
-    //   await libs.addWallet(name)
-    //   return result
-    // }
-
     //adds owner address
     async function createTokenWithOwner({name,signature}){
       assert(name,'requires token name')
@@ -34,6 +25,7 @@ module.exports = (config,{query,commands,users,signer}) => {
     }
 
     async function setAdmin({userid,isAdmin}){
+      assert(userid,'requires userid')
       assert(userid !== user.id,'You cannot change your admin status')
       return users.setAdmin(userid.toLowerCase(),isAdmin)
     }

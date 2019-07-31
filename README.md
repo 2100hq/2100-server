@@ -150,7 +150,7 @@ Special routes only admins can call.
 - sets a public address to be admin or not. isAdmin = true makes them an admin, isAdmin = false revokes.
 - you cannot mess with your own admin status
 
-#### System Actions
+### System Actions
 Only system user can take these actions. System address is specified in the .env file.
 
 **setAdmin({userid:string,isAdmin:boolean})**

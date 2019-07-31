@@ -29,7 +29,7 @@ module.exports = async (config)=>{
   //set a default for now to our dev chain id
   config.chainid = config.chainid || '2100'
 
-  assert(config.cmdTickRate,'reqeuires a transactionTickRate')
+  assert(config.cmdTickRate,'requires a transactionTickRate')
   assert(config.confirmations,'requires confirmations')
 
   config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address

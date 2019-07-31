@@ -10,12 +10,18 @@ module.exports = (config,{handlers,commands})=>{
 
   const step = Step(config,handlers)
 
-  async function runToDone(command,steps=0){
+  async function runToDone(command,steps=0,now=Date.now()){
     if(command.done) return command
+    if(lodash.isBoolean(command.yield) && command.yield) return command
+    if(lodash.isNumber(command.yield) && command.yield > now) return command
+
     if(stepLimit) assert(steps < stepLimit,'Command failed to complete in ' + stepLimit + ' steps')
     const next = await tick(command)
-    if(command.yield) return command
-    // assert(next.state !== command.state,'Command must transition state')
+
+    if(next.done) return next
+    if(lodash.isBoolean(next.yield) && next.yield) return next
+    if(lodash.isNumber(next.yield) && next.yield > now) return next
+
     await new Promise(res=>setTimeout(res,tickRate))
     return runToDone(next,steps+1)
   }

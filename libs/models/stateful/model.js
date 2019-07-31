@@ -49,6 +49,14 @@ module.exports = (config, table, emit=x=>x) => {
     val.reject = reject
     return set({ ...val, ...props })
   }
+  
+  //hack which allows command to yield to other
+  //commands. doesnt really belong here but easiest
+  async function yield(id,value=true){
+    const cmd = await get(id)
+    cmd.yield = value
+    return set(cmd)
+  }
 
   return {
     ...table,
@@ -60,10 +68,6 @@ module.exports = (config, table, emit=x=>x) => {
     setState,
     defaults,
     validate,
-    async yield(id){
-      const cmd = await get(id)
-      cmd.yield = true
-      return set(cmd)
-    }
+    yield,
   }
 }
