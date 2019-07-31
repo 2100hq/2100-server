@@ -80,7 +80,11 @@ module.exports = (config,libs)=>{
 
   async function getUser(userid){
     assert(userid,'requires user id')
-    return libs.users.get(userid)
+    const user = await libs.users.get(userid)
+    if (String(config.systemAddress).toLowerCase() === user.id.toLowerCase()){
+      user.isSystemAddress = true
+    }
+    return user
   }
 
   async function listStakes(){
