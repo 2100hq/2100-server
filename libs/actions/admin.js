@@ -9,19 +9,11 @@ module.exports = (config,{query,commands,users,signer}) => {
     assert(user,'You must be logged in')
     assert(user.isAdmin,'You must be an admin')
 
-    //adds owner address
-    async function createTokenWithOwner({name,signature}){
-      assert(name,'requires token name')
-      assert(signature,'requires signed message')
-      const ownerAddress = (await signer.verifyMessage(name,signature)).toLowerCase()
-      assert(ownerAddress,'requires an owner address derived from signature')
+    async function createToken({name,ownerAddress}){
       assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
-      return commands.createType('createPendingToken',{name,userid:user.id,ownerAddress})
-    }
-
-    async function createToken({name}){
-      assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
-      return commands.createType('createPendingToken',{name,userid:user.id})
+      const data = {name,userid:user.id}
+      if (ownerAddress) data.ownerAddress = ownerAddress.toLowerCase()
+      return commands.createType('createPendingToken',data)
     }
 
     async function setAdmin({userid,isAdmin}){
@@ -32,7 +24,6 @@ module.exports = (config,{query,commands,users,signer}) => {
 
     return {
       createToken,
-      createTokenWithOwner,
       setAdmin,
     }
   }
