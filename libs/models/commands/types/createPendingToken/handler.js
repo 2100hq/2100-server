@@ -16,8 +16,9 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       return commands.setState(cmd.id,'Sign Create Coupon')
     },
     async 'Sign Create Coupon'(cmd){
-      const message = await signer.createTokenMessage(cmd.name)
-      const data = await signer.sign(message)
+      const messageId = await signer.createTokenMessage(cmd.name)
+      const { v, r, s } = await signer.sign(messageId)
+      const data = { symbol: cmd.name, messageId, v, r, s }
 
       const coupon = await coupons.create.create({
         id:cmd.name,
