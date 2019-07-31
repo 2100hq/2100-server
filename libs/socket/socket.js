@@ -50,7 +50,9 @@ module.exports = async (config, libs) => {
               assert(valid,'Authentication Failed')
               socket.userid = address.toLowerCase()
               socket.join(socket.userid)
-              query.privateState(socket.userid).then(state=>{
+              libs.users.getOrCreate(socket.userid).then(user=>{
+                query.privateState(socket.userid)
+              }).then(state=>{
                 io.to(socket.userid).emit('private',[],state)
               }).catch(err=>{
                 console.log('err getting private state',err)

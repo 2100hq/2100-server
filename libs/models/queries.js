@@ -80,7 +80,7 @@ module.exports = (config,libs)=>{
 
   async function getUser(userid){
     assert(userid,'requires user id')
-    return libs.users.getOrCreate(userid)
+    return libs.users.get(userid)
   }
 
   async function listStakes(){
