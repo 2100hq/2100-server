@@ -111,7 +111,7 @@ module.exports = (config,libs)=>{
         locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
-      myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,50),'id'),
+      myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
       myCoupons:{
         mint:lodash.keyBy(await userMintCoupons(userid),'id'),
       },
@@ -178,5 +178,6 @@ module.exports = (config,libs)=>{
     adminState,
     userMintCoupons,
     listCreateCoupons,
+    userCommandHistory,
   }
 }

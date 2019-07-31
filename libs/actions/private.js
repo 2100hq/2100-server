@@ -12,6 +12,10 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
       return user
     }
 
+    function myCommandHistory({start=0,length=50}){
+      return query.userCommandHistory(user.id,start,length)
+    }
+
 
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
@@ -35,6 +39,7 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
 
     return {
       me,
+      myCommandHistory,
     }
   }
 }
