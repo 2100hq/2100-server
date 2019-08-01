@@ -23,7 +23,6 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       const coupon = await coupons.create.create({
         id:messageId,
         data,
-        userid:cmd.userid,
         name:cmd.name,
         description:`Submit to chain to create 2100 for @${cmd.name}`
       })

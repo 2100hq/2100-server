@@ -1,7 +1,7 @@
 module.exports = () => {
   return {
     id: 'string',
-    userid:'string',
+    userid:{type:'string',optional:true},
     data:'object',
     description:'string',
   }
