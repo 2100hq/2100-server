@@ -48,13 +48,16 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
       await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
-      return commands.setState(cmd.id,'Remove Pending')
+      return commands.setState(cmd.id,'Claim Coupon')
     },
     //set coupon as done
-    async 'Remove Pending'(cmd){
+    async 'Claim Coupon'(cmd){
       const pending = await tokens.pending.get(cmd.name)
-      await tokens.pending.delete(cmd.name)
       if(pending.couponid) await coupons.create.setDone(pending.couponid)
+      return commands.setState(cmd.id,'Remove Pending')
+    },
+    async 'Remove Pending'(cmd){
+      await tokens.pending.delete(cmd.name)
       return commands.success(cmd.id,'Token Confirmed and Enabled')
     }
   }
