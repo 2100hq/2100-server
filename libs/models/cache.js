@@ -14,6 +14,12 @@ module.exports = config =>{
     has(id){
       return map.has(id)
     },
+    hasAll(ids=[]){
+      return ids.reduce((result,id)=>{
+        if(result === false) return result
+        return map.has(id)
+      },true)
+    },
     latest(){
       return [...map.values()].reduce((max,next)=>{
         if(max == null ) return next
@@ -28,6 +34,9 @@ module.exports = config =>{
     },
     getByToken(id){
       return [...map.values()].filter(x=>x.tokenid == id)
-    }
+    },
+    getByUser(userid){
+      return [...map.values()].filter(x=>x.userid == userid)
+    },
   }
 }

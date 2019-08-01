@@ -2,12 +2,21 @@ const lodash = require('lodash')
 const assert = require('assert')
 const pad = require('pad')
 const Rethink = require('rethinkdb')
+const bn = require('bignumber.js')
 
 
 exports.regexAddress = /^0x[a-f0-9]+$/
 exports.regexLowerNum = /^[a-z0-9]+$/
 exports.regexLowerUrl = /^[a-z0-9_-]+$/
 exports.regexTwitter = /^[a-z0-9_]{1,15}$/
+
+//validate stakes ad up to 1 or less and that they are positive
+exports.validateStakes = (stakes)=>{
+  assert(lodash.size(stakes) > 0,'Requires at least 1 stake')
+  assert(lodash.sum(lodash.values(stakes)) <= 1,'Stakes add up to more than balance')
+  assert(lodash.every(stakes,value=>bn(value).isGreaterThanOrEqualTo(0)),'Stakes must be 0 or greater')
+  return stakes
+}
 
 exports.GetWallets = wallets => type =>{
   assert(wallets,'requires wallet type tables')
@@ -23,6 +32,12 @@ exports.parseError = err => {
     message:err.message,
     stack:err.stack,
   }
+}
+
+exports.stakeid = (userid,tokenid) =>{
+  assert(userid,'requires userid')
+  assert(tokenid,'requires tokenid')
+  return [userid,tokenid].join('!')
 }
 
 exports.blockid = (number)=>{
