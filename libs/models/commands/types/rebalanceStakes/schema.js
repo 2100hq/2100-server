@@ -1,6 +1,6 @@
-module.exports = config =>{
+module.exports = () => {
   return {
-    //key value [tokenid]:value
-    stakes:{type:'object'}
   }
 }
+
+

@@ -16,7 +16,9 @@ module.exports = config =>{
     },
     hasAll(ids=[]){
       return ids.reduce((result,id)=>{
-        if(result === false) return result
+        if(result === false){
+          return result
+        }
         return map.has(id)
       },true)
     },

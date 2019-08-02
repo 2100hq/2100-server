@@ -24,9 +24,10 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
     }
 
     async function stake(stakes){
-      assert(validateStakes(stakes),'Invalid stakes configuration')
+      const {balance} = await getWallets('available').get(user.id,config.primaryToken)
+      validateStakes(stakes,balance)
       assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
-      return commands.createType('rebalanceStakes',{userid:user.id,stakes})
+      return commands.createType('setAbsoluteStakes',{userid:user.id,stakes})
     }
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')

@@ -17,7 +17,7 @@ module.exports = async (config={},libs,emit=x=>x) => {
       // external:Wallets.Model({},Cache(),(...args)=>emit('external',...args)),
       locked:Wallets.Model({},Cache(),(...args)=>emit('wallets.locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
-      stakes:Wallets.Model({allowFloats:true},Cache(),(...args)=>emit('wallets.stakes',...args)),
+      stakes:Wallets.Model({},Cache(),(...args)=>emit('wallets.stakes',...args)),
     },
     //all tokens we knwo of
     tokens:{

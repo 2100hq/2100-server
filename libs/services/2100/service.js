@@ -83,8 +83,10 @@ module.exports = async (config)=>{
     'withdrawPrimary',    //handle blockchain withdraws
     'createPendingToken', //handle pending tokens created from api
     'createActiveToken',  //handle blockchain tokens created from blockchain
-    'rebalanceStakes',    //handle user stakes updates
+    'rebalanceStakes',    //handle rebalancing stakes during withdraw/deposit
+    'setAbsoluteStakes',    //handle user stakes updates
   ]
+
   libs.handlers = Handlers({...config,commandTypes},libs)
 
   //adding engines

@@ -9,6 +9,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
   //addresses need to be lower cased for all comparisons in the rest of the system
   const handlers = {
     async Deposit(event){
+      //this command now issue a rebalance stakes command on success
       return commands.createType('pendingDeposit',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
@@ -21,6 +22,7 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
       })
     },
     async Withdraw(event){
+      //this command now issue a rebalance stakes command on success
       return commands.createType('withdrawPrimary',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,

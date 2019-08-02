@@ -1,64 +1,68 @@
-const lodash = require('lodash')
 const assert = require('assert')
+const lodash = require('lodash')
 const Promise = require('bluebird')
+const bn = require('bignumber.js')
 //should be run in the transaction queue
-//like anything which reads or writes wallets
-const {validateStakes} = require('../../../../utils')
-module.exports = (config,{commands,getWallets,tokens})=>{
-  assert(commands,'requires commands table')
-  assert(getWallets,'requires getWallets function')
-  assert(tokens,'requires tokens table')
-  assert(tokens.active,'requires active tokens table')
+//this is an accounting process which can be initiated by
+//any event, but most likely a withdraw or deposit.
+//it has to make sure our staking accounts match what our dai deposit is
+module.exports = (config,{commands,getWallets})=>{
+  assert(commands,'requires commands')
+  assert(getWallets,'requires getWallets')
+  assert(config.primaryToken,'requires primary token')
+
   return {
     async Start(cmd){
-      try{
-        validateStakes(cmd.stakes)
-        assert(await tokens.active.hasAll(lodash.keys(cmd.stakes)),'Unable to stake on a token that is not active')
-      }catch(err){
-        return commands.failure(cmd.id,err.message)
-      }
-      return commands.setState(cmd.id,'Calculate All Stakes')
+      return commands.setState(cmd.id,'Validate Stakes')
     },
-    async 'Calculate All Stakes'(cmd){
-      const wallets = await getWallets('stakes')
-      //convert array of stakes to [tokenid]:balance object
-      const currentStakes = lodash.reduce(await wallets.getByUser(cmd.userid),(result,value,id)=>{
-        result[value.tokenid] = value.balance
-        return result
-      },{})
+    async 'Validate Stakes'(cmd){
+      const available = await getWallets('available').get(cmd.userid,config.primaryToken)
+      const stakes = await getWallets('stakes').getByUser(cmd.userid)
+      const staked = bn.sum(...stakes.map(x=>x.balance))
 
-      const newStakes = {
-        ...currentStakes,
-        ...cmd.stakes
+      const delta = bn(available.balance).minus(staked)
+
+      const update = {
+        delta:delta.toString(),
+        staked:staked.toString(),
+        available:available.balance,
+      }
+      //this means our avaialble balance exeeeds our total staked wallets
+      if(delta.isPositive()){
+        //add stake
+        return commands.setState(cmd.id,'Add Stake',update)
       }
 
-      try{
-        validateStakes(newStakes)
-        assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
-      }catch(err){
-        return commands.failure(cmd.id,err.message)
+      //this means our staking exceeds our dai balance
+      if(delta.isNegative()){
+        return commands.setState(cmd.id,'Reset Stakes',update)
       }
 
-      //throw here for now so we can see if this causes any problems by crashing
-      //in future we can add the commented out code below to reset state
-      await Promise.map(lodash.entries(newStakes),async ([tokenid,balance])=>{
-        //make sure wallet exists
-        await wallets.getOrCreate(cmd.userid,tokenid)
-        return wallets.setBalance(cmd.userid,tokenid,balance)
+      return commands.success(cmd.id,'Stakes match available funds',update)
+    },
+    //in this case we add stake to the dai 
+    //wallet, in order to allow user to 
+    //add new stake amounts manually
+    async 'Add Stake'(cmd){
+      console.log(cmd)
+      await getWallets('stakes').getOrCreate(cmd.userid,config.primaryToken)
+      const wallet = await getWallets('stakes').deposit(cmd.userid,config.primaryToken,cmd.delta)
+      return commands.success(cmd.id,'Added Funds To Stake',{balance:wallet.balance})
+    },
+    //in this case we want to strategically remove stakes. 
+    //v1: remove all stakes
+    async 'Reset Stakes'(cmd){
+      const stakes = await getWallets('stakes').getByUser(cmd.userid)
+      //set all stakes to 0
+      await Promise.map(stakes,wallet=>{
+        return getWallets('stakes').setBalance(wallet.userid,wallet.tokenid,0)
       })
-
-      //}catch(err){
-      //  //if any errors occur, we will reset to original balance
-      //  //if an error occurs here we will crash the app. if its common then we will have
-      //  //to catch it and retry or do something sensible.
-      //  await Promise.map(lodash.entries(currentStakes),async ([tokenid,balance])=>{
-      //    await wallets.getOrCreate(cmd.userid,tokenid)
-      //    return wallets.setBalance(cmd.userid,tokenid,balance)
-      //  })
-      //}
-
-      return commands.success(cmd.id,'Stakes Updated')
-    },
+      //set primary token wallet to the total available balance, resetting users ability to stake
+      const wallet = await getWallets('stakes').setBalance(cmd.userid,config.primaryToken,cmd.available)
+      return commands.success(cmd.id,'Stakes Reset',{balance:wallet.balance})
+    }
+    //future unstaking strategies can be added as a new state transition
+    // async 'Remove Stakes Until OK'(cmd)...
   }
-}
 
+}

@@ -30,6 +30,8 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       if(bn(cmd.value).isGreaterThan(total)){
         return commands.success(cmd.id,'Funds Overdrawn',{total})
       }
+      //we need to rebalance staking as soon as withdraw completes
+      await commands.createType('rebalanceStakes',{userid:cmd.fromAddress})
       return commands.success(cmd.id,'Withdraw Success')
     },
   }

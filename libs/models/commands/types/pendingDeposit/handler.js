@@ -41,6 +41,8 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       try{
         await locked.withdraw(cmd.toAddress,cmd.tokenid,transferAmount)
         const wallet = await available.deposit(cmd.toAddress,cmd.tokenid,transferAmount)
+        //we are firining off this command because we need to update staking wallets
+        await commands.createType('rebalanceStakes',{userid:cmd.toAddress})
         return commands.success(cmd.id,'Deposit Success',{balance:wallet.balance})
       }catch(err){
         return commands.failure(cmd.id,err.message)

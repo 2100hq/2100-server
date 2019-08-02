@@ -1,3 +1,6 @@
-module.exports = config =>{
-  return props => props
+module.exports = config => {
+  return props => {
+    return props
+  }
 }
+
