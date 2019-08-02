@@ -13,6 +13,8 @@ module.exports = (config,{query,commands,users,signer,coupons}) => {
     async function createToken({name,ownerAddress}){
       assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
       assert(!(await coupons.create.has(name.toLowerCase())),'Coupon already exists')
+      assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
+
       assert(ownerAddress,'requires owners address to create token')
       const data = {name,userid:user.id}
       data.ownerAddress = ownerAddress.toLowerCase()

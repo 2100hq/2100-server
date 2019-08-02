@@ -19,13 +19,18 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
       const messageId = await signer.createTokenMessage(cmd.name)
       const { v, r, s } = await signer.sign(messageId)
       const data = { symbol: cmd.name, messageId, v, r, s }
+      let coupon
+      try {
+        coupon = await coupons.create.create({
+          id:messageId,
+          data,
+          name:cmd.name,
+          description:`Submit to chain to create 2100 for @${cmd.name}`
+        })
+      } catch(e){
+        return commands.failure(cmd.id, e.message)
+      }
 
-      const coupon = await coupons.create.create({
-        id:messageId,
-        data,
-        name:cmd.name,
-        description:`Submit to chain to create 2100 for @${cmd.name}`
-      })
 
       return commands.setState(cmd.id,'Create Pending Token', {couponid: coupon.id})
     },
