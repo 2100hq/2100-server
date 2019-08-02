@@ -118,6 +118,10 @@ module.exports = (config,libs)=>{
         available:lodash.keyBy(await getUserWallets('available',userid),'tokenid'),
         locked:lodash.keyBy(await getUserWallets('locked',userid),'tokenid')
       },
+      myStakes:lodash.reduce(await getUserWallets('stakes',userid),(result,wallet)=>{
+        result[wallet.tokenid] = wallet.balance
+        return result
+      },{}),
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
       myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
       myCoupons:{

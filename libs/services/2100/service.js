@@ -79,10 +79,11 @@ module.exports = async (config)=>{
   }
 
   const commandTypes = [
-    'pendingDeposit',   //handle blockchain pending deposits
-    'withdrawPrimary',  //handle blockchain withdraws
-    'createPendingToken',  //handle pending tokens created from api
+    'pendingDeposit',     //handle blockchain pending deposits
+    'withdrawPrimary',    //handle blockchain withdraws
+    'createPendingToken', //handle pending tokens created from api
     'createActiveToken',  //handle blockchain tokens created from blockchain
+    'rebalanceStakes',    //handle user stakes updates
   ]
   libs.handlers = Handlers({...config,commandTypes},libs)
 
@@ -142,7 +143,7 @@ module.exports = async (config)=>{
   loop(async x=>{
     const commands = await libs.commands.getDone(false)
     if(commands.length) console.log('processing',commands.length,'commands')
-    return highland(commands)
+    return highland(lodash.orderBy(commands,['id'],['asc']))
       .map(libs.engines.commands.runToDone)
       .flatMap(highland)
       .collect()

@@ -30,6 +30,9 @@ module.exports = (config,libs,emit)=>{
       case 'wallets.locked':{
         return emit('private',data.userid,['myWallets','locked',data.tokenid],data)
       }
+      case 'wallets.stakes':{
+        return emit('private',data.userid,['myStakes',data.tokenid],data.balance)
+      }
       case 'coupons.mint':{
         return emit('private',data.userid,['myCoupons','mint',data.id],data)
       }

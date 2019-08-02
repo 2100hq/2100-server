@@ -1,4 +1,5 @@
 const { Table } = require('../../utils').Rethink
+const Promise = require('bluebird')
 const assert = require('assert')
 
 module.exports = async (config, con) => {
@@ -19,7 +20,14 @@ module.exports = async (config, con) => {
     getByName(name){
       assert(name,'requires token name')
       return table.getBy('name',name)
+    },
+    hasAll(ids=[]){
+      return Promise.reduce(ids,(result,id)=>{
+        if(result === false) return result
+        return table.has(id)
+      },true)
     }
+
   }
 }
 

@@ -8,6 +8,7 @@ const bn = require('bignumber.js')
 
 //wallets should be processed in wei strings
 module.exports = function(config,table,emit=x=>x) {
+  const {allowFloats} = config
   const validate = Validate(Schema(config))
   const defaults = Defaults(config)
 
@@ -42,7 +43,11 @@ module.exports = function(config,table,emit=x=>x) {
   async function canWithdraw(userid,tokenid,amount){
     const wallet = await get(userid,tokenid)
     amount = bn(amount)
-    assert(amount.isInteger(),'Withdraw amount must be a number')
+    if(allowFloats){
+      assert(amount.isFinite(), 'amount required to be a number!')
+    }else{
+      assert(amount.isInteger(), 'amount required to be a number!')
+    }
     assert(amount.isGreaterThan(0),'Withdraw amount must be above 0')
     assert(amount.isLessThanOrEqualTo(wallet.balance),'Withdraw amount exceeds balance')
     return wallet
@@ -63,7 +68,11 @@ module.exports = function(config,table,emit=x=>x) {
   async function setBalance(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
     amount = bn(amount)
-    assert(amount.isInteger(), 'amount required to be a number!')
+    if(allowFloats){
+      assert(amount.isFinite(), 'amount required to be a number!')
+    }else{
+      assert(amount.isInteger(), 'amount required to be a number!')
+    }
     // going to allow balances to be negative for now....
     // assert(amount.isGreaterThanOrEqualTo(0), 'balance must be 0 or greater')
     wallet.balance = amount.toString()

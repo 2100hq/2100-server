@@ -1,6 +1,9 @@
 const assert = require('assert')
+const lodash = require('lodash')
+const {validateStakes} = require('../utils')
 module.exports = (config,{query,getWallets,commands,tokens}) => {
   assert(tokens,'requires tokens')
+  assert(tokens.active,'requires active tokens')
   assert(getWallets,'requires tokens')
   assert(commands,'requires queries')
 
@@ -20,6 +23,11 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
       return query.privateState(user.id)
     }
 
+    async function stake(stakes){
+      assert(validateStakes(stakes),'Invalid stakes configuration')
+      assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
+      return commands.createType('rebalanceStakes',{userid:user.id,stakes})
+    }
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
     //   const {balance} = await wallet.get(user.id)
@@ -44,6 +52,7 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
       me,
       myCommandHistory,
       state,
+      stake,
     }
   }
 }
