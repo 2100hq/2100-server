@@ -1,5 +1,5 @@
 module.exports = {
-  Handlers:require('./handlers'),
+  Handler:require('./handler'),
   Schema:require('./schema'),
   Defaults:require('./defaults')
 }

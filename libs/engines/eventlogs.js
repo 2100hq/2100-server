@@ -1,10 +1,13 @@
 const assert = require('assert')
+const Promise = require('bluebird')
 
-module.exports = (config,{commands,eventlogs,ethers})=>{
+module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
   assert(config.confirmations,'requires confirmations count')
   assert(config.primaryToken,'requires primary token')
   assert(commands,'requires commands library')
   assert(ethers,'requires ethers library')
+  assert(tokens,'requires tokens')
+  assert(getWallets,'requires getWallets')
 
   //addresses need to be lower cased for all comparisons in the rest of the system
   const handlers = {
@@ -41,6 +44,13 @@ module.exports = (config,{commands,eventlogs,ethers})=>{
         createdBlock:event.blockNumber,
         creatorAddress:event.values.creator.toLowerCase(),
         contractAddress:event.values.token.toLowerCase(),
+      })
+    },
+    //synthetic event produced at the end of each block.
+    //find all tokens with stakers and generate stake rewards.
+    async RewardStakers(event){
+      return commands.createType('generateStakeRewards',{
+        ...event.values
       })
     },
   }

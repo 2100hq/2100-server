@@ -45,9 +45,10 @@ exports.stakeid = (userid,tokenid) =>{
 exports.blockid = (number)=>{
   return pad(16,number,'0')
 }
-exports.eventid = (address,number,index=0)=>{
+exports.eventid = (address,number,index)=>{
   assert(address,'requires contract address')
   assert(number,'requires block number')
+  assert(index >= 0,'index must be a positive number')
   return [pad(16,number,'0'),pad(16,index,'0'),address].join('!')
 }
 

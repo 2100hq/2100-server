@@ -5,14 +5,49 @@ const highland = require('highland')
 
 const {stringifyValues} = require('../utils')
 
-module.exports = (config,{eventlogs,ethers})=>{
-  const {primaryToken,contracts=[]} = config
+module.exports = (config,{eventlogs,ethers,tokens})=>{
+  const {primaryToken,contracts=[],systemAddress,disableBlockRewards=false} = config
   assert(eventlogs,'requires eventlogs')
   assert(ethers,'requires ethers')
   assert(primaryToken,'requires primary token symbol')
+  assert(tokens,'requires tokens')
+
+
+  //generate synthetic block events to trigger stake rewards
+  async function processStakeRewards(block,contract,startIndex){
+    const activeTokens = await tokens.active.list()
+    // console.log('active',activeTokens)
+    //should also probably filter unstaked tokens but maybe later
+    const rewards = await Promise.map(activeTokens,(token,index)=>{
+      // console.log(block.number,{index,startIndex},contract.contractAddress)
+      return eventlogs.create({
+        blockHash:block.hash,
+        blockNumber:block.number,
+        synthetic:true,
+        index:index + startIndex,
+        contractAddress:contract.contractAddress,
+        contractName:contract.contractName,
+        name:'RewardStakers',
+        topic:'RewardStakers',
+        transactionHash:'0xF',
+        signature:'RewardStakers()',
+        values:{
+          userid:systemAddress,
+          tokenid:token.id,
+          minimumStake:token.minimumStake || '0',
+          ownerShare:token.ownerShare,
+          ownerAddress:token.ownerAddress,
+          reward:token.reward,
+        }
+      })
+
+    })
+    // console.log('rewards',rewards)
+    return rewards
+  }
 
   async function tick(block){
-    return highland(contracts)
+    const events = await highland(contracts)
       .map(async contract=>{
         const logs = await ethers.getLogs({blockHash:block.hash,address:contract.contractAddress})
         // console.log('logs',logs)
@@ -42,6 +77,15 @@ module.exports = (config,{eventlogs,ethers})=>{
       .flatMap(highland)
       .collect()
       .toPromise(Promise)
+
+    if(disableBlockRewards) return events
+    //hope contract 0 is 2100 controller contract
+    const rewards = await processStakeRewards(block,contracts[0],events.length)
+
+    return [
+      ...events,...rewards
+    ]
+
   }
 
 

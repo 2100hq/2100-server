@@ -5,6 +5,7 @@ module.exports = () => {
     contractAddress:{type:'string',pattern:regexAddress},
     name:{type:'string',pattern:regexTwitter},
     supply:{type:'string',numeric:true},
+    minimumStake:{type:'string',numeric:true},
     decimals:{type:'number',min:0,max:18},
     ownerShare:{type:'number',max:1,min:0},
     ownerAddress:{type:'string',pattern:regexAddress},

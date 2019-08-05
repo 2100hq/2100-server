@@ -62,7 +62,7 @@ module.exports = async (config)=>{
   //we need to init this with our last processed block
   const lastBlock = await libs.blocks.latest()
   if(lastBlock){
-    config.ethers.defaultStartBlock = lastBlock.number
+    config.ethers.defaultStartBlock = lastBlock.number + 1
   }
 
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
@@ -85,6 +85,9 @@ module.exports = async (config)=>{
     'createActiveToken',  //handle blockchain tokens created from blockchain
     'rebalanceStakes',    //handle rebalancing stakes during withdraw/deposit
     'setAbsoluteStakes',    //handle user stakes updates
+    'generateStakeRewards',    //handle user stakes updates
+    'transferOwnerReward',    //handle crediting owner rewards
+    'transferStakeReward',    //handle crediting stake rewards
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)
@@ -161,7 +164,7 @@ module.exports = async (config)=>{
     // console.log(blocks)
     return highland(lodash.orderBy(blocks,['id'],['asc']))
     .map(async block=>{
-      // console.log('processing block',block.number)
+      console.log('processing block',block.number)
       const result = await libs.engines.blocks.tick(block)
       // console.log('completed block')
       return libs.blocks.setDone(block.id)
@@ -176,13 +179,13 @@ module.exports = async (config)=>{
   loop(async x=>{
     const events = await libs.eventlogs.getDone(false)
     return highland(lodash.orderBy(events,['id'],['asc']))
-    .map(async event=>{
-      const result = await libs.engines.eventlogs.tick(event)
-      return libs.eventlogs.setDone(event.id)
-    })
-    .flatMap(highland)
-    .collect()
-    .toPromise(Promise)
+      .map(async event=>{
+        const result = await libs.engines.eventlogs.tick(event)
+        return libs.eventlogs.setDone(event.id)
+      })
+      .flatMap(highland)
+      .collect()
+      .toPromise(Promise)
   },1000).catch(err=>{
     console.log('event engine error',err)
     process.exit(1)
