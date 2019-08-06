@@ -18,7 +18,7 @@ module.exports = (config,{commands,blocks,getWallets})=>{
     async 'Wait For Confirmations'(cmd){
       const block = await blocks.latest()
       // console.log('latest block',block.number,cmd.blockNumber,cmd.confirmations)
-      if(Number(block.number) >= Number(cmd.blockNumber) + Number(cmd.confirmations)){
+      if((Number(block.number) + 1) >= Number(cmd.blockNumber) + Number(cmd.confirmations)){
         return commands.setState(cmd.id,'Credit Deposit')
       }else{
         return commands.yield(cmd.id)
