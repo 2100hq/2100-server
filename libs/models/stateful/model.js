@@ -13,49 +13,65 @@ module.exports = (config, table, emit=x=>x) => {
     return table.get(id)
   }
 
-  async function set (value) {
+  async function set (value,previous) {
     validate(defaults(value))
     value.updated = Date.now()
     await table.set(value.id, value)
-    emit('change',value)
+    //if we provide a previous state, then check that against new state
+    // console.log('set state',value.state,previous.state)
+    if(previous){
+      //only emit change if state changes, this will reduce number of emissions
+      if(value.state !== previous.state || value.done !== previous.done) emit('change',value)
+    }
     return value
   }
 
   function create (props) {
-    return set(defaults(props))
+    return set(defaults(props),props)
   }
 
   async function setState (id, state, props = {}) {
     assert(state, 'requires state')
     const val = await get(id)
-    val.state = state
-    val.yield = false
-    return set({ ...val, ...props })
+    const update = {
+      state:state,
+      yield:false,
+    }
+    return set({ ...val, ...update, ...props },val)
   }
 
   async function success (id, resolve, props = {}) {
     const val = await get(id)
-    val.state = 'Success'
-    val.done = true
-    val.yield = false
-    val.resolve = resolve
-    return set({ ...val, ...props })
+
+    const update = {
+      state : 'Success',
+      done : true,
+      yield : false,
+      resolve : resolve,
+    }
+
+    return set({ ...val, ...update, ...props },val)
   }
   async function failure (id, reject, props = {}) {
     const val = await get(id)
-    val.state = 'Failure'
-    val.done = true
-    val.yield = false
-    val.reject = reject
-    return set({ ...val, ...props })
+
+    const update = {
+      state : 'Failure',
+      done : true,
+      yield : false,
+      reject : reject,
+    }
+    return set({ ...val, ...update, ...props },val)
   }
   
   //hack which allows command to yield to other
   //commands. doesnt really belong here but easiest
   async function yield(id,value=true){
     const cmd = await get(id)
-    cmd.yield = value
-    return set(cmd)
+    const update = {
+      yield:value
+    }
+    return set({...cmd,...update},cmd)
   }
 
   return {
