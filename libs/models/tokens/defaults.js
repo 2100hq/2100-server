@@ -6,6 +6,7 @@ module.exports = (config={}) => {
   assert(config.ownerAddress,'requires default token ownerAddress')
   assert(config.reward,'requires default token block reward in eth')
   assert(config.decimals,'requires default token decimals')
+  assert(config.minimumStake,'requires default token minimumStake')
 
   return (props = {}) => {
     return {
@@ -15,6 +16,7 @@ module.exports = (config={}) => {
       creatorReward:config.creatorReward,
       ownerAddress:config.ownerAddress,
       reward:config.reward,
+      minimumStake:config.tokens.minimumStake,
       decimals:Number(config.decimals),
       created:Date.now(),
       ...props

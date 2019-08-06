@@ -12,6 +12,7 @@ module.exports = () => {
     creatorAddress:{type:'string',pattern:regexAddress},
     creatorReward:{type:'string',numeric:true},
     reward:{type:'string',numeric:true},
+    minimumStake:{type:'string',numeric:true},
     createdBlock:'number',
   }
 }
