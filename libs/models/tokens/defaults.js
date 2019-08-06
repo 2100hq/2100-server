@@ -16,7 +16,7 @@ module.exports = (config={}) => {
       creatorReward:config.creatorReward,
       ownerAddress:config.ownerAddress,
       reward:config.reward,
-      minimumStake:config.tokens.minimumStake,
+      minimumStake:config.minimumStake,
       decimals:Number(config.decimals),
       created:Date.now(),
       ...props
