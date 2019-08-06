@@ -88,6 +88,7 @@ module.exports = async (config)=>{
     'generateStakeRewards',    //handle user stakes updates
     'transferOwnerReward',    //handle crediting owner rewards
     'transferStakeReward',    //handle crediting stake rewards
+    'transferCreatorReward',    //handle crediting creator rewards
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)

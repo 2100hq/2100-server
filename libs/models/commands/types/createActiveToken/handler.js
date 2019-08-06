@@ -30,7 +30,7 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
         ownerAddress:pending.ownerAddress,
         creatorAddress:cmd.creatorAddress,
         creatorReward:cmd.creatorReward,
-        miniumStake:cmd.miniumStake,
+        minimumStake:cmd.minimumStake,
         supply:cmd.supply,
         name:cmd.name,
         createdBlock:cmd.createdBlock,
@@ -49,6 +49,14 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
       await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
+      if(cmd.creatorAddress && bn(cmd.creatorReward).isGreaterThan(0)){
+        //submit creator reward command
+        await commands.createType('transferCreatorReward',{
+          userid:cmd.creatorAddress,
+          tokenid:token.id,
+          amount:cmd.creatorReward
+        })
+      }
       return commands.setState(cmd.id,'Remove Coupon')
     },
     //set coupon as done
