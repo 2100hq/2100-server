@@ -30,6 +30,7 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
         ownerAddress:pending.ownerAddress,
         creatorAddress:cmd.creatorAddress,
         creatorReward:cmd.creatorReward,
+        miniumStake:cmd.miniumStake,
         supply:cmd.supply,
         name:cmd.name,
         createdBlock:cmd.createdBlock,

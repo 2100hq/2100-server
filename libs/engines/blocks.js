@@ -15,7 +15,9 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
 
   //generate synthetic block events to trigger stake rewards
   async function processStakeRewards(block,contract,startIndex){
-    const activeTokens = await tokens.active.list()
+    let activeTokens = await tokens.active.list()
+    activeTokens = activeTokens.filter(x=>x.id.toLowerCase() !== primaryToken.toLowerCase())
+
     // console.log('active',activeTokens)
     //should also probably filter unstaked tokens but maybe later
     const rewards = await Promise.map(activeTokens,(token,index)=>{
@@ -34,7 +36,7 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
         values:{
           userid:systemAddress,
           tokenid:token.id,
-          minimumStake:token.minimumStake || '0',
+          minimumStake:token.minimumStake || '1',
           ownerShare:token.ownerShare,
           ownerAddress:token.ownerAddress,
           reward:token.reward,

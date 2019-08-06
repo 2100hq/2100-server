@@ -10,6 +10,7 @@ module.exports = () => {
     creatorReward:{type:'string',numeric:true},
     reward:{type:'string',numeric:true},
     createdBlock:'number',
+    minimumStake:{type:'string',numeric:true},
     transactionHash:'string',
   }
 }

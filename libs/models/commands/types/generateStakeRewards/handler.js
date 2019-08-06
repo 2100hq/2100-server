@@ -6,9 +6,14 @@ module.exports = (config,{commands,getWallets,tokens})=>{
   assert(getWallets,'requires wallets')
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires tokens.active')
+  const {primaryToken} = config
+  assert(primaryToken,'requires primary token')
 
   return {
     Start(cmd){
+      if(cmd.tokenid.toLowerCase() === primaryToken.toLowerCase()){
+        return commands.setState(cmd.id,'Cannot generate stake rewards on primary token')
+      }
       return commands.setState(cmd.id,'Generate Rewards')
     },
     async 'Generate Rewards'(cmd){
@@ -22,10 +27,14 @@ module.exports = (config,{commands,getWallets,tokens})=>{
 
       //filter minmimum stakes
       const allowedStakes = stakes.filter(stake=>{
-        return bn(stake.balance).isGreaterThanOrEqualTo(cmd.minimum || 0)
+        return bn(stake.balance).isGreaterThanOrEqualTo(cmd.minimumStake || 0)
       })
 
-      const total = bn.sum(...allowedStakes.map(s=>s.balance))
+      if(allowedStakes.length === 0){
+        return commands.success(cmd.id,'No Rewards, No Stakers')
+      }
+
+      let total = bn.sum(...allowedStakes.map(s=>s.balance))
 
       const reward = bn.minimum(tokenWallet.balance,cmd.reward)
 
@@ -34,14 +43,20 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //reward to public, reduced by owners percent
       const publicReward = reward.minus(ownerReward)
 
-      const receipts = await Promise.map(allowedStakes,async stake=>{
-        const command = await commands.createType('transferStakeReward',{
-          tokenid:cmd.tokenid,
-          userid:stake.userid,
-          amount:publicReward.dividedBy(total).times(reward).toString()
-        })
-        return command.id
-      })
+      // console.log('ownerreward',ownerReward.toString(),'public reward',publicReward.toString())
+      // console.log('allowed stakes',allowedStakes)
+      // console.log('publicreward',publicReward.toString(),'total',total.toString(),'reward',reward.toString())
+
+
+       const receipts = await Promise.map(allowedStakes,async stake=>{
+         // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
+         const command = await commands.createType('transferStakeReward',{
+           tokenid:cmd.tokenid,
+           userid:stake.userid,
+           amount:bn(stake.balance).dividedBy(total).times(publicReward).toString()
+         })
+         return command.id
+       })
 
       //apply owner reward only if there were stakes
       if(receipts.length){
@@ -54,7 +69,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
         receipts.push(ownerReceipt.id)
       }
 
-      return commands.success(cmd.id,'Rewards Generated',{receipts})
+       return commands.success(cmd.id,'Rewards Generated',{receipts})
     },
   }
 }
