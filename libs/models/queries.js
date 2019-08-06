@@ -1,6 +1,7 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const Promise = require('bluebird')
+const bn = require('bignumber.js')
 module.exports = (config,libs)=>{
 
   // async function getBlock(blocknumber){
@@ -56,6 +57,23 @@ module.exports = (config,libs)=>{
   function listUsers(){
     return libs.users.list()
   }
+
+  async function sumStakes(tokenid){
+    assert(tokenid,'requires tokenid')
+    const stakes = await libs.getWallets('stakes').getByToken(tokenid)
+    if(stakes.length == 0) return '0'
+    return bn.sum(...stakes.map(s=>s.balance)).toString()
+  }
+
+  //list all token stakes 
+  async function allStakes(){
+    const tokens = await libs.tokens.active.list()
+    return Promise.reduce(tokens,async (result,token)=>{
+      result[token.id] = await sumStakes(token.id)
+      return result
+    },{})
+  }
+
   function getTokenByName(token){
     return libs.tokens.active.getByName(token)
   }
@@ -89,10 +107,6 @@ module.exports = (config,libs)=>{
       user.isSystemAddress = true
     }
     return user
-  }
-
-  async function listStakes(){
-    return libs.stakes.list()
   }
 
   async function userCommands(userid,done=false){
@@ -164,6 +178,9 @@ module.exports = (config,libs)=>{
         pending:lodash.keyBy((await listPendingTokens()),'id'),
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
+      stakes:{ 
+        ...(await allStakes())
+      },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },
@@ -193,5 +210,7 @@ module.exports = (config,libs)=>{
     listCreateCoupons,
     userCommandHistory,
     hasActiveTokenByName,
+    allStakes,
+    sumStakes,
   }
 }
