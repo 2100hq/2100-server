@@ -18,7 +18,12 @@ module.exports = (config,{commands,getWallets})=>{
     async 'Validate Stakes'(cmd){
       const available = await getWallets('available').get(cmd.userid,config.primaryToken)
       const stakes = await getWallets('stakes').getByUser(cmd.userid)
-      const staked = bn.sum(...stakes.map(x=>x.balance))
+
+      let staked = bn(0)
+
+      if(stakes.length){
+        staked = bn.sum(...stakes.map(x=>x.balance))
+      }
 
       const delta = bn(available.balance).minus(staked)
 
