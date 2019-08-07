@@ -53,7 +53,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
          const command = await commands.createType('transferStakeReward',{
            tokenid:cmd.tokenid,
            userid:stake.userid,
-           amount:bn(stake.balance).dividedBy(total).times(publicReward).toString()
+           amount:bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
          })
          return command.id
        })
