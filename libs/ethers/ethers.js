@@ -1,7 +1,6 @@
 const ethers = require('ethers')
 const lodash = require('lodash')
 const assert = require('assert')
-const Catchup = require('./catchup')
 
 module.exports = async (config,libs,emit=x=>x) => {
   assert(config.provider.type,'requires provider type')
@@ -35,7 +34,6 @@ module.exports = async (config,libs,emit=x=>x) => {
         const number = index + defaultStartBlock
         emit('block',number)
       })
-      // await Catchup({startBlock:defaultStartBlock},provider,x=>emit('block',x))
     }
 
     provider.on('block',x=>emit('block',x))
