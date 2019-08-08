@@ -180,6 +180,7 @@ module.exports = async (config)=>{
       // console.log('completed block')
       return libs.blocks.setDone(block.id)
     })
+    .flatMap(highland)
     .collect()
     .toPromise(Promise)
   },1000).catch(err=>{

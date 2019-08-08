@@ -51,7 +51,7 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
   async function tick(block){
     const events = await highland(contracts)
       .map(async contract=>{
-        const logs = await ethers.getLogs({blockHash:block.hash,address:contract.contractAddress})
+        const logs = await ethers.getLogs({fromBlock:block.number,toBlock:block.number,address:contract.contractAddress})
         // console.log('logs',logs)
         return logs.map((log,index)=>{
           // console.log('log index',index,block.number)
