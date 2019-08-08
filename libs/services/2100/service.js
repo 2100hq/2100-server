@@ -59,12 +59,6 @@ module.exports = async (config)=>{
 
   libs.getWallets = GetWallets(libs.wallets)
 
-  //we need to init this with our last processed block
-  const lastBlock = await libs.blocks.latest()
-  if(lastBlock){
-    config.ethers.defaultStartBlock = lastBlock.number + 1
-  }
-
   libs.ethers = await Ethers(config.ethers,{},(...args)=>emitter.emit('eth',args))
   libs.signer = await Signer(config.signer,{provider:libs.ethers})
 
@@ -107,23 +101,28 @@ module.exports = async (config)=>{
   libs.socket = await Socket(config,libs)
 
 
+  const blockStream = highland('eth',emitter)
+
   //events from ethers block chain
-  emitter.on('eth',async ([type,data])=>{
-    try{
-      switch(type){
-        case 'block':{
-          const block = await libs.ethers.getBlock(data)
-          if(! await libs.blocks.has(data)){
-            await libs.blocks.create(block)
-          }
-          return
+  blockStream.map(async ([type,data])=>{
+    switch(type){
+      case 'block':{
+        const block = await libs.ethers.getBlock(data)
+        if(! await libs.blocks.has(data)){
+          await libs.blocks.create(block)
         }
+        return data
       }
-    }catch(err){
-      console.log('eth event error',err)
-      process.exit(1)
     }
+    return data
   })
+  .flatMap(highland)
+  // .doto(x=>console.log('saved',x))
+  .errors(err=>{
+    console.log('eth event error',err)
+    process.exit(1)
+  })
+  .resume()
 
   //write model events to the event reducer, this will output api events
   emitter.on('models',async args=>{
@@ -145,6 +144,17 @@ module.exports = async (config)=>{
       process.exit(1)
     }
   })
+
+  //we need to init this with our last processed block
+  // const lastBlock = await libs.blocks.latestDone()
+  const lastBlock = await libs.blocks.latest()
+  
+  //have to put this after we bind eth events
+  if(lastBlock){
+    await libs.ethers.start(lastBlock.number)
+  }else{
+    await libs.ethers.start()
+  }
 
   loop(async x=>{
     const commands = await libs.commands.getDone(false)

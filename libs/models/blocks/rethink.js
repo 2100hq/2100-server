@@ -22,6 +22,11 @@ module.exports = async (config, con) => {
     getDone(done=false){
       return table.getBy('done',done)
     },
+    latestDone(done=true){
+      return table.run(
+        table.table().getAll(done,{index:'done'}).max('id')
+      )
+    },
     latest(){
       const query = table.table().max({index:'id'})
       return table.run(query).catch(err=>{

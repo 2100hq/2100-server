@@ -1,19 +1,18 @@
 const ethers = require('ethers')
+const lodash = require('lodash')
 const assert = require('assert')
+const Catchup = require('./catchup')
 
-module.exports = async (config,{},emit=x=>x) => {
-  const {defaultStartBlock} = config
+module.exports = async (config,libs,emit=x=>x) => {
   assert(config.provider.type,'requires provider type')
 
 
-  console.log({defaultStartBlock})
+  // console.log({defaultStartBlock})
   // assert(defaultStartBlock,'requires starting block')
 
   const provider = new ethers.providers[config.provider.type](config.provider.url,config.provider.network)
 
-  if(defaultStartBlock) provider.resetEventsBlock(defaultStartBlock)
-
-  provider.on('block',x=>emit('block',x))
+  // if(defaultStartBlock) provider.resetEventsBlock(defaultStartBlock)
 
   const decodeLog = (abi,meta={}) => {
     const iface = new ethers.utils.Interface(abi)
@@ -25,14 +24,23 @@ module.exports = async (config,{},emit=x=>x) => {
     }
   }
 
-  function signData(hash){
-  }
-
-  function verifySignature(hash){
-  }
-
   provider.decodeLog = decodeLog
   provider.utils = ethers.utils
+
+  provider.start = async (defaultStartBlock)=>{
+    if(lodash.isFinite(defaultStartBlock)){
+      const currentBlockNumber = await provider.getBlockNumber()
+      console.log(defaultStartBlock,currentBlockNumber)
+      lodash.times(currentBlockNumber-defaultStartBlock,index=>{
+        const number = index + defaultStartBlock
+        emit('block',number)
+      })
+      // await Catchup({startBlock:defaultStartBlock},provider,x=>emit('block',x))
+    }
+
+    provider.on('block',x=>emit('block',x))
+
+  }
 
   return provider
 
