@@ -232,6 +232,6 @@ module.exports = (config,libs)=>{
     allStakes,
     sumStakes,
     allStakesDetailed,
-    allStakes,
+    detailedStakes,
   }
 }

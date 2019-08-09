@@ -50,7 +50,7 @@ module.exports = (config,libs,emit)=>{
 
   async function publicEvent([table,method,data]){
     if(table == 'wallets.stakes'){
-      emit('public',['stakes',data.tokenid],await libs.query.allStakes(data.tokenid))
+      emit('public',['stakes',data.tokenid],await libs.query.detailedStakes(data.tokenid))
     }
     if(table.includes('wallets')){
       return 
