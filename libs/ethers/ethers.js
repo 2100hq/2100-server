@@ -28,7 +28,7 @@ module.exports = async (config,libs,emit=x=>x) => {
 
   provider.start = async (defaultStartBlock)=>{
     if(lodash.isFinite(defaultStartBlock)){
-      const currentBlockNumber = await provider.getBlockNumber()
+      const currentBlockNumber = (await provider.getBlockNumber() + 1)
       console.log(defaultStartBlock,currentBlockNumber)
       lodash.times(currentBlockNumber-defaultStartBlock,index=>{
         const number = index + defaultStartBlock

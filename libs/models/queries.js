@@ -65,11 +65,30 @@ module.exports = (config,libs)=>{
     return bn.sum(...stakes.map(s=>s.balance)).toString()
   }
 
+  async function detailedStakes(tokenid){
+    assert(tokenid,'requires tokenid')
+    const stakes = await libs.getWallets('stakes').getByToken(tokenid)
+    if(stakes.length == 0) return {}
+    return stakes.reduce((result,stake)=>{
+      result[stake.userid] = stake.balance
+      return result
+    },{})
+  }
+
   //list all token stakes 
   async function allStakes(){
     const tokens = await libs.tokens.active.list()
     return Promise.reduce(tokens,async (result,token)=>{
       result[token.id] = await sumStakes(token.id)
+      return result
+    },{})
+  }
+
+  //list all token stakes 
+  async function allStakesDetailed(){
+    const tokens = await libs.tokens.active.list()
+    return Promise.reduce(tokens,async (result,token)=>{
+      result[token.id] = await detailedStakes(token.id)
       return result
     },{})
   }
@@ -179,7 +198,7 @@ module.exports = (config,libs)=>{
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
       stakes:{ 
-        ...(await allStakes())
+        ...(await allStakesDetailed())
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
@@ -212,5 +231,6 @@ module.exports = (config,libs)=>{
     hasActiveTokenByName,
     allStakes,
     sumStakes,
+    detailedStakes,
   }
 }

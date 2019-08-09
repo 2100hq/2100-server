@@ -27,6 +27,14 @@ module.exports = async (config, con) => {
         table.table().getAll(done,{index:'done'}).max('id')
       )
     },
+    //get next unprocessed block
+    next(){
+      return table.run(
+        table.table().getAll(false,{index:'done'}).min('id')
+      ).catch(err=>{
+        //error probably no non done blocks, return null
+      })
+    },
     latest(){
       const query = table.table().max({index:'id'})
       return table.run(query).catch(err=>{

@@ -53,6 +53,12 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
         ...event.values
       })
     },
+    async Owner(event){
+      console.log(event)
+    },
+    async DAIAddress(event){
+      console.log(event)
+    },
   }
 
   async function tick(event){

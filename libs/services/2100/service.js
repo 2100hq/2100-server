@@ -145,15 +145,14 @@ module.exports = async (config)=>{
     }
   })
 
-  //we need to init this with our last processed block
-  // const lastBlock = await libs.blocks.latestDone()
+  //we need to init this with our last known block
   const lastBlock = await libs.blocks.latest()
   
   //have to put this after we bind eth events
   if(lastBlock){
     await libs.ethers.start(lastBlock.number)
   }else{
-    await libs.ethers.start()
+    await libs.ethers.start(0)
   }
 
   loop(async x=>{
@@ -169,20 +168,23 @@ module.exports = async (config)=>{
     process.exit(1)
   })
 
+  let lastProcessed = 0
   //loop over unprocessed blocks
   loop(async x=>{
-    const blocks = await libs.blocks.getDone(false)
-    // console.log(blocks)
-    return highland(lodash.orderBy(blocks,['id'],['asc']))
-    .map(async block=>{
+    let block = await libs.blocks.next()
+
+    do{
+      if(block == null) return
+      if(lastProcessed){
+        assert(lastProcessed === block.number-1,'Block processed out of order: ' + lastProcessed + ' vs ' + block.number)
+      }
+      lastProcessed = block.number
       console.log('processing block',block.number)
       const result = await libs.engines.blocks.tick(block)
-      // console.log('completed block')
-      return libs.blocks.setDone(block.id)
-    })
-    .flatMap(highland)
-    .collect()
-    .toPromise(Promise)
+      await libs.blocks.setDone(block.id)
+      block = await libs.blocks.next()
+    }while(block)
+
   },1000).catch(err=>{
     console.log('block engine error',err)
     process.exit(1)

@@ -49,7 +49,7 @@ module.exports = (config,{commands,getWallets})=>{
     //wallet, in order to allow user to 
     //add new stake amounts manually
     async 'Add Stake'(cmd){
-      console.log(cmd)
+      // console.log(cmd)
       await getWallets('stakes').getOrCreate(cmd.userid,config.primaryToken)
       const wallet = await getWallets('stakes').deposit(cmd.userid,config.primaryToken,cmd.delta)
       return commands.success(cmd.id,'Added Funds To Stake',{balance:wallet.balance})
