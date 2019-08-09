@@ -231,6 +231,6 @@ module.exports = (config,libs)=>{
     hasActiveTokenByName,
     allStakes,
     sumStakes,
-    detailedStakes,
+    allStakesDetailed,
   }
 }

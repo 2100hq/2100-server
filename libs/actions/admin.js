@@ -1,9 +1,10 @@
 const assert = require('assert')
 
-module.exports = (config,{query,commands,users,signer,coupons}) => {
+module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
   assert(query,'requires query model')
   assert(commands,'requires commands model')
   assert(users,'requires users model')
+  assert(blocks,'requires blocks')
   assert(coupons,'requires coupons model')
 
   return user =>{
@@ -16,7 +17,8 @@ module.exports = (config,{query,commands,users,signer,coupons}) => {
       assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
 
       assert(ownerAddress,'requires owners address to create token')
-      const data = {name,userid:user.id}
+      const {number} = await blocks.latest() 
+      const data = {name,userid:user.id,blockNumber:number}
       data.ownerAddress = ownerAddress.toLowerCase()
       return commands.createType('createPendingToken',data)
     }

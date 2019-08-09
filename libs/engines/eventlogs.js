@@ -41,6 +41,7 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
         userid:event.values.creator.toLowerCase(),
         name:event.values.username.toLowerCase(),
         transactionHash:event.transactionHash.toLowerCase(),
+        blockNumber:event.blockNumber,
         createdBlock:event.blockNumber,
         creatorAddress:event.values.creator.toLowerCase(),
         contractAddress:event.values.token.toLowerCase(),
@@ -50,6 +51,7 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
     //find all tokens with stakers and generate stake rewards.
     async RewardStakers(event){
       return commands.createType('generateStakeRewards',{
+        blockNumber:event.blockNumber,
         ...event.values
       })
     },

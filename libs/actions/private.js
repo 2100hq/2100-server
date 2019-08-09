@@ -1,11 +1,12 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const {validateStakes} = require('../utils')
-module.exports = (config,{query,getWallets,commands,tokens}) => {
+module.exports = (config,{query,getWallets,commands,tokens,blocks}) => {
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
   assert(getWallets,'requires tokens')
   assert(commands,'requires queries')
+  assert(blocks,'requires blocks')
 
   //user scoped api
   return user =>{
@@ -27,7 +28,8 @@ module.exports = (config,{query,getWallets,commands,tokens}) => {
       const {balance} = await getWallets('available').get(user.id,config.primaryToken)
       validateStakes(stakes,balance)
       assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
-      return commands.createType('setAbsoluteStakes',{userid:user.id,stakes})
+      const {number} = await blocks.latest() 
+      return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
     }
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
