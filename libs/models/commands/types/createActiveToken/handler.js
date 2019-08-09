@@ -2,7 +2,7 @@ const assert = require('assert')
 const bn = require('bignumber.js')
 
 //keep this simple for now
-module.exports = (config,{commands,tokens,getWallets,coupons})=>{
+module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
   assert(getWallets,'requires getWallets')
   assert(commands,'requires commands')
   assert(tokens,'requires tokens')
@@ -10,6 +10,7 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
   assert(tokens.pending,'requires pending tokens')
   assert(coupons,'requires coupons')
   assert(coupons.create,'requires coupons.create')
+  assert(blocks,'requires blocks')
   return {
     async Start(cmd){
       if(!(await tokens.pending.has(cmd.name))){
@@ -48,10 +49,11 @@ module.exports = (config,{commands,tokens,getWallets,coupons})=>{
       //create the creator and owner wallets if they dont exist
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
       await getWallets('available').getOrCreate(token.creatorAddress,token.id)
-
+      const block = await blocks.latest()
       if(cmd.creatorAddress && bn(cmd.creatorReward).isGreaterThan(0)){
         //submit creator reward command
         await commands.createType('transferCreatorReward',{
+          blockNumber:block.number,
           userid:cmd.creatorAddress,
           tokenid:token.id,
           amount:cmd.creatorReward

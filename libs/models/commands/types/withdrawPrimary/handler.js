@@ -4,6 +4,7 @@ module.exports = (config,{commands,blocks,getWallets})=>{
   assert(getWallets,'requires getWallets')
   assert(commands,'requires commands')
   assert(config.primaryToken,'requires primary token')
+  assert(blocks,'requires blocks')
 
   return {
     async Start(cmd){
@@ -30,8 +31,10 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       if(bn(cmd.value).isGreaterThan(total)){
         return commands.success(cmd.id,'Funds Overdrawn',{total})
       }
+
+      const block = await blocks.latest()
       //we need to rebalance staking as soon as withdraw completes
-      await commands.createType('rebalanceStakes',{userid:cmd.fromAddress})
+      await commands.createType('rebalanceStakes',{blockNumber:block.number,userid:cmd.fromAddress})
       return commands.success(cmd.id,'Withdraw Success')
     },
   }

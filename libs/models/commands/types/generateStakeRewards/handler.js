@@ -1,11 +1,12 @@
 const assert = require('assert')
 const Promise = require('bluebird')
 const bn = require('bignumber.js')
-module.exports = (config,{commands,getWallets,tokens})=>{
+module.exports = (config,{commands,getWallets,tokens,blocks})=>{
   assert(commands,'requires commands')
   assert(getWallets,'requires wallets')
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires tokens.active')
+  assert(blocks,'requires blocks')
   const {primaryToken} = config
   assert(primaryToken,'requires primary token')
 
@@ -43,26 +44,24 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //reward to public, reduced by owners percent
       const publicReward = reward.minus(ownerReward)
 
-      // console.log('ownerreward',ownerReward.toString(),'public reward',publicReward.toString())
-      // console.log('allowed stakes',allowedStakes)
-      // console.log('publicreward',publicReward.toString(),'total',total.toString(),'reward',reward.toString())
-
-
-       const receipts = await Promise.map(allowedStakes,async stake=>{
-         // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
-         const command = await commands.createType('transferStakeReward',{
-           tokenid:cmd.tokenid,
-           userid:stake.userid,
-           amount:bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
-         })
-         return command.id
-       })
+      const block = await blocks.latest()
+      const receipts = await Promise.map(allowedStakes,async stake=>{
+        // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
+        const command = await commands.createType('transferStakeReward',{
+          tokenid:cmd.tokenid,
+          userid:stake.userid,
+          blockNumber:block.number,
+          amount:bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
+        })
+        return command.id
+      })
 
       //apply owner reward only if there were stakes
       if(receipts.length){
         const ownerReceipt = await commands.createType('transferOwnerReward',{
           tokenid:cmd.tokenid,
           userid:cmd.ownerAddress,
+          blockNumber:block.number,
           amount:ownerReward.toString(),
         })
 
