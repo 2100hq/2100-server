@@ -22,11 +22,8 @@ module.exports = (config,{commands,getWallets,tokens})=>{
 
       //convert array of stakes to [tokenid]:balance object
       const currentStakes = stakes.reduce((result,wallet)=>{
-        if(wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase()){
-          //do not add
-        }else{
-          result[wallet.tokenid] = wallet.balance
-        }
+        if(wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase()) return result
+        result[wallet.tokenid] = wallet.balance
         return result
       },{})
 
