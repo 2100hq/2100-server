@@ -3,6 +3,7 @@ module.exports = () => {
   return (props = {}) => {
     return {
       id: uuid(),
+      favorites:[],
       ...props,
     }
   }

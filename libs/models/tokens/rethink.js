@@ -7,7 +7,7 @@ module.exports = async (config, con) => {
 
   const schema = {
     table: config.table,
-    indices:['name']
+    indices:['name','ownerAddress']
   }
 
   const table = await Table(con, schema)
@@ -16,6 +16,9 @@ module.exports = async (config, con) => {
     ...table,
     set(id,data){
       return table.upsert(data)
+    },
+    getByOwner(ownerAddress){
+      return table.getBy('ownerAddress',ownerAddress)
     },
     getByName(name){
       assert(name,'requires token name')

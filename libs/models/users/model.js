@@ -4,7 +4,7 @@ const Schema = require('./schema')
 const Validate = require('../validate')
 const assert = require('assert')
 
-module.exports = (config,table,emit) => {
+module.exports = (config,table,emit=x=>x) => {
   const defaults = Defaults()
   const validate = Validate(Schema())
 
@@ -40,6 +40,18 @@ module.exports = (config,table,emit) => {
     return set(user)
   }
 
+  async function setFavorite(id,address,favorite=true){
+    const user = await get(id)
+    let favorites = user.favorites || []
+    if(favorite){
+      favorites = lodash.uniq([address,...favorites])
+    }else{
+      favorites = favorites.filter(x=>x!==address)
+    }
+    user.favorites = favorites
+    return set(user)
+  }
+
   return {
     ...table,
     create,
@@ -47,6 +59,7 @@ module.exports = (config,table,emit) => {
     get,
     getOrCreate,
     setAdmin,
+    setFavorite,
   }
 }
 

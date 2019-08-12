@@ -15,9 +15,9 @@ module.exports = (config,libs)=>{
   //   return libs.blocks.list(from).then(blocks=>Promise.map(blocks,block=>getBlock(block.number)))
   // }
 
-  function getStakesByUser(userid){
-    return libs.stakes.getByUser(userid)
-  }
+  // function getStakesByUser(userid){
+  //   return libs.stakes.getByUser(userid)
+  // }
 
   // function getTransaction(transactionid){
   //   return libs.transactions.get(transactionid)
@@ -66,16 +66,21 @@ module.exports = (config,libs)=>{
   }
 
   async function detailedStakes(tokenid){
+    return detailedBalances(tokenid,'stakes')
+  }
+
+  async function detailedBalances(tokenid,wallet='available'){
     assert(tokenid,'requires tokenid')
-    const stakes = await libs.getWallets('stakes').getByToken(tokenid)
-    if(stakes.length == 0) return {}
-    return stakes.reduce((result,stake)=>{
-      result[stake.userid] = stake.balance
+    const wallets = await libs.getWallets(wallet).getByToken(tokenid)
+    if(wallets.length == 0) return {}
+    return wallets.reduce((result,wallet)=>{
+      if(wallet.userid.toLowerCase() === tokenid.toLowerCase()) return result
+      result[wallet.userid.toLowerCase()] = wallet.balance
       return result
     },{})
   }
 
-  //list all token stakes 
+  //list all token stakes summed for all users
   async function allStakes(){
     const tokens = await libs.tokens.active.list()
     return Promise.reduce(tokens,async (result,token)=>{
@@ -84,7 +89,7 @@ module.exports = (config,libs)=>{
     },{})
   }
 
-  //list all token stakes 
+  //list all token stakes per user
   async function allStakesDetailed(){
     const tokens = await libs.tokens.active.list()
     return Promise.reduce(tokens,async (result,token)=>{
@@ -96,12 +101,12 @@ module.exports = (config,libs)=>{
   function getTokenByName(token){
     return libs.tokens.active.getByName(token)
   }
-  async function getWallet(token){
-    assert(token,'requires token name')
-    const wallet = await libs.wallets.get(token)
-    assert(wallet,'no such wallet for token: ' + token)
-    return wallet
-  }
+  // async function getWallet(token){
+  //   assert(token,'requires token name')
+  //   const wallet = await libs.wallets.get(token)
+  //   assert(wallet,'no such wallet for token: ' + token)
+  //   return wallet
+  // }
 
   async function getUserWallets(type,userid){
     assert(type,'requires wallet type')
@@ -109,14 +114,21 @@ module.exports = (config,libs)=>{
     return libs.getWallets(type).getByUser(userid)
   }
 
+  async function getUserStakeOnToken(userid,tokenid){
+    assert(userid,'requires userid')
+    assert(tokenid,'requires tokenid')
+    return (await libs.getWallets('stakes').get(userid,tokenid)).balance
+  }
+
+
   async function listWalletTypes(){
     return [...libs.wallets.keys()]
   }
 
-  async function getBalance(token,userid){
-    assert(token,'requires token name')
+  async function getAvailableBalance(userid,tokenid){
+    assert(tokenid,'requires token name')
     assert(userid,'requires userid of wallet to check')
-    return getWallet(token).then(x=>x.getOrCreate(userid))
+    return (await libs.getWallets('available').get(userid,tokenid)).balance
   }
 
   async function getUser(userid){
@@ -207,10 +219,16 @@ module.exports = (config,libs)=>{
     }
   }
 
+  async function tokenState(tokenid){
+    return {
+      stakes:await detailedStakes(tokenid)
+    }
+  }
+
   return {
     // getBlock,
     latestBlock,
-    getStakesByUser,
+    // getStakesByUser,
     // getTransaction,
     // getTransactionsToUser,
     // getTransactionsFromUser,
@@ -220,8 +238,8 @@ module.exports = (config,libs)=>{
     listDisabledTokens,
     hasPendingToken,
     listUsers,
-    getWallet,
-    getBalance,
+    // getWallet,
+    // getBalance,
     publicState,
     privateState,
     adminState,
@@ -233,5 +251,8 @@ module.exports = (config,libs)=>{
     sumStakes,
     allStakesDetailed,
     detailedStakes,
+    detailedBalances,
+    getUserStakeOnToken,
+    getAvailableBalance,
   }
 }
