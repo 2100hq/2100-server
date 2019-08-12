@@ -1,7 +1,7 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const {validateStakes} = require('../utils')
-module.exports = (config,{query,getWallets,commands,tokens,blocks}) => {
+module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
   assert(getWallets,'requires tokens')
@@ -31,6 +31,12 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks}) => {
       const {number} = await blocks.latest() 
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
     }
+
+    async function setFavorite(tokenid,favorite){
+      assert((await tokens.active.has(tokenid)),'Invalid token id')
+      return users.setFavorite(user.id,tokenid,favorite)
+    }
+
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
     //   const {balance} = await wallet.get(user.id)
@@ -56,6 +62,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks}) => {
       myCommandHistory,
       state,
       stake,
+      setFavorite,
     }
   }
 }

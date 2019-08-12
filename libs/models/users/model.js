@@ -41,6 +41,8 @@ module.exports = (config,table,emit=x=>x) => {
   }
 
   async function setFavorite(id,address,favorite=true){
+    assert(id,'requires user id')
+    assert(address,'requires token address')
     const user = await get(id)
     let favorites = user.favorites || []
     if(favorite){
