@@ -169,7 +169,7 @@ module.exports = (config,libs)=>{
       },{}),
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
       // myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
-      myCommandHistory:[],
+      myCommandHistory:{},
       myCoupons:{
         mint:lodash.keyBy(await userMintCoupons(userid),'id'),
       },

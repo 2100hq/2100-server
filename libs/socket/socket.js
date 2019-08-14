@@ -46,7 +46,11 @@ module.exports = async (config, libs) => {
             const [signed,address] = args
             let valid = false
             try{
-              valid = libs.authenticate(socket.token,signed,address)
+              if(config.disableAuth){
+                valid = true
+              }else{
+                valid = libs.authenticate(socket.token,signed,address)
+              }
               assert(valid,'Authentication Failed')
               socket.userid = address.toLowerCase()
               socket.join(socket.userid)
