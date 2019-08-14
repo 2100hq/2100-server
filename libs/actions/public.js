@@ -25,9 +25,18 @@ module.exports = (config,libs) => user =>{
     return libs.query.detailedBalances(tokenid)
   }
 
-  function owns(userid){
+  function ownedTokens(userid){
     assert(userid,'requires user address')
     return libs.tokens.active.getByOwner(userid)
+  }
+  async function isOwner(userid,tokenid){
+    assert(userid,'requires user address')
+    assert(tokenid,'requires tokenid')
+    const token = await libs.tokens.active.get(tokenid.toLowerCase())
+    return userid.toLowerCase() === token.ownerAddress.toLowerCase()
+  }
+  async function getTokenOwner(tokenid){
+    return (await libs.tokens.active.get(tokenid)).ownerAddress
   }
 
   return {
@@ -37,7 +46,9 @@ module.exports = (config,libs) => user =>{
     userStake,
     userHolding,
     tokenHolders,
-    owns,
+    ownedTokens,
+    isOwner,
+    getTokenOwner,
   }
 }
 

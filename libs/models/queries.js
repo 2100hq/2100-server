@@ -168,7 +168,8 @@ module.exports = (config,libs)=>{
         return result
       },{}),
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
-      myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
+      // myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
+      myCommandHistory:[],
       myCoupons:{
         mint:lodash.keyBy(await userMintCoupons(userid),'id'),
       },
