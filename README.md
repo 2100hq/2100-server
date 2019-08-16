@@ -34,6 +34,9 @@ rethink.db=2100
 # set the public socket api port
 socket.port=9312       
 
+# set auth host
+auth.host=ws://localhost:9315
+
 # set your rate speed for processing all commands 
 cmdTickRate=1000       
 
@@ -66,6 +69,18 @@ signer.privateKey=
 # public address of the system user, this is the first user who can create admins
 # it will be assigned when authenticated
 systemAddress=
+```
+## Auth Service ##
+This should run as a seperate application service. 
+
+### Start
+First update env then
+`npm run start-auth` or `service=auth node start`
+
+### ENV
+You can add this to the same env as 2100.
+```
+auth.socket.port=9315
 ```
 
 ## API

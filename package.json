@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node start",
+    "start-auth": "service=auth node start",
     "test": "node test"
   },
   "dependencies": {
