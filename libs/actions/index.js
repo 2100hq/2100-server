@@ -6,15 +6,17 @@
 // }
 
 const assert = require('assert')
-module.exports = (name, config, libs)=>{
-  const actions = require('./' + name)(config,libs)
+const lodash = require('lodash')
+module.exports = (name, config, libs,emit)=>{
+  const actions = require('./' + name)(config,libs,emit)
   assert(actions,'actions not found: ' + name)
   return async (user,action,...args)=>{
     const scope = actions(user)
     assert(scope[action],'No such action ' + action + ' in ' + name)
-    console.time([name,action].join(' '))
+    const id = lodash.uniqueId([name,action,''].join(' '))
+    console.time(id)
     const result = await scope[action](...args)
-    console.timeEnd([name,action].join(' '))
+    console.timeEnd(id)
     return result
   }
 }

@@ -5,6 +5,7 @@ const lodash = require('lodash')
 const Promise = require('bluebird')
 
 const Socket = require('../../socket')
+const SocketClient = require('../../socket/client')
 const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
@@ -72,6 +73,8 @@ module.exports = async (config)=>{
     return libs.ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === address.toLowerCase()
   }
 
+  libs.auth = (await SocketClient(config.auth.host))('auth')
+
   const commandTypes = [
     'pendingDeposit',     //handle blockchain pending deposits
     'withdrawPrimary',    //handle blockchain withdraws
@@ -93,14 +96,12 @@ module.exports = async (config)=>{
   //data joins/ queries
   libs.joins = await Joins(config,libs)
   libs.query = await Queries(config,libs)
-  libs.actions = await Actions(config,libs)
+  libs.actions = await Actions(config,libs,(...args)=>emitter.emit('actions',args))
 
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
 
   libs.socket = await Socket(config,libs)
-
-
   const blockStream = highland('eth',emitter)
 
   //events from ethers block chain
@@ -130,6 +131,22 @@ module.exports = async (config)=>{
       await libs.events.write(args)
     }catch(err){
       console.log('socket event error',err)
+      process.exit(1)
+    }
+  })
+
+
+  //this is mainly for auth stuff to know when someones authenticated
+  emitter.on('actions',async ([channel,type,...args])=>{
+    if(channel !== 'auth') return
+    if(type !== 'login') return
+    try{
+      const [socketid,userid] = args
+      await libs.socket.join(socketid,userid)
+      await libs.socket.private(userid,[],await libs.query.privateState(userid))
+    }catch(err){
+      console.log('action error: ' + type)
+      console.log(err)
       process.exit(1)
     }
   })

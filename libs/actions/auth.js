@@ -1,24 +1,91 @@
 const uuid = require('uuid/v4')
 const assert = require('assert')
 
-module.exports = (config,libs) => user =>{
+//all other actions pass user in where session is, but
+//this is a special case where we need to update the session
+//object, which in this case is the users socket session
+//consider this not great practice, but its fairly simple
+module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
+  assert(auth,'requires auth client library')
+  assert(ethers,'requires ethers')
+  assert(socket,'requiers socket')
 
-  async function login({username}){
-    assert(username,'login requires username')
-    assert(username.length,'login requires username of at least length 1')
-    try{
-      return await libs.users.getByUsername(username)
-    }catch(err){
-      return libs.users.create({username})
+  function isValidSignature(unsigned,signed,publicAddress,prefix='2100 Login: '){
+    assert(unsigned,'requires unsigned token')
+    assert(signed,'requires signed token')
+    assert(publicAddress,'requires public address')
+    return ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === publicAddress
+  }
+
+  function fakeLogin(_,_,publicAddress){
+      //update socket userid
+      socket.userid = publicAddress
+      emit('login',socket.id,publicAddress)
+      //get or create the user
+      return users.getOrCreate(publicAddress)
+  }
+
+  async function login(signed,publicAddress,tokenid=socket.tokenid){
+    assert(publicAddress,'requires publicAddress')
+    assert(tokenid,'requires a token')
+    assert(signed,'requires signed token')
+    //verify its a good token before anything
+    await auth.call('validate',tokenid)
+
+    //validate signature with address (userid)
+    publicAddress = publicAddress.toLowerCase()
+    await isValidSignature(tokenid,signed,publicAddress)
+
+    //tell auth server user logged in
+    await auth.call('login',tokenid,publicAddress)
+
+    //do socket things on login
+    //update socket userid
+    socket.userid = publicAddress
+    emit('login',socket.id,publicAddress)
+    //get or create the user
+    return users.getOrCreate(publicAddress)
+  }
+
+  async function validate(tokenid){
+    await auth.call('validate',tokenid)
+    //set this to your session
+    socket.tokenid = tokenid
+    return tokenid
+  }
+
+  //get an official auth token
+  async function token(publicAddress){
+    const tokenid = await auth.call('token')
+    //set this to your session
+    socket.tokenid = tokenid
+    return tokenid
+  }
+
+  async function logout(tokenid){
+    return auth.call('logout',tokenid)
+  }
+
+  function authenticate(...args){
+    if(config.disableAuth){
+      return fakeLogin(...args)
+    }else{
+      return login(...args)
     }
+
+  }
+  function unauthenticate(...args){
+    logout(...args)
   }
 
-  async function logout(props){
-    return props
-  }
 
   return {
+    isValidSignature,
     login,
     logout,
+    authenticate,
+    unauthenticate,
+    token,
+    validate,
   }
 }
