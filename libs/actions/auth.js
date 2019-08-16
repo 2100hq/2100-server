@@ -26,6 +26,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
   }
 
   async function login(signed,publicAddress,tokenid=socket.tokenid){
+    assert(!socket.userid, 'you are already logged in')
     assert(publicAddress,'requires publicAddress')
     assert(tokenid,'requires a token')
     assert(signed,'requires signed token')
@@ -44,13 +45,15 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     socket.userid = publicAddress
     emit('login',socket.id,publicAddress)
     //get or create the user
-    return users.getOrCreate(publicAddress)
+    await users.getOrCreate(publicAddress)
+    return tokenid
   }
 
-  async function validate(tokenid){
+  async function validate(tokenid=socket.tokenid){
     await auth.call('validate',tokenid)
     //set this to your session
     socket.tokenid = tokenid
+    socket.userid = await auth.call('user',tokenid) 
     return tokenid
   }
 
@@ -62,8 +65,10 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     return tokenid
   }
 
-  async function logout(tokenid){
-    return auth.call('logout',tokenid)
+  async function logout(tokenid=socket.tokenid){
+    await auth.call('logout',tokenid)
+    socket.userid = null
+    return tokenid
   }
 
   function authenticate(...args){

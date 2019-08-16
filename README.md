@@ -85,8 +85,13 @@ auth.socket.port=9315
 
 ## API
 Describes the public api. Currently only socket io is used for frontend backend communication. 
-Api is split between state and actions. State is not queried, but pused to user through socket.
+Api is split between state and actions. State is not queried, but pushed to user through socket.
 Actions are request/response from user to server.
+
+### Authentication
+Authentication is done through tokens over socket. There is a specific flow required to correctly
+authenticate.
+
 
 ### Public State 
 Public data follows this general schema and comes in through the private channel.
