@@ -6,7 +6,8 @@ const assert = require('assert')
 //object, which in this case is the users socket session
 //consider this not great practice, but its fairly simple
 module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
-  assert(auth,'requires auth client library')
+
+  if(!config.disableAuth) assert(auth,'requires auth client library')
   assert(ethers,'requires ethers')
   assert(socket,'requiers socket')
 
