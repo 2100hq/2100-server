@@ -58,7 +58,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     //set this to your session
     socket.tokenid = tokenid
     socket.userid = await auth.call('user',tokenid) 
-    return socket.userid
+    return tokenid
   }
 
   //get an official auth token

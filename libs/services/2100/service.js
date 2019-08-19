@@ -73,7 +73,9 @@ module.exports = async (config)=>{
     return libs.ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === address.toLowerCase()
   }
 
-  libs.auth = (await SocketClient(config.auth.host))('auth')
+  if(!config.disableAuth){
+    libs.auth = (await SocketClient(config.auth.host))('auth')
+  }
 
   const commandTypes = [
     'pendingDeposit',     //handle blockchain pending deposits

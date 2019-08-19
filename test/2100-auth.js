@@ -39,6 +39,7 @@ async function run(){
   })
 
   tokenid = await initAuth(client1.auth,wallet/*,window.getStorage('token')*/)
+  console.log('good token',tokenid)
   //window.setStorage('token',tokenid)
   console.log('client1',await client1.private.call('me'))
 
