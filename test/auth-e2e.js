@@ -13,7 +13,7 @@ test('auth',t=>{
   })
   t.test('token',async t=>{
     tokenid = await client.call('token')
-    console.log(tokenid)
+    console.log('token',tokenid)
     t.ok(tokenid)
     t.end()
   })

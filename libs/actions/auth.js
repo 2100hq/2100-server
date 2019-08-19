@@ -49,12 +49,16 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     return tokenid
   }
 
+  async function user(tokenid){
+    return auth.call('user',tokenid)
+  }
+
   async function validate(tokenid=socket.tokenid){
     await auth.call('validate',tokenid)
     //set this to your session
     socket.tokenid = tokenid
     socket.userid = await auth.call('user',tokenid) 
-    return tokenid
+    return socket.userid
   }
 
   //get an official auth token
@@ -92,5 +96,6 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     unauthenticate,
     token,
     validate,
+    user,
   }
 }

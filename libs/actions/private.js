@@ -25,9 +25,9 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
     }
 
     async function stake(stakes){
-      const {balance} = await getWallets('available').get(user.id,config.primaryToken)
-      validateStakes(stakes,balance)
       assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
+      const {balance} = await getWallets('available').getOrCreate(user.id,config.primaryToken)
+      validateStakes(stakes,balance)
       const {number} = await blocks.latest() 
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
     }
