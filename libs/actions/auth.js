@@ -18,7 +18,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     return ethers.utils.verifyMessage(prefix+token,signed).toLowerCase() === publicAddress
   }
 
-  function fakeLogin(_,_,publicAddress){
+  function fakeLogin(_,publicAddress){
       //update socket userid
       socket.userid = publicAddress
       emit('login',socket.id,publicAddress)
