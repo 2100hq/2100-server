@@ -167,11 +167,13 @@ module.exports = async (config)=>{
   //we need to init this with our last known block
   const lastBlock = await libs.blocks.latest()
   
-  //have to put this after we bind eth events
-  if(lastBlock){
+  if(config.forceStartBlock){
+    await libs.ethers.start(parseInt(config.forceStartBlock))
+  }else if(lastBlock){
+    //have to put this after we bind eth events
     await libs.ethers.start(lastBlock.number)
   }else{
-    await libs.ethers.start(0)
+    await libs.ethers.start(config.defaultStartBlock || 0)
   }
 
   loop(async x=>{
