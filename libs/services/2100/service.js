@@ -173,7 +173,7 @@ module.exports = async (config)=>{
     //have to put this after we bind eth events
     await libs.ethers.start(lastBlock.number)
   }else{
-    await libs.ethers.start(config.defaultStartBlock || 0)
+    await libs.ethers.start(parseInt(config.defaultStartBlock || 0))
   }
 
   loop(async x=>{
