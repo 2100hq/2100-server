@@ -216,6 +216,10 @@ module.exports = (config,libs)=>{
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },
+      config:{
+        primaryToken:config.primaryToken,
+        disableAuth:config.disableAuth || false,
+      },
 
     }
   }
