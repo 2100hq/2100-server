@@ -20,6 +20,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
 
   function fakeLogin(_,publicAddress){
       //update socket userid
+      publicAddress = publicAddress.toLowerCase()
       socket.userid = publicAddress
       emit('login',socket.id,publicAddress)
       //get or create the user
