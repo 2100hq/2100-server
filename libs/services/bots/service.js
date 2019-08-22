@@ -93,8 +93,7 @@ module.exports = async config =>{
       async Start(state){
         await state.actions.auth.call('authenticate',undefined,state.wallet.address)
         return 'Unstake'
-        return 'Check Eth'
-        // return 'ChooseAction'
+        // return 'Check Eth'
       },
       async 'Check Eth'(state){
         const balance = await state.wallet.getBalance()

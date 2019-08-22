@@ -16,16 +16,8 @@ module.exports = (config,{users,getWallets}) => {
       return users.setAdmin(userid.toLowerCase(),isAdmin)
     }
 
-    //testing only
-    async function gift(userid,amount){
-      const wallets = getWallets('available')
-      await wallets.getOrCreate(userid,primaryToken)
-      return wallets.deposit(userid,primaryToken,amount)
-    }
-
     return {
       setAdmin,
-      gift,
     }
   }
 }

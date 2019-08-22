@@ -8,7 +8,6 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
   assert(coupons,'requires coupons model')
 
   return user =>{
-    console.log(user)
     assert(user,'You must be logged in')
     assert(user.isAdmin,'You must be an admin')
 

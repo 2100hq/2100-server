@@ -182,7 +182,8 @@ module.exports = async (config)=>{
     const commands = await libs.commands.getDone(false)
     let id 
     if(commands.length){
-      id = lodash.uniqueId(['processing',commands.length,'commands','_'].join(' '))
+      id = lodash.uniqueId(['processing',commands.length,'commands',''].join(' '))
+      console.log(id)
       console.time(id)
     }
     const result = await highland(lodash.orderBy(commands,['id'],['asc']))
