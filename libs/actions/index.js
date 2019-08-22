@@ -13,9 +13,16 @@ module.exports = (name, config, libs,emit)=>{
   return async (user,action,...args)=>{
     const scope = actions(user)
     assert(scope[action],'No such action ' + action + ' in ' + name)
-    const id = lodash.uniqueId([name,action,''].join(' '))
+    const id = lodash.uniqueId(['actions',name,action,''].join('.'))
     console.time(id)
-    const result = await scope[action](...args)
+    const result = await scope[action](...args).catch(err=>{
+      console.timeEnd(id)
+      if(config.debug){
+        console.error(id,err.stack)
+        console.error(...args)
+      }
+      throw err
+    })
     console.timeEnd(id)
     return result
   }

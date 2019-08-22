@@ -180,12 +180,20 @@ module.exports = async (config)=>{
 
   loop(async x=>{
     const commands = await libs.commands.getDone(false)
-    if(commands.length) console.log('processing',commands.length,'commands')
-    return highland(lodash.orderBy(commands,['id'],['asc']))
+    let id 
+    if(commands.length){
+      id = lodash.uniqueId(['processing',commands.length,'commands',''].join(' '))
+      console.log(id)
+      console.time(id)
+    }
+    const result = await highland(lodash.orderBy(commands,['id'],['asc']))
       .map(libs.engines.commands.runToDone)
       .flatMap(highland)
       .collect()
       .toPromise(Promise)
+
+    if(id) console.timeEnd(id)
+    return result
   },config.cmdTickRate).catch(err=>{
     console.log('command engine error',err)
     process.exit(1)

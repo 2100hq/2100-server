@@ -36,6 +36,9 @@ module.exports = (config,libs,emit)=>{
       case 'coupons.mint':{
         return emit('private',data.userid,['myCoupons','mint',data.id],data)
       }
+      case 'tokens.active':{
+        return emit('private',data.userid,['myTokens',data.id],data)
+      }
       // case 'stakes':{
       //   console.log('private event',table,method,data)
       //   lodash.forEach(data.stakers,(amount,userid)=>{

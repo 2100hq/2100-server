@@ -140,6 +140,10 @@ module.exports = (config,libs)=>{
     return user
   }
 
+  async function ownedTokens(userid){
+    return libs.tokens.active.getByOwner(userid)
+  }
+
   async function userCommands(userid,done=false){
     return libs.commands.getUserDone(userid,done)
   }
@@ -168,6 +172,7 @@ module.exports = (config,libs)=>{
         return result
       },{}),
       myCommands: lodash.keyBy(await userCommands(userid),'id'),
+      myTokens: lodash.keyBy(await ownedTokens(userid),'id'),
       // myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
       myCommandHistory:{},
       myCoupons:{
@@ -216,6 +221,10 @@ module.exports = (config,libs)=>{
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },
+      config:{
+        primaryToken:config.primaryToken,
+        disableAuth:config.disableAuth || false,
+      },
 
     }
   }
@@ -255,5 +264,6 @@ module.exports = (config,libs)=>{
     detailedBalances,
     getUserStakeOnToken,
     getAvailableBalance,
+    ownedTokens,
   }
 }

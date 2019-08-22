@@ -1,7 +1,11 @@
 const assert = require('assert')
 
-module.exports = (config,{users}) => {
+module.exports = (config,{users,getWallets}) => {
   assert(users,'requires users model')
+  assert(getWallets,'requires getWallets')
+
+  const {primaryToken} = config
+  assert(primaryToken,'requires primary token')
 
   return user =>{
     assert(user,'You must be logged in')

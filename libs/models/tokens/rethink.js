@@ -25,9 +25,15 @@ module.exports = async (config, con) => {
       return table.getBy('name',name)
     },
     hasAll(ids=[]){
-      return Promise.reduce(ids,(result,id)=>{
-        if(result === false) return result
-        return table.has(id)
+      return Promise.reduce(ids,async (result,id)=>{
+        if(result === false){
+          return result
+        }
+        const res = await table.has(id)
+        // if(!res){
+        //   console.log('none',id)
+        // }
+        return res
       },true)
     }
 
