@@ -53,6 +53,7 @@ module.exports = async (config, libs) => {
     })
 
     socket.on('admin',async function(action,args,cb){
+      console.log('admin',socket.userid)
       if(socket.userid == null) return cb('Please Login')
       libs.users.getOrCreate(socket.userid).then(async user=>{
         assert(user.isAdmin,'You are not an admin')
@@ -63,6 +64,7 @@ module.exports = async (config, libs) => {
     })
 
     socket.on('system',async function(action,args,cb){
+      console.log('system',socket.userid)
       if(socket.userid == null) return cb('Please Login')
       if(config.systemAddress == null) return cb('System address has not been set')
       libs.users.getOrCreate(socket.userid).then(async user=>{
