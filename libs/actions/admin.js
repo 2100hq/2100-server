@@ -29,8 +29,14 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
       return users.setAdmin(userid.toLowerCase(),isAdmin)
     }
 
+    //set a token description
+    async function setTokenDescription(tokenid,description=''){
+      return tokens.active.setDescription(tokenid,description)
+    }
+
     return {
       createToken,
+      setTokenDescription,
       setAdmin,
     }
   }

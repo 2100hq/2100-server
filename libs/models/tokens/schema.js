@@ -14,6 +14,7 @@ module.exports = () => {
     reward:{type:'string',numeric:true},
     minimumStake:{type:'string',numeric:true},
     createdBlock:'number',
+    description:{type:'string',optional:true},
   }
 }
 
