@@ -42,6 +42,14 @@ module.exports = async (config, con) => {
     getTypeDone(type,done=false){
       assert(type,'requires command type')
       return table.getBy('typeDone',[type,done])
+    },
+    countDone(done=false){
+      const query = table.table().getAll(done,{index:'done'}).count()
+      return table.run(query)
+    },
+    readStream(done=false){
+      const query = table.table().getAll(done,{index:'done'})
+      return table.streamify(query)
     }
   }
 }

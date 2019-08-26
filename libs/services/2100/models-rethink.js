@@ -15,10 +15,19 @@ module.exports = async (config={},{con},emit)=>{
 
   const models = {
     wallets:{
-      available:Wallets.Model({},await Wallets.Rethink({table:'available'},con),(...args)=>emit('wallets.available',...args)),
-      locked:Wallets.Model({},await Wallets.Rethink({table:'locked'},con),(...args)=>emit('wallets.locked',...args)),
+      available:Wallets.Model({},
+        Commands.Cache(config, await Wallets.Rethink({table:'available'},con)),
+        // await Wallets.Rethink({table:'available'},con),
+        (...args)=>emit('wallets.available',...args)),
+      locked:Wallets.Model({},
+        Commands.Cache(config, await Wallets.Rethink({table:'locked'},con)),
+        // await Wallets.Rethink({table:'locked'},con),
+        (...args)=>emit('wallets.locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
-      stakes:Wallets.Model({},await Wallets.Rethink({table:'stakes'},con),(...args)=>emit('wallets.stakes',...args)),
+      stakes:Wallets.Model({},
+        Commands.Cache(config, await Wallets.Rethink({table:'stakes'},con)),
+        // await Wallets.Rethink({table:'stakes'},con),
+        (...args)=>emit('wallets.stakes',...args)),
     },
     //all tokens we knwo of
     //tokens are now stateful, they are pending, active, disabled
@@ -41,6 +50,7 @@ module.exports = async (config={},{con},emit)=>{
     },
     commands:Commands.Model(config, 
       Stateful.Model(config,
+        // Commands.Cache(config, await Commands.Rethink({table:'commands'},con)),
         await Commands.Rethink({table:'commands'},con),
         (...args)=>emit('commands',...args)
       )

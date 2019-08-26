@@ -1,13 +1,10 @@
 const assert = require('assert')
 const Promise = require('bluebird')
 
-module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
+module.exports = (config,{commands,eventlogs})=>{
   assert(config.confirmations,'requires confirmations count')
   assert(config.primaryToken,'requires primary token')
   assert(commands,'requires commands library')
-  assert(ethers,'requires ethers library')
-  assert(tokens,'requires tokens')
-  assert(getWallets,'requires getWallets')
 
   //addresses need to be lower cased for all comparisons in the rest of the system
   const handlers = {
@@ -64,7 +61,7 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
   }
 
   async function tick(event){
-    // console.log('starting event',event.name)
+    // console.log('starting event',event.name,event.id)
     assert(handlers[event.name],'no handler for event name')
     return handlers[event.name](event)
   }

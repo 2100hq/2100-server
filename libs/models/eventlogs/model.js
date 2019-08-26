@@ -28,15 +28,15 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function create(props) {
     const result = validate(defaults(props))
-    assert(!(await table.has(result.id)), 'Event with that ID already exists')
+    if(result.id) assert(!(await table.has(result.id)), 'Event with that ID already exists: ' + result.id)
     return set(result)
   }
 
-  async function setDone(id){
-    const result = await get(id)
-    result.done = true
-    return set(result)
-  }
+  // async function setDone(id){
+  //   const result = await get(id)
+  //   result.done = true
+  //   return set(result)
+  // }
 
 
   return {
@@ -45,7 +45,7 @@ module.exports = function(config,table,emit=x=>x) {
     get,
     getBy,
     create,
-    setDone,
+    // setDone,
   }
 }
 

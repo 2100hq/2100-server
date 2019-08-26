@@ -10,7 +10,7 @@ const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
 
-const {RethinkConnection,loop,GetWallets} = require('../../utils')
+const {RethinkConnection,loop,GetWallets,Benchmark} = require('../../utils')
 const RethinkModels = require('./models-rethink')
 const Ethers = require('../../ethers')
 const Signer = require('../../signer')
@@ -178,26 +178,51 @@ module.exports = async (config)=>{
     await libs.ethers.start(0)
   }
 
-  loop(async x=>{
-    const commands = await libs.commands.getDone(false)
-    let id 
-    if(commands.length){
-      id = lodash.uniqueId(['processing',commands.length,'commands',''].join(' '))
-      console.log(id)
-      console.time(id)
-    }
-    const result = await highland(lodash.orderBy(commands,['id'],['asc']))
-      .map(libs.engines.commands.runToDone)
-      .flatMap(highland)
-      .collect()
-      .toPromise(Promise)
+  const cmdBench = Benchmark()
+  const logBench = Benchmark()
+  let cmdStream = await libs.commands.readStream(false)
+  await cmdStream
+    .sortBy((a,b)=>{
+      return a.id < b.id ? -1 : 1
+    })
+    // .doto(x=>console.log(x.id))
+    .doto(x=>{
+      if(x.state !== 'Start') return
+      // console.log('new',x.type,x.id)
+      cmdBench.new()
+    })
+    .doto(libs.engines.commands.optimized.write)
+    .last()
+    .toPromise(Promise)
 
-    if(id) console.timeEnd(id)
-    return result
-  },config.cmdTickRate).catch(err=>{
-    console.log('command engine error',err)
-    process.exit(1)
+  emitter.on('models',([table,event,data])=>{
+    if(table !== 'commands') return
+    if(event !== 'change') return
+    // console.log(data.type,data.state,data.id)
+    if(data.done){
+      // console.log(data.id,data.type)
+      cmdBench.completed()
+      return
+    }
+    const now = Date.now()
+    if(lodash.isBoolean(data.yield) && data.yield){
+      return libs.engines.commands.optimized.write(data)
+    }
+    if(lodash.isNumber(data.yield) && data.yield > now){
+      return libs.engines.commands.optimized.write(data)
+    }
+    if(data.state !== 'Start') return
+    cmdBench.new()
+    // console.log('new',data.type,data.id)
+    libs.engines.commands.optimized.write(data)
   })
+
+  loop(x=>{
+    cmdBench.print()
+    cmdBench.clear()
+    logBench.print()
+    logBench.clear()
+  },1000)
 
   let lastProcessed = 0
   //loop over unprocessed blocks
@@ -222,30 +247,28 @@ module.exports = async (config)=>{
   })
 
   loop(async x=>{
-    const events = await libs.eventlogs.getDone(false)
-    return highland(lodash.orderBy(events,['id'],['asc']))
+    return libs.eventlogs.readStream(false)
+      .sortBy((a,b)=>{
+        return a.id < b.id ? -1 : 1
+      })
+      // .batch(1000)
+      .doto(x=>logBench.new())
+      // .flatten()
       .map(async event=>{
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })
       .flatMap(highland)
-      .collect()
+      .doto(x=>logBench.completed())
+      .last()
       .toPromise(Promise)
+
   },1000).catch(err=>{
     console.log('event engine error',err)
     process.exit(1)
   })
 
-  // disable for now
-  // loop(async x=>{
-  //   const tokens = await libs.tokens.list()
-  //   const commands = await libs.engines.minting.tick(tokens)
-  //   return Promise.map(commands,props=>libs.commands.createType('transaction',props))
-
-  // },config.mintingTickRate).catch(err=>{
-  //   console.log('minting engine error',err)
-  //   process.exit(1)
-  // })
+  libs.engines.commands.optimized.resume()
 
   return libs
 }

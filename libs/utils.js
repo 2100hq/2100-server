@@ -21,6 +21,65 @@ exports.validateStakes = (stakes,max=1,min=0)=>{
   return stakes
 }
 
+exports.Benchmark = (benchmarks={})=>{
+  benchmarks = {
+    new:0,
+    completed:0,
+    seconds:1,
+    ...benchmarks
+  }
+
+  return {
+    new(){
+      benchmarks.new++
+    },
+    completed(){
+      benchmarks.completed++
+    },
+    print(){
+      // const pendingCount = await libs.commands.countDone(false)
+      // benchmarks.pending = pendingCount
+      benchmarks.perSecond = (benchmarks.completed/benchmarks.seconds).toFixed(2)
+      if(benchmarks.completed) benchmarks.avg = (benchmarks.seconds * 1000 / benchmarks.completed).toFixed(2) + 'ms'
+      console.table(benchmarks)
+    },
+    clear(){
+      benchmarks.new = 0
+      benchmarks.completed = 0
+      benchmarks.perSecond = 0
+      benchmarks.avg = 0
+    }
+  }
+}
+
+exports.BenchTimer = ({length=10}) =>{
+  const samples =[]
+  let index = 0
+  return {
+    start(now=Date.now()){
+      samples[index] = [now]
+    },
+    end(now=Date.now()){
+      samples[index].push(now)
+      index ++ 
+      if(index >= length){
+        index = 0
+      }
+    },
+    avg(){
+      if(samples.length === 0) return 0
+      return lodash(samples).filter(([start,end])=>{
+        return start && end
+      }).sumBy(([start,end])=>{
+        return end - start
+      })/samples.length
+    },
+    length(){
+      return samples.length
+    }
+  }
+}
+
 exports.GetWallets = wallets => type =>{
   assert(wallets,'requires wallet type tables')
   assert(type,'requires wallet type')

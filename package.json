@@ -6,10 +6,12 @@
   "scripts": {
     "start": "node start",
     "start-auth": "service=auth node start",
+    "eventlogs": "service=eventlogs node start",
     "test": "node test"
   },
   "dependencies": {
     "2100-contracts": "github:2100hq/2100-contracts#v0.2.2",
+    "big.js": "^5.2.2",
     "bignumber.js": "^9.0.0",
     "bluebird": "^3.5.5",
     "dotenv": "^8.0.0",
@@ -18,6 +20,7 @@
     "fastest-validator": "^0.6.17",
     "highland": "^2.13.4",
     "lodash": "^4.17.15",
+    "memtable": "^2.0.0-alpha.12",
     "moment": "^2.24.0",
     "pad": "^3.2.0",
     "rethink-table": "^0.0.5",

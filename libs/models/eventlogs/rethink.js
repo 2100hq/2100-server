@@ -22,6 +22,13 @@ module.exports = async (config, con) => {
     list(){
       return table.run(table.table().getorderBy('id').slice(from).coerceTo('array'))
     },
+    readStream(done=false){
+      const query = table.table().getAll(done,{index:'done'})
+      return table.streamify(query)
+    },
+    setDone(id,done=true){
+      return table.update(id,{done})
+    },
     latest(){
       const query = table.table().max({index:'id'})
       return table.run(query).catch(err=>{

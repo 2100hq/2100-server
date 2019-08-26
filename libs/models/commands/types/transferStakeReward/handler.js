@@ -1,5 +1,4 @@
 const assert = require('assert')
-const bn = require('bignumber.js')
 module.exports = (config,{commands,getWallets,tokens})=>{
   assert(commands,'requires commands')
   assert(getWallets,'requires wallets')
