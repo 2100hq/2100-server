@@ -56,7 +56,10 @@ module.exports = async (config={},{con},emit)=>{
       )
     ),
     blocks:Blocks.Model({},await Blocks.Rethink({table:'blocks'},con),(...args)=>emit('blocks',...args)),
-    eventlogs:Events.Model({},await Events.Rethink({table:'events'},con),(...args)=>emit('eventlogs',...args)),
+    eventlogs:Events.Model({},
+      await Events.Rethink({table:'events'},con),
+      (...args)=>emit('eventlogs',...args)
+    ),
     //transactions:{
     //  success:Transactions.Model({},await Transactions.Rethink({table:'transactions'},con),(...args)=>emit('success',...args)),
     //  //pending and failures do not get persisted
