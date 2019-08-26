@@ -56,12 +56,20 @@ module.exports = function(config,table,emit=x=>x) {
     return set(token)
   }
 
+  async function setDescription(id,description=''){
+    assert(id,'requires a token id')
+    const token = await get(id)
+    token.description = description
+    return set(token)
+  }
+
   return {
     ...table,
     set,
     get,
     create,
     updateOwner,
+    setDescription,
   }
 }
 

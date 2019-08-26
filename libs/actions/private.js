@@ -37,6 +37,12 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return users.setFavorite(user.id,tokenid,favorite)
     }
 
+    async function setTokenDescription(tokenid,description=''){
+      const token = await tokens.active.get(tokenid)
+      assert(token.ownerAddress.toLowerCase() === user.id.toLowerCase(),'You are not the owner')
+      return tokens.active.setDescription(tokenid,description)
+    }
+
     // async function stake({token,value}){
     //   const wallet = await queries.getWallet('DAI')
     //   const {balance} = await wallet.get(user.id)
@@ -63,6 +69,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       state,
       stake,
       setFavorite,
+      setTokenDescription,
     }
   }
 }

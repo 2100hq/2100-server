@@ -22,6 +22,7 @@ module.exports = async host => {
         })
       })
     }
+
     function listen(cb){
       socket.on(channel,cb)
     }

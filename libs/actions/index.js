@@ -15,15 +15,17 @@ module.exports = (name, config, libs,emit)=>{
     assert(scope[action],'No such action ' + action + ' in ' + name)
     const id = lodash.uniqueId(['actions',name,action,''].join('.'))
     console.time(id)
-    const result = await scope[action](...args).catch(err=>{
+    try{
+      const result = await scope[action](...args)
+      console.timeEnd(id)
+      return result
+    }catch(err){
       console.timeEnd(id)
       if(config.debug){
         console.error(id,err.stack)
         console.error(...args)
       }
       throw err
-    })
-    console.timeEnd(id)
-    return result
+    }
   }
 }
