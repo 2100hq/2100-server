@@ -60,6 +60,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     //set this to your session
     socket.tokenid = tokenid
     socket.userid = await auth.call('user',tokenid) 
+    if(socket.userid) emit('login',socket.id,socket.userid)
     return tokenid
   }
 
