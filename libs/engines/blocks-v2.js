@@ -107,7 +107,7 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
       })(log)
       result.values = stringifyValues(result.values)
       // console.log('eventlog',result)
-      return events.format(lodash.omit(result,['decode']))
+      return eventlogs.format(lodash.omit(result,['decode']))
     })
   }
 
