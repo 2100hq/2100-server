@@ -38,6 +38,7 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
       createToken,
       setTokenDescription,
       setAdmin,
+      createCommand,
     }
   }
 }

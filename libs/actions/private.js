@@ -1,6 +1,6 @@
 const assert = require('assert')
 const lodash = require('lodash')
-const {validateStakes} = require('../utils')
+const {validateStakes, parseTwitterUser} = require('../utils')
 module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
@@ -30,6 +30,15 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       validateStakes(stakes,balance)
       const {number} = await blocks.latest() 
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
+    }
+
+    async function verifyTwitter(link){
+      const name = parseTwitterUser(link)
+      assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
+      return commands.createType('createTokenByTweet',{
+        userid:user.id,
+        link,
+      })
     }
 
     async function setFavorite(tokenid,favorite){
