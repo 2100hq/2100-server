@@ -36,6 +36,10 @@ module.exports = async (config, con) => {
         //no entries
         return null
       })
+    },
+    insert(many){
+      const query = table.table().insert(many,{return_changes:false,conflict:'error'})
+      return table.run(query)
     }
   }
 }

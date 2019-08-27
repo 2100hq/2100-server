@@ -35,6 +35,7 @@ module.exports = async config =>{
 
   function updateState(channel,state){
     return (...args)=>{
+      // console.log(channel,...args)
       if(args[0].length){
         lodash.set(state[channel],...args)
       }else{
@@ -57,6 +58,11 @@ module.exports = async config =>{
       return new ethers.Contract(contract.networks[config.chainid].address,contract.abi,wallet)
     })
     const socket = await SocketClient(host)
+    const actions =  {
+      public: socket('public',updateState('public',server)),
+      private: socket('private',updateState('private',server)),
+      auth:socket('auth'),
+    }
     console.log('pk',wallet.privateKey)
     return {
       controller,
@@ -64,15 +70,11 @@ module.exports = async config =>{
       wallet,
       tokenName,
       socket,
+      actions,
       numstakes:config.bots.numstakes,
       log:(...args)=>{
         console.log(tokenName,...args)
         return args[0]
-      },
-      actions : {
-        public: socket('public',updateState('public',server)),
-        private: socket('private',updateState('private',server)),
-        auth:socket('auth'),
       },
       server,
       state:'Start',
@@ -148,7 +150,7 @@ module.exports = async config =>{
       },
       async ChooseAction(state){
         const primaryBalance = await fakedai.balanceOf(state.wallet.address)
-        // state.log('balance',state.server.private.myWallets.available)
+        // state.log('balance',state.server.public)
         let balance = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
         // state.log(state.server.public)
         const available = ethers.utils.bigNumberify(balance)

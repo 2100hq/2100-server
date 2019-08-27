@@ -50,6 +50,11 @@ module.exports = async (config, con) => {
     readStream(done=false){
       const query = table.table().getAll(done,{index:'done'})
       return table.streamify(query)
+    },
+    insert(many){
+      console.log('many',many.length)
+      const query = table.table().insert(many,{return_changes:false,conflict:'error'})
+      return table.run(query)
     }
   }
 }

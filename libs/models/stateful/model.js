@@ -85,5 +85,6 @@ module.exports = (config, table, emit=x=>x) => {
     defaults,
     validate,
     yield,
+    emit,
   }
 }

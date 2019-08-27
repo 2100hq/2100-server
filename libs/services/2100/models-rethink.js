@@ -8,6 +8,7 @@ const Stateful = require('../../models/stateful')
 const Blocks = require('../../models/blocks')
 const Events = require('../../models/eventlogs')
 const Coupons = require('../../models/coupons')
+const Visited = require('../../models/visited')
 
 //please ignore absurdity of this code, but its just a helper to essentially wire
 //stores with models and listen for events
@@ -60,6 +61,7 @@ module.exports = async (config={},{con},emit)=>{
       await Events.Rethink({table:'events'},con),
       (...args)=>emit('eventlogs',...args)
     ),
+    visited:Visited.Model(config,await Visited.Rethink({table:'visited'},con),(...args)=>emit('visited',...args)),
     //transactions:{
     //  success:Transactions.Model({},await Transactions.Rethink({table:'transactions'},con),(...args)=>emit('success',...args)),
     //  //pending and failures do not get persisted

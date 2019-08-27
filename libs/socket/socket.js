@@ -29,7 +29,11 @@ module.exports = async (config, libs) => {
       // console.log('disconnect',socket.user)
     })
 
-    query.publicState().then(state=>io.emit('public',[],state)).catch(err=>{
+    // console.log('socket online',socket.id)
+    query.publicState().then( state=>{
+      // console.log('public state',socket.id,state)
+      io.emit('public',[],state)
+    }).catch(err=>{
       console.log('error getting public state',err)
     })
 

@@ -32,6 +32,10 @@ module.exports = function(config,table,emit=x=>x) {
     return set(result)
   }
 
+  function format(props){
+    return validate(defaults(props))
+  }
+
   // async function setDone(id){
   //   const result = await get(id)
   //   result.done = true
@@ -45,6 +49,7 @@ module.exports = function(config,table,emit=x=>x) {
     get,
     getBy,
     create,
+    format,
     // setDone,
   }
 }

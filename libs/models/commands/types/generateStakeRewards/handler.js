@@ -52,28 +52,32 @@ module.exports = (config,{commands,getWallets,tokens,blocks})=>{
         const amount=bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
         const userWallet = await getWallets('available').getOrCreate(stake.userid,cmd.tokenid)
         await getWallets('available').deposit(stake.userid,cmd.tokenid,amount)
-        const command = await commands.createType('transferStakeReward',{
+        // console.log('processing stake',stake.id)
+        const receipt = await commands.format('transferStakeReward',{
           tokenid:cmd.tokenid,
           userid:stake.userid,
           blockNumber:block.number,
           done:true,
           amount,
         })
-        return command.id
-      },{concurrency:10})
+        console.log(receipt)
+        return receipt
+      })
 
       if(receipts.length){
         const userWallet = await getWallets('available').getOrCreate(cmd.ownerAddress,cmd.tokenid)
         await getWallets('available').deposit(cmd.ownerAddress,cmd.tokenid,ownerReward.toString())
-        const ownerReceipt = await commands.createType('transferOwnerReward',{
+        const ownerReceipt = await commands.format('transferOwnerReward',{
           tokenid:cmd.tokenid,
           userid:cmd.ownerAddress,
           blockNumber:block.number,
           amount:ownerReward.toString(),
           done:true,
         })
-        receipts.push(ownerReceipt.id)
+        receipts.push(ownerReceipt)
       }
+
+      await commands.createAll(receipts)
       //const receipts = await Promise.map(allowedStakes,async stake=>{
       //  // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
       //  const command = await commands.createType('transferStakeReward',{
@@ -99,7 +103,7 @@ module.exports = (config,{commands,getWallets,tokens,blocks})=>{
 
       // await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString())
 
-       return commands.success(cmd.id,'Rewards Generated',{receipts})
+       return commands.success(cmd.id,'Rewards Generated',{})
     },
   }
 }

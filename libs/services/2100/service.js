@@ -10,7 +10,7 @@ const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
 
-const {RethinkConnection,loop,GetWallets,Benchmark} = require('../../utils')
+const {RethinkConnection,loop,GetWallets,Benchmark,sleep} = require('../../utils')
 const RethinkModels = require('./models-rethink')
 const Ethers = require('../../ethers')
 const Signer = require('../../signer')
@@ -103,29 +103,6 @@ module.exports = async (config)=>{
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
 
-  libs.socket = await Socket(config,libs)
-  const blockStream = highland('eth',emitter)
-
-  //events from ethers block chain
-  blockStream.map(async ([type,data])=>{
-    switch(type){
-      case 'block':{
-        const block = await libs.ethers.getBlock(data)
-        if(! await libs.blocks.has(data)){
-          await libs.blocks.create(block)
-        }
-        return data
-      }
-    }
-    return data
-  })
-  .flatMap(highland)
-  // .doto(x=>console.log('saved',x))
-  .errors(err=>{
-    console.log('eth event error',err)
-    process.exit(1)
-  })
-  .resume()
 
   //write model events to the event reducer, this will output api events
   emitter.on('models',async args=>{
@@ -136,7 +113,6 @@ module.exports = async (config)=>{
       process.exit(1)
     }
   })
-
 
   //this is mainly for auth stuff to know when someones authenticated
   emitter.on('actions',async ([channel,type,...args])=>{
@@ -153,6 +129,7 @@ module.exports = async (config)=>{
     }
   })
 
+  libs.socket = await Socket(config,libs)
   //take api events and write to socket channels
   emitter.on('api',async ([channel,...args])=>{
     try{
@@ -164,22 +141,34 @@ module.exports = async (config)=>{
     }
   })
 
-  //we need to init this with our last known block
-  const lastBlock = await libs.blocks.latest()
-  
-  if(config.forceLatestBlock){
-    await libs.ethers.start()
-  }else if(config.defaultStartBlock){
-    await libs.ethers.start(parseInt(config.defaultStartBlock || 0))
-  }else if(lastBlock){
-    //have to put this after we bind eth events
-    await libs.ethers.start(lastBlock.number)
-  }else{
-    await libs.ethers.start(0)
-  }
+  const eventlogStream = libs.eventlogs.readStream()
 
-  const cmdBench = Benchmark()
   const logBench = Benchmark()
+  const cmdBench = Benchmark()
+  loop(x=>{
+    // cmdBench.print()
+    cmdBench.clear()
+    // logBench.print()
+    logBench.clear()
+  },1000)
+
+  //this needs to be processed first
+  await libs.eventlogs.readStream(false)
+    .sortBy((a,b)=>{
+      return a.id < b.id ? -1 : 1
+    })
+    .doto(x=>logBench.new())
+    .map(async event=>{
+      const result = await libs.engines.eventlogs.tick(event)
+      return libs.eventlogs.setDone(event.id)
+    })
+    .map(highland)
+    .parallel(100)
+    .doto(x=>logBench.completed())
+    .last()
+    .toPromise(Promise)
+
+
   let cmdStream = await libs.commands.readStream(false)
   await cmdStream
     .sortBy((a,b)=>{
@@ -195,12 +184,14 @@ module.exports = async (config)=>{
     .last()
     .toPromise(Promise)
 
+  libs.engines.commands.optimized.resume()
+
   emitter.on('models',([table,event,data])=>{
     if(table !== 'commands') return
     if(event !== 'change') return
-    // console.log(data.type,data.state,data.id)
+    // console.log('cmd model',data)
     if(data.done){
-      // console.log(data.id,data.type)
+      console.log(data.id,data.type)
       cmdBench.completed()
       return
     }
@@ -217,35 +208,6 @@ module.exports = async (config)=>{
     libs.engines.commands.optimized.write(data)
   })
 
-  loop(x=>{
-    cmdBench.print()
-    cmdBench.clear()
-    logBench.print()
-    logBench.clear()
-  },1000)
-
-  let lastProcessed = 0
-  //loop over unprocessed blocks
-  loop(async x=>{
-    let block = await libs.blocks.next()
-
-    do{
-      if(block == null) return
-      if(lastProcessed){
-        assert(lastProcessed === block.number-1,'Block processed out of order: ' + lastProcessed + ' vs ' + block.number)
-      }
-      lastProcessed = block.number
-      console.log('processing block',block.number)
-      const result = await libs.engines.blocks.tick(block)
-      await libs.blocks.setDone(block.id)
-      block = await libs.blocks.next()
-    }while(block)
-
-  },1000).catch(err=>{
-    console.log('block engine error',err)
-    process.exit(1)
-  })
-
   loop(async x=>{
     return libs.eventlogs.readStream(false)
       .sortBy((a,b)=>{
@@ -258,17 +220,21 @@ module.exports = async (config)=>{
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })
-      .flatMap(highland)
+      .map(highland)
+      .parallel(100)
       .doto(x=>logBench.completed())
       .last()
       .toPromise(Promise)
 
-  },1000).catch(err=>{
+  },5000).catch(err=>{
     console.log('event engine error',err)
     process.exit(1)
   })
 
-  libs.engines.commands.optimized.resume()
+  loop(async x=>{
+    emitter.emit('models','blocks','change',await libs.blocks.latest())
+  },1000)
+
 
   return libs
 }

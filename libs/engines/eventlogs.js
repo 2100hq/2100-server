@@ -8,9 +8,9 @@ module.exports = (config,{commands,eventlogs})=>{
 
   //addresses need to be lower cased for all comparisons in the rest of the system
   const handlers = {
-    async Deposit(event){
+    Deposit(event){
       //this command now issue a rebalance stakes command on success
-      return commands.createType('pendingDeposit',{
+      return commands.format('pendingDeposit',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
         toAddress:event.values.account.toLowerCase(),
@@ -21,9 +21,9 @@ module.exports = (config,{commands,eventlogs})=>{
         value:event.values.amount,
       })
     },
-    async Withdraw(event){
+    Withdraw(event){
       //this command now issue a rebalance stakes command on success
-      return commands.createType('withdrawPrimary',{
+      return commands.format('withdrawPrimary',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
         fromAddress:event.values.account.toLowerCase(),
@@ -33,8 +33,8 @@ module.exports = (config,{commands,eventlogs})=>{
       })
     } ,
     //token creation event
-    async Create(event){
-      return commands.createType('createActiveToken',{
+    Create(event){
+      return commands.format('createActiveToken',{
         userid:event.values.creator.toLowerCase(),
         name:event.values.username.toLowerCase(),
         transactionHash:event.transactionHash.toLowerCase(),
@@ -46,16 +46,16 @@ module.exports = (config,{commands,eventlogs})=>{
     },
     //synthetic event produced at the end of each block.
     //find all tokens with stakers and generate stake rewards.
-    async RewardStakers(event){
-      return commands.createType('generateStakeRewards',{
+    RewardStakers(event){
+      return commands.format('generateStakeRewards',{
         blockNumber:event.blockNumber,
         ...event.values
       })
     },
-    async Owner(event){
+    Owner(event){
       console.log(event)
     },
-    async DAIAddress(event){
+    DAIAddress(event){
       console.log(event)
     },
   }
@@ -63,11 +63,17 @@ module.exports = (config,{commands,eventlogs})=>{
   async function tick(event){
     // console.log('starting event',event.name,event.id)
     assert(handlers[event.name],'no handler for event name')
+    return commands.create(await handlers[event.name](event))
+  }
+
+  function getCommand(event){
+    assert(handlers[event.name],'no handler for event name')
     return handlers[event.name](event)
   }
 
   return {
     tick,
-    handlers
+    handlers,
+    getCommand,
   }
 }

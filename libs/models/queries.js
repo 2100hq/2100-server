@@ -215,9 +215,9 @@ module.exports = (config,libs)=>{
         pending:lodash.keyBy((await listPendingTokens()),'id'),
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
-      stakes:{ 
-        ...(await allStakesDetailed())
-      },
+      // stakes:{ 
+      //   ...(await allStakesDetailed())
+      // },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },

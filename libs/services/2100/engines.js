@@ -9,7 +9,8 @@ module.exports = (config,libs,emit=x=>x)=>{
       standard:Engines.Commands(config,libs),
     },
     eventlogs:Engines.EventLogs(config,libs),
-    blocks:Engines.Blocks(config,libs),
+    // blocks:Engines.Blocks(config,libs),
+    blocks:Engines.BlocksV2(config,libs),
   }
 }
 

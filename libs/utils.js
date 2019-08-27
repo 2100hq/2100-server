@@ -156,6 +156,10 @@ exports.calculateStakes = (token,stakers)=>{
   })
 }
 
+exports.sleep = ms =>{
+  return new Promise(res=>setTimeout(res,ms))
+}
+
 exports.loop = async (fn, delay = 1000, max, count = 0, result) => {
   assert(lodash.isFunction(fn), 'loop requires a function')
   if (max && count >= max) return result
