@@ -11,7 +11,7 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
     assert(user,'You must be logged in')
     assert(user.isAdmin,'You must be an admin')
 
-    async function createToken({name,ownerAddress}){
+    async function createPendingToken({name,ownerAddress}){
       assert(!(await query.hasPendingToken(name.toLowerCase())),'Token is already pending creation')
       assert(!(await coupons.create.has(name.toLowerCase())),'Coupon already exists')
       assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
@@ -34,10 +34,17 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
       return tokens.active.setDescription(tokenid,description)
     }
 
+    async function createToken(props){
+      assert(!(await query.hasActiveTokenByName(props.name.toLowerCase())),'Token is already active')
+      props.userid = user.id
+      return commands.createType('createTokenByName',props)
+    }
+
     return {
       createToken,
       setTokenDescription,
       setAdmin,
+      createPendingToken,
     }
   }
 }

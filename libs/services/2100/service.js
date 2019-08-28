@@ -88,6 +88,8 @@ module.exports = async (config)=>{
     'transferOwnerReward',    //handle crediting owner rewards
     'transferStakeReward',    //handle crediting stake rewards
     'transferCreatorReward',    //handle crediting creator rewards
+    'createTokenByTweet',    //user creating a token by tweet
+    'createTokenByName',    //admin creating token by name
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)
@@ -141,11 +143,19 @@ module.exports = async (config)=>{
   //this is mainly for auth stuff to know when someones authenticated
   emitter.on('actions',async ([channel,type,...args])=>{
     if(channel !== 'auth') return
-    if(type !== 'login') return
     try{
-      const [socketid,userid] = args
-      await libs.socket.join(socketid,userid)
-      await libs.socket.private(userid,[],await libs.query.privateState(userid))
+      if(type === 'login'){
+          const [socketid,userid] = args
+          await libs.socket.join(socketid,userid)
+          await libs.socket.private(userid,[],await libs.query.privateState(userid))
+          return
+      }
+      if(type === 'logout'){
+          const [socketid,userid] = args
+          await libs.socket.leave(socketid,userid)
+          await libs.socket.private(userid,[],{})
+          return
+      }
     }catch(err){
       console.log('action error: ' + type)
       console.log(err)
@@ -168,6 +178,7 @@ module.exports = async (config)=>{
   const lastBlock = await libs.blocks.latest()
   
   if(config.forceLatestBlock){
+    await libs.blocks.setDone(lastBlock.id)
     await libs.ethers.start()
   }else if(config.defaultStartBlock){
     await libs.ethers.start(parseInt(config.defaultStartBlock || 0))

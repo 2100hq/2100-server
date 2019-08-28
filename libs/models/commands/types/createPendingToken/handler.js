@@ -31,7 +31,6 @@ module.exports = (config,{commands,tokens,signer,coupons})=>{
         return commands.failure(cmd.id, e.message)
       }
 
-
       return commands.setState(cmd.id,'Create Pending Token', {couponid: coupon.id})
     },
     //this can only happen once, create will throw if anything already exists
