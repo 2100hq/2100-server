@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "node start",
-    "start-auth": "service=auth node start",
+    "auth": "service=auth node start",
+    "blocks": "service=blocks node start",
+    "bots": "service=bots node start",
     "test": "node test"
   },
   "dependencies": {
