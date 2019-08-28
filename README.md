@@ -171,7 +171,7 @@ Special routes only admins can call.
 **createPendingToken({name:string,ownerAddress:(string,optional)})**
 - creates ownerless token which needs to be confirmed on blockchain.
 
-**createTokenByName({name:string,ownerAddress:string,creatorAddress:string,description:(string,optional)})
+**createTokenByName({name:string,ownerAddress:string,creatorAddress:string,description:(string,optional)})**
 -  creates an active token off chain which has these properties. 
 
 **setTokenDescription(tokenid:string,description='')**
