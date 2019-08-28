@@ -176,7 +176,7 @@ module.exports = async (config)=>{
   const lastBlock = await libs.blocks.latest()
   
   if(config.forceLatestBlock){
-    await libs.blocks.setDone(lastBlock.id)
+    if(lastBlock) await libs.blocks.setDone(lastBlock.id)
     await libs.ethers.start()
   }else if(config.defaultStartBlock){
     await libs.ethers.start(parseInt(config.defaultStartBlock || 0))
