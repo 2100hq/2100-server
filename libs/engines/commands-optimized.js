@@ -32,7 +32,9 @@ module.exports = (config,{handlers,commands})=>{
       //this can be its own stream, but not 
       //a lot of events, we will just add to sparse stream
       case 'createPendingToken':
-      case 'createActiveToken':{
+      case 'createActiveToken':
+      case 'createTokenByTweet':
+      case 'createTokenByName':{
         const stream = getOrCreateStream('slow')
         stream.write(cmd)
         break
