@@ -94,7 +94,7 @@ module.exports = async config =>{
     const {privateKey} = config
     return {
       async Start(state){
-        await state.actions.auth.call('authenticate',undefined,state.wallet.address)
+        await state.actions.auth.call('authenticate',undefined,state.wallet.address.toLowerCase())
         // return 'Unstake'
         return 'Check Eth'
       },
@@ -175,6 +175,7 @@ module.exports = async config =>{
       },
       async 'Check My Token'(state){
         const myTokens = state.server.private.myTokens
+        console.log('myTokens',myTokens)
         if(lodash.size(myTokens)){
           return 'Check Stakes'
         }
