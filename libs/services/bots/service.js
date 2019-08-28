@@ -207,7 +207,7 @@ module.exports = async config =>{
         return 'Check My Token'
       },
       async 'Create My Token'(state){
-        return actions.admin.call('createToken',{name:state.tokenName,ownerAddress:state.wallet.address}).then(x=>{
+        return actions.admin.call('createTokenByName',{name:state.tokenName,ownerAddress:state.wallet.address.toLowerCase(),creatorAddress:state.wallet.address.toLowerCase()}).then(x=>{
           state.log(x)
           return 'Check My Token'
         }).catch(err=>{

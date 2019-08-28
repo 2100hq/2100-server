@@ -194,8 +194,14 @@ module.exports = async (config)=>{
 
   libs.engines.commands.optimized.resume()
 
+  const alarms = new Map()
+
   emitter.on('models',([table,event,data])=>{
     if(table !== 'commands') return
+    if(event === 'wake'){
+      // console.log('running wake cmd',data.id)
+      return libs.engines.commands.optimized.write(data)
+    }
     if(event !== 'change') return
     // console.log('cmd model',data)
     if(data.done){
@@ -203,11 +209,19 @@ module.exports = async (config)=>{
       return
     }
     const now = Date.now()
-    if(lodash.isBoolean(data.yield) && data.yield){
-      return libs.engines.commands.optimized.write(data)
+    if(lodash.isBoolean(data.yield)){
+      if(data.yield){
+        return libs.engines.commands.optimized.write(data)
+      }
     }
-    if(lodash.isNumber(data.yield) && data.yield > now){
-      return libs.engines.commands.optimized.write(data)
+    if(lodash.isNumber(data.yield)){
+      // console.log('yielding')
+      if(data.yield <= now){
+        return libs.engines.commands.optimized.write(data)
+      }else{
+        // console.log('setting alarm')
+        return alarms.set(data.id,data.yield)
+      }
     }
     if(data.state !== 'Start') return
     cmdBench.new()
@@ -215,6 +229,22 @@ module.exports = async (config)=>{
     libs.engines.commands.optimized.write(data)
   })
 
+  //these wake commands after they yield
+  loop(async x=>{
+    alarms.forEach((value,key)=>{
+      if(value < Date.now()){
+        alarms.delete(key)
+        libs.commands.wake(key).then(res=>{
+          // console.log('command woke',key)
+        }).catch(err=>{
+          console.log('err waking cmd',err.message)
+        })
+      }
+    })
+  },1000).catch(err=>{
+    console.log('alarm loop err',err)
+    process.exit(1)
+  })
   loop(async x=>{
     return libs.eventlogs.readStream(false)
       .sortBy((a,b)=>{
@@ -224,6 +254,7 @@ module.exports = async (config)=>{
       .doto(x=>logBench.new())
       // .flatten()
       .map(async event=>{
+        // console.log('running event',event.id)
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })

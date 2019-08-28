@@ -22,7 +22,7 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       if((Number(block.number) + 1) >= Number(cmd.blockNumber) + Number(cmd.confirmations)){
         return commands.setState(cmd.id,'Credit Deposit')
       }else{
-        return commands.yield(cmd.id,Date.now() + 50000)
+        return commands.yield(cmd.id,Date.now() + 5000)
       }
     },
     async 'Credit Deposit'(cmd){

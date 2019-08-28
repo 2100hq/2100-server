@@ -1,7 +1,7 @@
-const {regexTwitter,regexLowerNum, regexAddress}  = require('../../utils')
+const {regexTwitter,regexLowerNum, regexAddress,regexLowerUrl}  = require('../../utils')
 module.exports = () => {
   return {
-    id: {type:'string',pattern:regexLowerNum},
+    id: {type:'string',pattern:regexLowerUrl},
     contractAddress:{type:'string',pattern:regexAddress,optional:true},
     name:{type:'string',pattern:regexTwitter},
     supply:{type:'string',numeric:true},
