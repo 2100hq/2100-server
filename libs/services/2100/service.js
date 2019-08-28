@@ -37,9 +37,7 @@ module.exports = async (config)=>{
 
   assert(config.primaryToken,'requires primary token address or symbol')
 
-
   const emitter = new Emitter()
-
 
   config.contracts = contracts.map((json)=>{
     assert(json.contractName,'contract abi requires contractName')
