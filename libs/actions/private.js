@@ -32,12 +32,18 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
     }
 
-    async function verifyTwitter(link){
+    async function verifyTwitter(link,description=''){
+      assert(link,'requires tweet link')
       const name = parseTwitterUser(link)
       assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
+
+      const owns = await tokens.active.getByOwner(user.id)
+      assert(owns.length === 0,'You own a token already, try changing the token name instead')
+
       return commands.createType('createTokenByTweet',{
         userid:user.id,
         link,
+        description,
       })
     }
 
@@ -79,6 +85,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       stake,
       setFavorite,
       setTokenDescription,
+      verifyTwitter,
     }
   }
 }

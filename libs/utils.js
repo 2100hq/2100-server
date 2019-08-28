@@ -39,9 +39,10 @@ exports.matchTweet = (tweet,match)=>{
 
 exports.validateTweet = async (url,publicAddress,prefix='Add me to @2100hq: ') =>{
   const name = exports.parseTwitterUser(url)
-  const tweet = await parseTweet(url)
+  const tweet = await exports.parseTweet(url)
   const match = exports.matchTweet(tweet,prefix + publicAddress)
   assert(match,'Public address does not match')
+  assert(name,'Unable to parse name from tweet URL')
   return name
 }
 

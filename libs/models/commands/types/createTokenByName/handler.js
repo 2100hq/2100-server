@@ -1,44 +1,40 @@
 const assert = require('assert')
 const bn = require('bignumber.js')
-const {validateTweet} = require('../../../../utils')
 
 //keep this simple for now
-//does not require pending token
-module.exports = (config,{commands,tokens,blocks,getWallets})=>{
+module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
+  assert(getWallets,'requires getWallets')
   assert(commands,'requires commands')
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
   assert(tokens.pending,'requires pending tokens')
-  assert(getWallets,'requires getWallets')
+  assert(coupons,'requires coupons')
+  assert(coupons.create,'requires coupons.create')
   assert(blocks,'requires blocks')
   return {
     async Start(cmd){
       return commands.setState(cmd.id,'Create Active Token')
     },
+    //this can only happen once, create will throw if anything already exists
+    //this assume the commands initilalized with all valid numbers.
     async 'Create Active Token'(cmd){
 
       try{
-        var name = await validateTweet(cmd.link,cmd.userid,cmd.prefix)
-        assert(name,'Twitter name not found. Use full link to message.')
-
-        //lowercase name for token
-        name = name.toLowerCase()
-        const exists = await tokens.active.getByName(name)
-        assert(exists.length === 0,'Token exists: ' + name)
-        const owns = await tokens.active.getByOwner(cmd.userid)
-        assert(owns.length === 0,'You own a token already, try changing the token name instead')
+        const exists = await tokens.active.getByName(cmd.name.toLowerCase())
+        assert(exists.length === 0,'Token exists: ' + cmd.name)
       }catch(err){
+        console.log(err)
         return commands.failure(cmd.id,err.message)
       }
 
       const block = await blocks.latest()
 
       const token = await tokens.active.create({
-        id:name,
-        description:cmd.description,
-        ownerAddress:cmd.userid,
-        creatorAddress:cmd.userid,
-        name:name,
+        id:cmd.name,
+        creatorAddress:cmd.creatorAddress,
+        ownerAddress:cmd.ownerAddress,
+        name:cmd.name,
+        createdBlock:cmd.createdBlock,
         createdBlock:block.number,
       })
 
@@ -53,7 +49,6 @@ module.exports = (config,{commands,tokens,blocks,getWallets})=>{
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
       await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
-
       if(cmd.creatorAddress && bn(cmd.creatorReward).isGreaterThan(0)){
         //submit creator reward command
         await commands.createType('transferCreatorReward',{
@@ -66,11 +61,8 @@ module.exports = (config,{commands,tokens,blocks,getWallets})=>{
       return commands.setState(cmd.id,'Remove Pending')
     },
     async 'Remove Pending'(cmd){
-      //only if it exists
-      await tokens.pending.delete(cmd.name).catch(err=>{
-        //ok do nothing
-      })
-      return commands.success(cmd.id,'Token Confirmed and Enabled')
+      await tokens.pending.delete(cmd.name).catch(err=>err)
+      return commands.success(cmd.id,'Token Created By Name')
     }
   }
 }
