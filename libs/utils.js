@@ -80,6 +80,8 @@ exports.BenchTimer = ({length=10}) =>{
       return samples.length
     }
   }
+}
+
 exports.parseTweet = async url =>{
   const resp = await axios.get(url)
   const dom = cheerio.load(resp.data);
