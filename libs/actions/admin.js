@@ -34,14 +34,14 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
       return tokens.active.setDescription(tokenid,description)
     }
 
-    async function createToken(props){
+    async function createTokenByName(props){
       assert(!(await query.hasActiveTokenByName(props.name.toLowerCase())),'Token is already active')
       props.userid = user.id
       return commands.createType('createTokenByName',props)
     }
 
     return {
-      createToken,
+      createTokenByName,
       setTokenDescription,
       setAdmin,
       createPendingToken,

@@ -153,17 +153,29 @@ Private actions are scoped the the socket private channel and can only be called
 **me**
 - returns your user. Its already avaialble in your private state, but here for testing.
 
+**verifyTwitter(link:string,description:string)**
+- Create a new token based on you twitter name. Requires a link to a tweet in this format: 
+  - "Add me to @2100hq: 0x..." where 0x is your public address
+- link - full https link to tweet which contains the formatted message.
+- description - optional description of your token. 
+
+**setFavorite(tokenid:string,favorite=true)**
+- adds a token to your favorites list. can also remove token by setting favorite=false.
+
+**setTokenDescription(tokenid:string,description='')**
+- set the description of a token you own. 
+
 ### Admin Actions
 Special routes only admins can call.
 
-**createTokenWithOwner({name:string,signature:string})**
-- generates a pending token with a pre-set owner address
-- signed coupon will be created for submission on block chain to create
-- string must be a valid twitter name or action will fail
-- this generates a command for the user which can be monitored in private.myCommands
+**createPendingToken({name:string,ownerAddress:(string,optional)})**
+- creates ownerless token which needs to be confirmed on blockchain.
 
-**createToken({name:string})**
-- creates ownerless token
+**createTokenByName({name:string,ownerAddress:string,creatorAddress:string,description:(string,optional)})
+-  creates an active token off chain which has these properties. 
+
+**setTokenDescription(tokenid:string,description='')**
+- set the description of any active token.
 
 **setAdmin({userid:string,isAdmin:boolean})**
 - user ids are identical to user addresses
