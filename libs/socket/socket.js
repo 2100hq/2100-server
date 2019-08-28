@@ -91,6 +91,14 @@ module.exports = async (config, libs) => {
   })
 
   return {
+    leave(sessionid,channel){
+      assert(io.sockets.connected[sessionid],'session not connected')
+      const socket = io.sockets.connected[sessionid]
+      return new Promise((res,rej)=>socket.leave(channel,err=>{
+        if(err) return rej(err)
+        res()
+      }))
+    },
     join(sessionid,channel){
       assert(io.sockets.connected[sessionid],'session not connected')
       const socket = io.sockets.connected[sessionid]

@@ -37,9 +37,7 @@ module.exports = async (config)=>{
 
   assert(config.primaryToken,'requires primary token address or symbol')
 
-
   const emitter = new Emitter()
-
 
   config.contracts = contracts.map((json)=>{
     assert(json.contractName,'contract abi requires contractName')
@@ -88,6 +86,8 @@ module.exports = async (config)=>{
     'transferOwnerReward',    //handle crediting owner rewards
     'transferStakeReward',    //handle crediting stake rewards
     'transferCreatorReward',    //handle crediting creator rewards
+    'createTokenByTweet',    //user creating a token by tweet
+    'createTokenByName',    //admin creating token by name
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)
@@ -117,11 +117,19 @@ module.exports = async (config)=>{
   //this is mainly for auth stuff to know when someones authenticated
   emitter.on('actions',async ([channel,type,...args])=>{
     if(channel !== 'auth') return
-    if(type !== 'login') return
     try{
-      const [socketid,userid] = args
-      await libs.socket.join(socketid,userid)
-      await libs.socket.private(userid,[],await libs.query.privateState(userid))
+      if(type === 'login'){
+          const [socketid,userid] = args
+          await libs.socket.join(socketid,userid)
+          await libs.socket.private(userid,[],await libs.query.privateState(userid))
+          return
+      }
+      if(type === 'logout'){
+          const [socketid,userid] = args
+          await libs.socket.leave(socketid,userid)
+          await libs.socket.private(userid,[],{})
+          return
+      }
     }catch(err){
       console.log('action error: ' + type)
       console.log(err)
@@ -191,7 +199,6 @@ module.exports = async (config)=>{
     if(event !== 'change') return
     // console.log('cmd model',data)
     if(data.done){
-      console.log(data.id,data.type)
       cmdBench.completed()
       return
     }
@@ -221,7 +228,7 @@ module.exports = async (config)=>{
         return libs.eventlogs.setDone(event.id)
       })
       .map(highland)
-      .parallel(100)
+      .parallel(10)
       .doto(x=>logBench.completed())
       .last()
       .toPromise(Promise)

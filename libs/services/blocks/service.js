@@ -58,6 +58,7 @@ module.exports = async config =>{
   const lastBlock = await libs.blocks.latest()
   
   if(config.forceLatestBlock){
+    if(lastBlock) await libs.blocks.setDone(lastBlock.id)
     await libs.ethers.start()
   }else if(config.defaultStartBlock){
     await libs.ethers.start(parseInt(config.defaultStartBlock || 0))

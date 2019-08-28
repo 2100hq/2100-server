@@ -28,6 +28,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
   }
 
   async function login(signed,publicAddress,tokenid=socket.tokenid){
+    assert(auth,'auth server not enabled')
     assert(!socket.userid, 'you are already logged in')
     assert(publicAddress,'requires publicAddress')
     assert(tokenid,'requires a token')
@@ -52,14 +53,17 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
   }
 
   async function user(tokenid){
+    assert(auth,'auth server not enabled')
     return auth.call('user',tokenid)
   }
 
   async function validate(tokenid=socket.tokenid){
+    assert(auth,'auth server not enabled')
     await auth.call('validate',tokenid)
     //set this to your session
     socket.tokenid = tokenid
     socket.userid = await auth.call('user',tokenid) 
+    if(socket.userid) emit('login',socket.id,socket.userid)
     return tokenid
   }
 
@@ -72,7 +76,9 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
   }
 
   async function logout(tokenid=socket.tokenid){
+    assert(auth,'auth server not enabled')
     await auth.call('logout',tokenid)
+    emit('logout',socket.id,socket.userid)
     socket.userid = null
     return tokenid
   }

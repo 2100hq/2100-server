@@ -1,6 +1,6 @@
 const assert = require('assert')
 const lodash = require('lodash')
-const {validateStakes} = require('../utils')
+const {validateStakes, parseTwitterUser} = require('../utils')
 module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
@@ -32,6 +32,21 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
     }
 
+    async function verifyTwitter(link,description=''){
+      assert(link,'requires tweet link')
+      const name = parseTwitterUser(link)
+      assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
+
+      const owns = await tokens.active.getByOwner(user.id)
+      assert(owns.length === 0,'You own a token already, try changing the token name instead')
+
+      return commands.createType('createTokenByTweet',{
+        userid:user.id,
+        link,
+        description,
+      })
+    }
+
     async function setFavorite(tokenid,favorite){
       assert((await tokens.active.has(tokenid)),'Invalid token id')
       return users.setFavorite(user.id,tokenid,favorite)
@@ -43,26 +58,6 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return tokens.active.setDescription(tokenid,description)
     }
 
-    // async function stake({token,value}){
-    //   const wallet = await queries.getWallet('DAI')
-    //   const {balance} = await wallet.get(user.id)
-    //   assert(value <= balance,'Not enough balance to stake: ' + value + ' vs ' + balance)
-    //   await wallet.withdraw(user.id,value)
-
-    //   try{
-    //     return stakes.join(token,user.id,value)
-    //   }catch(err){
-    //     await wallets.deposit(userid,value)
-    //     throw err
-    //   }
-    // }
-    
-    // async function unstake({token,value}){
-    //   const wallet = await queries.getWallet('DAI')
-    //   await stakes.leave(token,user.id,value)
-    //   return wallet.deposit(user.id,value)
-    // }
-
     return {
       me,
       myCommandHistory,
@@ -70,6 +65,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       stake,
       setFavorite,
       setTokenDescription,
+      verifyTwitter,
     }
   }
 }

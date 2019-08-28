@@ -3,6 +3,8 @@ const assert = require('assert')
 const pad = require('pad')
 const Rethink = require('rethinkdb')
 const bn = require('bignumber.js')
+const axios = require('axios')
+const cheerio = require('cheerio')
 
 
 exports.regexAddress = /^0x[a-f0-9]+$/
@@ -78,6 +80,27 @@ exports.BenchTimer = ({length=10}) =>{
       return samples.length
     }
   }
+exports.parseTweet = async url =>{
+  const resp = await axios.get(url)
+  const dom = cheerio.load(resp.data);
+  const text = dom('title').text()
+  return text
+}
+exports.parseTwitterUser = url =>{
+  return url.replace('https://', '').replace('http://', '').replace('twitter.com/', '').split('/')[0]
+}
+
+exports.matchTweet = (tweet,match)=>{
+  return new RegExp(match, 'i').test(tweet)
+}
+
+exports.validateTweet = async (url,publicAddress,prefix='Add me to @2100hq: ') =>{
+  const name = exports.parseTwitterUser(url)
+  const tweet = await exports.parseTweet(url)
+  const match = exports.matchTweet(tweet,prefix + publicAddress)
+  assert(match,'Public address does not match')
+  assert(name,'Unable to parse name from tweet URL')
+  return name
 }
 
 exports.GetWallets = wallets => type =>{
