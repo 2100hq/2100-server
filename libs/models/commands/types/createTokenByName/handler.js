@@ -18,13 +18,16 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
     //this can only happen once, create will throw if anything already exists
     //this assume the commands initilalized with all valid numbers.
     async 'Create Active Token'(cmd){
-
+      let {name, ownerAddress,description, tweetType} = cmd
+      name = name.toLowerCase()
       try{
-        const exists = await tokens.active.getByName(cmd.name.toLowerCase())
-        assert(exists.length === 0,'Token exists: ' + cmd.name)
+        const exists = await tokens.active.getByName(name)
+        assert(exists.length === 0,'Token exists: ' + name)
+        const owns = await tokens.active.getByOwner(ownerAddress)
+        assert(owns.length === 0,`${ownerAddress} owns a token already`)
       }catch(err){
         console.log(err)
-        return commands.failure(cmd.id,err.message)
+        return commands.failure(id,err.message)
       }
 
       const block = await blocks.latest()
