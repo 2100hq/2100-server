@@ -27,7 +27,7 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
         assert(owns.length === 0,`${ownerAddress} owns a token already`)
       }catch(err){
         console.log(err)
-        return commands.failure(id,err.message)
+        return commands.failure(cmd.id,err.message)
       }
 
       const block = await blocks.latest()
