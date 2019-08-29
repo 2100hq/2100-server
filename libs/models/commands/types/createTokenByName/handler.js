@@ -47,17 +47,20 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
 
       //create the creator and owner wallets if they dont exist
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
-      await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
-      if(cmd.creatorAddress && bn(cmd.creatorReward).isGreaterThan(0)){
-        //submit creator reward command
-        await commands.createType('transferCreatorReward',{
-          blockNumber:block.number,
-          userid:cmd.creatorAddress,
-          tokenid:token.id,
-          amount:cmd.creatorReward
-        })
-      }
+      /* NOTE: No on-chain creator */
+      //---------------------------//
+      // await getWallets('available').getOrCreate(token.creatorAddress,token.id)
+
+      // if(creatorAddress && bn(creatorReward).isGreaterThan(0)){
+      //   //submit creator reward command
+      //   await commands.createType('transferCreatorReward',{
+      //     blockNumber:block.number,
+      //     userid:creatorAddress,
+      //     tokenid:token.id,
+      //     amount:creatorReward
+      //   })
+      // }
       return commands.setState(cmd.id,'Remove Pending')
     },
     async 'Remove Pending'(cmd){
