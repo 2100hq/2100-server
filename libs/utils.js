@@ -37,17 +37,19 @@ exports.matchTweet = (tweet,match)=>{
   return new RegExp(match, 'i').test(tweet)
 }
 
-exports.validateTweet = async (url,publicAddress,prefix='Add me to @2100hq: ') =>{
-  const name = exports.parseTwitterUser(url)
 exports.tweetTemplates = {
   ['2100']: 'Add my token to @2100hq and use publicAddress as the owner address',
   'humanitydao': "I'm applying to the @HumanityDAO registry! My Ethereum address is publicAddress"
 }
+exports.validateTweet = async (url,publicAddress,twitterType) =>{
+  let name = exports.parseTwitterUser(url)
+  assert(name,'Unable get Twitter username')
+  name = name.toLowerCase()
+  const text = exports.tweetTemplates[twitterType].replace(/publicAddress/, publicAddress)
   const tweet = await exports.parseTweet(url)
-  const match = exports.matchTweet(tweet,prefix + publicAddress)
-  assert(match,'Public address does not match')
-  assert(name,'Unable to parse name from tweet URL')
-  return name
+  const match = exports.matchTweet(tweet,text)
+  assert(match,'Tweet does not match required text')
+  return name.toLowerCase()
 }
 
 exports.GetWallets = wallets => type =>{
