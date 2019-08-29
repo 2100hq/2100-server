@@ -5,7 +5,7 @@ const Rethink = require('rethinkdb')
 const bn = require('bignumber.js')
 const axios = require('axios')
 const cheerio = require('cheerio')
-
+const URL = require('url');
 
 exports.regexAddress = /^0x[a-f0-9]+$/
 exports.regexLowerNum = /^[a-z0-9]+$/
@@ -30,7 +30,7 @@ exports.parseTweet = async url =>{
   return text
 }
 exports.parseTwitterUser = url =>{
-  return url.replace('https://', '').replace('http://', '').replace('twitter.com/', '').split('/')[0]
+  return URL.parse(url).pathname.split('/')[1]
 }
 
 exports.matchTweet = (tweet,match)=>{
