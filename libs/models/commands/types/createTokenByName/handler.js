@@ -33,12 +33,13 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
       const block = await blocks.latest()
 
       const token = await tokens.active.create({
-        id:cmd.name,
-        creatorAddress:cmd.creatorAddress,
-        ownerAddress:cmd.ownerAddress,
-        name:cmd.name,
-        createdBlock:cmd.createdBlock,
-        createdBlock:block.number,
+        id:name,
+        description,
+        creatorAddress:'0x0',
+        ownerAddress,
+        name,
+        source:tweetType ? `twitter:${tweetType}` : 'internal',
+        createdBlock:block.number
       })
 
       //set token suppply
