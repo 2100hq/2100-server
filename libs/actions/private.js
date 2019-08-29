@@ -34,6 +34,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
 
     async function verifyTwitter({link,tweetType='2100',description=''}){
       assert(link,'requires Tweet link')
+      asset(link.indexOf('https://') === 0, 'Tweet link must start with https://')
       assert(tweetTemplates[tweetType], 'requires a correct Tweet type')
       const name = await validateTweet(link,user.id,tweetTemplates[tweetType])
       assert(!(await query.hasActiveTokenByName(name)),'Token is already active')
