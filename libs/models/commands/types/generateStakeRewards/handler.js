@@ -60,7 +60,7 @@ module.exports = (config,{commands,getWallets,tokens,blocks})=>{
           done:true,
           amount,
         })
-        console.log(receipt)
+        // console.log(receipt)
         return receipt
       })
 

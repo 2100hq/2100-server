@@ -23,6 +23,7 @@
     "highland": "^2.13.4",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "mongodb": "^3.3.2",
     "pad": "^3.2.0",
     "rethink-table": "^0.0.5",
     "rethinkdb": "^2.3.3",

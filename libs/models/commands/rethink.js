@@ -52,7 +52,7 @@ module.exports = async (config, con) => {
       return table.streamify(query)
     },
     insert(many){
-      console.log('many',many.length)
+      // console.log('many',many.length)
       const query = table.table().insert(many,{return_changes:false,conflict:'error'})
       return table.run(query)
     }

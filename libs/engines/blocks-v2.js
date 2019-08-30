@@ -113,7 +113,9 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
 
   async function getEvents(block){
     const events = await getLogEvents(contracts[0],block)
+    // console.log('disabledblockrewareds',disableBlockRewards)
     if(disableBlockRewards) return events
+    // console.log('generating rewards')
     //hope contract 0 is 2100 controller contract
     const rewards = await processStakeRewards(block,contracts[0],events.length)
     events.push(...rewards)

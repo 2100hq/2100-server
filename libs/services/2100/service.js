@@ -12,6 +12,8 @@ const Handlers = require('./handlers')
 
 const {RethinkConnection,loop,GetWallets,Benchmark,sleep} = require('../../utils')
 const RethinkModels = require('./models-rethink')
+const MongoModels = require('../../models/init-mongo')
+const Mongo = require('../../mongo')
 const Ethers = require('../../ethers')
 const Signer = require('../../signer')
 
@@ -51,10 +53,12 @@ module.exports = async (config)=>{
     }
   })
 
-  const con = await RethinkConnection(config.rethink)
+  // const con = await RethinkConnection(config.rethink)
+  const con = await Mongo(config.mongo)
 
   //starting libs with models
-  const libs = await RethinkModels(config,{con},(...args)=>emitter.emit('models',args))
+  // const libs = await RethinkModels(config,{con,mongo},(...args)=>emitter.emit('models',args))
+  const libs = await MongoModels(config,{con},(...args)=>emitter.emit('models',args))
 
   libs.getWallets = GetWallets(libs.wallets)
 
@@ -154,7 +158,7 @@ module.exports = async (config)=>{
   const logBench = Benchmark()
   const cmdBench = Benchmark()
   loop(x=>{
-    // cmdBench.print()
+    cmdBench.print()
     cmdBench.clear()
     // logBench.print()
     logBench.clear()
@@ -167,6 +171,7 @@ module.exports = async (config)=>{
     })
     .doto(x=>logBench.new())
     .map(async event=>{
+      console.log('running event',event)
       const result = await libs.engines.eventlogs.tick(event)
       return libs.eventlogs.setDone(event.id)
     })
@@ -254,7 +259,7 @@ module.exports = async (config)=>{
       .doto(x=>logBench.new())
       // .flatten()
       .map(async event=>{
-        // console.log('running event',event.id)
+        console.log('running event',event._id)
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })

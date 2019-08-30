@@ -53,21 +53,23 @@ module.exports = (config,{commands,eventlogs})=>{
       })
     },
     Owner(event){
-      console.log(event)
+      console.log(event.name)
     },
     DAIAddress(event){
-      console.log(event)
+      console.log(event.name)
     },
   }
 
   async function tick(event){
-    // console.log('starting event',event.name,event.id)
-    assert(handlers[event.name],'no handler for event name')
-    return commands.create(await handlers[event.name](event))
+    // console.log('starting event',event)
+    assert(handlers[event.name],'no handler for event name: ' + event.name)
+    const cmd = await await handlers[event.name](event)
+    if(cmd) return commands.create(cmd)
   }
 
   function getCommand(event){
-    assert(handlers[event.name],'no handler for event name')
+    // console.log('starting event',event)
+    assert(handlers[event.name],'no handler for event name: ' + event.name)
     return handlers[event.name](event)
   }
 

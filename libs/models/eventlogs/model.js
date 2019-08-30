@@ -22,7 +22,7 @@ module.exports = function(config,table,emit=x=>x) {
     return table.get(id)
   }
   async function get(id) {
-    assert(await table.has(id), 'That event does not exist')
+    assert(await table.has(id), 'That event does not exist: ' + id)
     return table.get(id)
   }
 
@@ -36,11 +36,12 @@ module.exports = function(config,table,emit=x=>x) {
     return validate(defaults(props))
   }
 
-  // async function setDone(id){
-  //   const result = await get(id)
-  //   result.done = true
-  //   return set(result)
-  // }
+  async function setDone(id){
+    console.log('setting done',id)
+    const result = await get(id)
+    result.done = true
+    return set(result)
+  }
 
 
   return {
@@ -50,7 +51,7 @@ module.exports = function(config,table,emit=x=>x) {
     getBy,
     create,
     format,
-    // setDone,
+    setDone,
   }
 }
 

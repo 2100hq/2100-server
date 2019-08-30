@@ -51,11 +51,16 @@ module.exports = async (config={},{con},emit)=>{
     },
     commands:Commands.Model(config, 
       Stateful.Model(config,
-        // Commands.Cache(config, await Commands.Rethink({table:'commands'},con)),
-        await Commands.Rethink({table:'commands'},con),
-        (...args)=>emit('commands',...args)
+        Commands.Cache(config, await Commands.Rethink({table:'commands'},con)),
       )
     ),
+    // commands:Commands.Model(config, 
+    //   Stateful.Model(config,
+    //     // Commands.Cache(config, await Commands.Rethink({table:'commands'},con)),
+    //     await Commands.Rethink({table:'commands'},con),
+    //     (...args)=>emit('commands',...args)
+    //   )
+    // ),
     blocks:Blocks.Model({},await Blocks.Rethink({table:'blocks'},con),(...args)=>emit('blocks',...args)),
     eventlogs:Events.Model({},
       await Events.Rethink({table:'events'},con),

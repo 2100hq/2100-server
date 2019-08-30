@@ -1,3 +1,4 @@
+require('dotenv').config()
 const test = require('tape')
 const Commands = require('./')
 const Stateful = require('../stateful')
@@ -27,24 +28,25 @@ test('commands',t=>{
     //   t.end()
     // })
   })
-  t.test('rethink',t=>{
-    const {RethinkConnection} = require('../../utils')
-    let con,rethink
+  t.test('mongo',t=>{
+    const Mongo = require('../../mongo')
+    const Table = require('./mongo')
+    const config = require('../../parseEnv')(process.env)
+    let con, mongo
     t.test('init',async t=>{
-      con = await RethinkConnection({db:'test'})
-      rethink = await Commands.Rethink({table:'test_commands'},con)
-      t.ok(con)
-      t.ok(rethink)
+      con = await Mongo(config.mongo)
+      // console.log(con)
+      mongo = await Table({table:'test'},con).catch(t.end)
       t.end()
     })
     t.test('drop',async t=>{
-      await rethink.drop()
+      await mongo.drop()
       t.end()
     })
     t.test('fill',async t=>{
       const result = await highland(lodash.times(100))
         .map(i=>{
-          return rethink.create({
+          return mongo.set(String(i),{
             id:String(i),
             userid:'testuser',
             type:'test',
@@ -58,14 +60,51 @@ test('commands',t=>{
       t.end()
     })
     t.test('getUserDone',async t=>{
-      const result = await rethink.getUserDone('testuser',true,0,10)
+      const result = await mongo.getUserDone('testuser',true,10,10)
+      console.log(result)
       t.equal(result.length,10)
       t.end()
     })
-    t.test('close',t=>{
-      con.close()
-      t.end()
-    })
   })
+  // t.test('rethink',t=>{
+  //   const {RethinkConnection} = require('../../utils')
+  //   let con,rethink
+  //   t.test('init',async t=>{
+  //     con = await RethinkConnection({db:'test'})
+  //     rethink = await Commands.Rethink({table:'test_commands'},con)
+  //     t.ok(con)
+  //     t.ok(rethink)
+  //     t.end()
+  //   })
+  //   t.test('drop',async t=>{
+  //     await rethink.drop()
+  //     t.end()
+  //   })
+  //   t.test('fill',async t=>{
+  //     const result = await highland(lodash.times(100))
+  //       .map(i=>{
+  //         return rethink.create({
+  //           id:String(i),
+  //           userid:'testuser',
+  //           type:'test',
+  //           done:Math.random() > .1
+  //         })
+  //       })
+  //       .flatMap(highland)
+  //       .collect()
+  //       .toPromise(Promise)
+  //     t.equal(result.length,100)
+  //     t.end()
+  //   })
+  //   t.test('getUserDone',async t=>{
+  //     const result = await rethink.getUserDone('testuser',true,0,10)
+  //     t.equal(result.length,10)
+  //     t.end()
+  //   })
+  //   t.test('close',t=>{
+  //     con.close()
+  //     t.end()
+  //   })
+  // })
 })
 
