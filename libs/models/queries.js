@@ -98,6 +98,13 @@ module.exports = (config,libs)=>{
     },{})
   }
 
+  async function allStakesDetailedStats(){
+    const tokens = await libs.tokens.active.list()
+    return Promise.map(tokens,token=>{
+      return libs.stats.stakes.get(token.id)
+    })
+  }
+
   function getTokenByName(token){
     return libs.tokens.active.getByName(token)
   }
@@ -161,6 +168,14 @@ module.exports = (config,libs)=>{
     return libs.coupons.mint.byUser(userid)
   }
 
+  async function allStakesDetailedStats(){
+    const stats = await libs.stats.stakes.list()
+    return stats.reduce((result,stat)=>{
+      result[stat.id] = stat.stats
+      return result
+    },{})
+  }
+
   async function privateState(userid){
     return {
       myWallets:{
@@ -216,9 +231,9 @@ module.exports = (config,libs)=>{
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
       //need number of stakers and total
-      // stakes:{ 
-      //   ...(await allStakesDetailed())
-      // },
+      stakes:{ 
+        ...(await allStakesDetailedStats())
+      },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },

@@ -9,6 +9,7 @@ const SocketClient = require('../../socket/client')
 const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
+const Stats = require('../../stats')
 
 const {RethinkConnection,loop,GetWallets,Benchmark,sleep} = require('../../utils')
 const RethinkModels = require('./models-rethink')
@@ -106,14 +107,24 @@ module.exports = async (config)=>{
 
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
+  libs.processStats = await Stats(config,libs,(...args)=>emitter.emit('stats',args))
 
+  //stats needs to warm
+  await libs.processStats.init()
 
-  //write model events to the event reducer, this will output api events
   emitter.on('models',async args=>{
     try{
+      //write model events to the event reducer, this will output api events
       await libs.events.write(args)
     }catch(err){
       console.log('socket event error',err)
+      process.exit(1)
+    }
+    try{
+      //stats collector
+      await libs.processStats.write(args)
+    }catch(err){
+      console.log('stats event error',err)
       process.exit(1)
     }
   })

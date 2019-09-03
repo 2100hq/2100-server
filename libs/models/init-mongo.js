@@ -9,6 +9,7 @@ const Blocks = require('./blocks')
 const Events = require('./eventlogs')
 const Coupons = require('./coupons')
 const Visited = require('./visited')
+const Stats = require('./stats')
 
 //con is a mongo db
 module.exports = async (config={},{con},emit)=>{
@@ -65,6 +66,9 @@ module.exports = async (config={},{con},emit)=>{
     coupons:{
       create:Coupons.Model({},await Coupons.Mongo({table:'create_coupons'},con),(...args)=>emit('coupons.create',...args)),
       mint:Coupons.Model({},await Coupons.Mongo({table:'mint_coupons'},con),(...args)=>emit('coupons.mint',...args)),
+    },
+    stats:{
+      stakes:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes',...args)) 
     }
   }
 
