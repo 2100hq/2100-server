@@ -158,7 +158,7 @@ module.exports = async (config)=>{
   const logBench = Benchmark()
   const cmdBench = Benchmark()
   loop(x=>{
-    cmdBench.print()
+    // cmdBench.print()
     cmdBench.clear()
     // logBench.print()
     logBench.clear()
