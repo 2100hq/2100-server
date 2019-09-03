@@ -17,7 +17,7 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
       assert(!(await query.hasActiveTokenByName(name.toLowerCase())),'Token is already active')
 
       assert(ownerAddress,'requires owners address to create token')
-      const {number} = await blocks.latest() 
+      const {number} = await blocks.latest()
       const data = {name,userid:user.id,blockNumber:number}
       data.ownerAddress = ownerAddress.toLowerCase()
       return commands.createType('createPendingToken',data)
@@ -35,8 +35,12 @@ module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
     }
 
     async function createTokenByName(props){
+      assert(props.ownerAddress, 'Requires ownerAddress')
       assert(!(await query.hasActiveTokenByName(props.name.toLowerCase())),'Token is already active')
+      const owns = await tokens.active.getByOwner(props.ownerAddress)
+      assert(owns.length === 0,`${props.ownerAddress} owns a token already`)
       props.userid = user.id
+      props.name = props.name.toLowerCase()
       return commands.createType('createTokenByName',props)
     }
 

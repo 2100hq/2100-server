@@ -18,10 +18,13 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
     //this can only happen once, create will throw if anything already exists
     //this assume the commands initilalized with all valid numbers.
     async 'Create Active Token'(cmd){
-
+      let {name, ownerAddress,description, tweetType} = cmd
+      name = name.toLowerCase()
       try{
-        const exists = await tokens.active.getByName(cmd.name.toLowerCase())
-        assert(exists.length === 0,'Token exists: ' + cmd.name)
+        const exists = await tokens.active.getByName(name)
+        assert(exists.length === 0,'Token exists: ' + name)
+        const owns = await tokens.active.getByOwner(ownerAddress)
+        assert(owns.length === 0,`${ownerAddress} owns a token already`)
       }catch(err){
         console.log(err)
         return commands.failure(cmd.id,err.message)
@@ -30,12 +33,13 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
       const block = await blocks.latest()
 
       const token = await tokens.active.create({
-        id:cmd.name,
-        creatorAddress:cmd.creatorAddress,
-        ownerAddress:cmd.ownerAddress,
-        name:cmd.name,
-        createdBlock:cmd.createdBlock,
-        createdBlock:block.number,
+        id:name,
+        description,
+        creatorAddress:'0x0',
+        ownerAddress,
+        name,
+        source:tweetType ? `twitter:${tweetType}` : 'internal',
+        createdBlock:block.number
       })
 
       //set token suppply
@@ -47,17 +51,20 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
 
       //create the creator and owner wallets if they dont exist
       await getWallets('available').getOrCreate(token.ownerAddress,token.id)
-      await getWallets('available').getOrCreate(token.creatorAddress,token.id)
 
-      if(cmd.creatorAddress && bn(cmd.creatorReward).isGreaterThan(0)){
-        //submit creator reward command
-        await commands.createType('transferCreatorReward',{
-          blockNumber:block.number,
-          userid:cmd.creatorAddress,
-          tokenid:token.id,
-          amount:cmd.creatorReward
-        })
-      }
+      /* NOTE: No on-chain creator */
+      //---------------------------//
+      // await getWallets('available').getOrCreate(token.creatorAddress,token.id)
+
+      // if(creatorAddress && bn(creatorReward).isGreaterThan(0)){
+      //   //submit creator reward command
+      //   await commands.createType('transferCreatorReward',{
+      //     blockNumber:block.number,
+      //     userid:creatorAddress,
+      //     tokenid:token.id,
+      //     amount:creatorReward
+      //   })
+      // }
       return commands.setState(cmd.id,'Remove Pending')
     },
     async 'Remove Pending'(cmd){

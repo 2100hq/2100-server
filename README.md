@@ -174,10 +174,10 @@ Private actions are scoped the the socket private channel and can only be called
 **me**
 - returns your user. Its already avaialble in your private state, but here for testing.
 
-**verifyTwitter(link:string,description:string)**
-- Create a new token based on you twitter name. Requires a link to a tweet in this format: 
-  - "Add me to @2100hq: 0x..." where 0x is your public address
+**verifyTwitter({link:string,tweetType:string='2100',description:string=''})**
+- Create a new token based on you twitter name. Requires a tweetType that looks up a template in utils.tweetTemplates
 - link - full https link to tweet which contains the formatted message.
+- tweetType - '2100' or 'humanitydao'
 - description - optional description of your token. 
 
 **setFavorite(tokenid:string,favorite=true)**
@@ -192,7 +192,7 @@ Special routes only admins can call.
 **createPendingToken({name:string,ownerAddress:(string,optional)})**
 - creates ownerless token which needs to be confirmed on blockchain.
 
-**createTokenByName({name:string,ownerAddress:string,creatorAddress:string,description:(string,optional)})
+**createTokenByName({name:string,ownerAddress:string,description:(string,optional)})**
 -  creates an active token off chain which has these properties. 
 
 **setTokenDescription(tokenid:string,description='')**
