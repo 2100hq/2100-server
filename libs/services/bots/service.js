@@ -35,6 +35,7 @@ module.exports = async config =>{
 
   function updateState(channel,state){
     return (...args)=>{
+      // console.log(channel,...args)
       if(args[0].length){
         lodash.set(state[channel],...args)
       }else{
@@ -57,6 +58,11 @@ module.exports = async config =>{
       return new ethers.Contract(contract.networks[config.chainid].address,contract.abi,wallet)
     })
     const socket = await SocketClient(host)
+    const actions =  {
+      public: socket('public',updateState('public',server)),
+      private: socket('private',updateState('private',server)),
+      auth:socket('auth'),
+    }
     console.log('pk',wallet.privateKey)
     return {
       controller,
@@ -64,14 +70,11 @@ module.exports = async config =>{
       wallet,
       tokenName,
       socket,
+      actions,
+      numstakes:config.bots.numstakes,
       log:(...args)=>{
         console.log(tokenName,...args)
         return args[0]
-      },
-      actions : {
-        public: socket('public',updateState('public',server)),
-        private: socket('private',updateState('private',server)),
-        auth:socket('auth'),
       },
       server,
       state:'Start',
@@ -91,9 +94,9 @@ module.exports = async config =>{
     const {privateKey} = config
     return {
       async Start(state){
-        await state.actions.auth.call('authenticate',undefined,state.wallet.address)
-        return 'Unstake'
-        // return 'Check Eth'
+        await state.actions.auth.call('authenticate',undefined,state.wallet.address.toLowerCase())
+        // return 'Unstake'
+        return 'Check Eth'
       },
       async 'Check Eth'(state){
         const balance = await state.wallet.getBalance()
@@ -102,7 +105,7 @@ module.exports = async config =>{
           return 'ChooseAction'
         }
         const systbalance = await wallet.getBalance()
-        const seed = ethers.utils.parseEther('0.01')
+        const seed = ethers.utils.parseEther('0.0001')
         state.log('system balance',systbalance.toString())
         if(balance.gte(seed)){
           throw new Error('you need a system account with some eth')
@@ -147,7 +150,7 @@ module.exports = async config =>{
       },
       async ChooseAction(state){
         const primaryBalance = await fakedai.balanceOf(state.wallet.address)
-        // state.log('balance',state.server.private.myWallets.available)
+        // state.log('balance',state.server.public)
         let balance = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
         // state.log(state.server.public)
         const available = ethers.utils.bigNumberify(balance)
@@ -172,6 +175,7 @@ module.exports = async config =>{
       },
       async 'Check My Token'(state){
         const myTokens = state.server.private.myTokens
+        console.log('myTokens',myTokens)
         if(lodash.size(myTokens)){
           return 'Check Stakes'
         }
@@ -204,7 +208,7 @@ module.exports = async config =>{
         return 'Check My Token'
       },
       async 'Create My Token'(state){
-        const create = await actions.admin.call('createToken',{name:state.tokenName,ownerAddress:state.wallet.address}).then(x=>{
+        return actions.admin.call('createTokenByName',{name:state.tokenName,ownerAddress:state.wallet.address.toLowerCase(),creatorAddress:state.wallet.address.toLowerCase()}).then(x=>{
           state.log(x)
           return 'Check My Token'
         }).catch(err=>{
@@ -259,6 +263,30 @@ module.exports = async config =>{
         }
         return 'End'
       },
+      async 'Fixed Stakes'(state){
+        const tokens = Object.values(lodash.get(state.server.public,'tokens.active',{}))
+        const available = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
+        const stakes = lodash.get(state.server.private,'myStakes',{})
+        let total = ethers.utils.bigNumberify(available)
+        total = total.add(...Object.values(stakes))
+
+        const newStakes = {}
+        tokens.reduce((result,token)=>{
+          const {minimumStake} = token
+          result[token.id] = '0'
+          const size = ethers.utils.bigNumberify(minimumStake)
+          if(size.gt(total)) return result
+          if(lodash.size(result) > state.numstakes) return result
+
+          result[token.id] = size.toString()
+          total = total.sub(size)
+          return result
+
+        },newStakes)
+        const cmd = await state.actions.private.call('stake',newStakes)
+        state.log(cmd)
+        return 'End'
+      },
       async 'Randomize Stakes'(state){
         const tokens = Object.values(lodash.get(state.server.public,'tokens.active',{}))
         const available = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
@@ -304,11 +332,13 @@ module.exports = async config =>{
         if(!state.iterations) state.iterations = 0
         state.iterations ++
         if(ethers.utils.bigNumberify(available).gt(0) && lodash.size(stakes) === 0){
-          return 'Randomize Stakes'
+          // return 'Randomize Stakes'
+          return 'Fixed Stakes'
         }
         if(lodash.size(stakes)){
           state.unstakeTime = moment().add(parseInt((Math.random() * 60)),'seconds').valueOf()
-          return 'Wait Randomize Stakes'
+          // return 'Randomize Stakes'
+          return 'Fixed Stakes'
         }
         return 'ChooseAction'
       },

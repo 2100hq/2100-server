@@ -1,19 +1,16 @@
 const assert = require('assert')
 const Promise = require('bluebird')
 
-module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
+module.exports = (config,{commands,eventlogs})=>{
   assert(config.confirmations,'requires confirmations count')
   assert(config.primaryToken,'requires primary token')
   assert(commands,'requires commands library')
-  assert(ethers,'requires ethers library')
-  assert(tokens,'requires tokens')
-  assert(getWallets,'requires getWallets')
 
   //addresses need to be lower cased for all comparisons in the rest of the system
   const handlers = {
-    async Deposit(event){
+    Deposit(event){
       //this command now issue a rebalance stakes command on success
-      return commands.createType('pendingDeposit',{
+      return commands.format('pendingDeposit',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
         toAddress:event.values.account.toLowerCase(),
@@ -24,9 +21,9 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
         value:event.values.amount,
       })
     },
-    async Withdraw(event){
+    Withdraw(event){
       //this command now issue a rebalance stakes command on success
-      return commands.createType('withdrawPrimary',{
+      return commands.format('withdrawPrimary',{
         userid:event.values.account.toLowerCase(),
         blockNumber:event.blockNumber,
         fromAddress:event.values.account.toLowerCase(),
@@ -36,8 +33,8 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
       })
     } ,
     //token creation event
-    async Create(event){
-      return commands.createType('createActiveToken',{
+    Create(event){
+      return commands.format('createActiveToken',{
         userid:event.values.creator.toLowerCase(),
         name:event.values.username.toLowerCase(),
         transactionHash:event.transactionHash.toLowerCase(),
@@ -49,28 +46,36 @@ module.exports = (config,{commands,tokens,eventlogs,ethers,getWallets})=>{
     },
     //synthetic event produced at the end of each block.
     //find all tokens with stakers and generate stake rewards.
-    async RewardStakers(event){
-      return commands.createType('generateStakeRewards',{
+    RewardStakers(event){
+      return commands.format('generateStakeRewards',{
         blockNumber:event.blockNumber,
         ...event.values
       })
     },
-    async Owner(event){
-      console.log(event)
+    Owner(event){
+      console.log(event.name)
     },
-    async DAIAddress(event){
-      console.log(event)
+    DAIAddress(event){
+      console.log(event.name)
     },
   }
 
   async function tick(event){
-    // console.log('starting event',event.name)
-    assert(handlers[event.name],'no handler for event name')
+    // console.log('starting event',event)
+    assert(handlers[event.name],'no handler for event name: ' + event.name)
+    const cmd = await await handlers[event.name](event)
+    if(cmd) return commands.create(cmd)
+  }
+
+  function getCommand(event){
+    // console.log('starting event',event)
+    assert(handlers[event.name],'no handler for event name: ' + event.name)
     return handlers[event.name](event)
   }
 
   return {
     tick,
-    handlers
+    handlers,
+    getCommand,
   }
 }

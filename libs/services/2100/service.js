@@ -10,8 +10,10 @@ const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
 
-const {RethinkConnection,loop,GetWallets} = require('../../utils')
+const {RethinkConnection,loop,GetWallets,Benchmark,sleep} = require('../../utils')
 const RethinkModels = require('./models-rethink')
+const MongoModels = require('../../models/init-mongo')
+const Mongo = require('../../mongo')
 const Ethers = require('../../ethers')
 const Signer = require('../../signer')
 
@@ -51,10 +53,12 @@ module.exports = async (config)=>{
     }
   })
 
-  const con = await RethinkConnection(config.rethink)
+  // const con = await RethinkConnection(config.rethink)
+  const con = await Mongo(config.mongo)
 
   //starting libs with models
-  const libs = await RethinkModels(config,{con},(...args)=>emitter.emit('models',args))
+  // const libs = await RethinkModels(config,{con,mongo},(...args)=>emitter.emit('models',args))
+  const libs = await MongoModels(config,{con},(...args)=>emitter.emit('models',args))
 
   libs.getWallets = GetWallets(libs.wallets)
 
@@ -103,29 +107,6 @@ module.exports = async (config)=>{
   //events to socket
   libs.events = await Events(config,libs,(...args)=>emitter.emit('api',args))
 
-  libs.socket = await Socket(config,libs)
-  const blockStream = highland('eth',emitter)
-
-  //events from ethers block chain
-  blockStream.map(async ([type,data])=>{
-    switch(type){
-      case 'block':{
-        const block = await libs.ethers.getBlock(data)
-        if(! await libs.blocks.has(data)){
-          await libs.blocks.create(block)
-        }
-        return data
-      }
-    }
-    return data
-  })
-  .flatMap(highland)
-  // .doto(x=>console.log('saved',x))
-  .errors(err=>{
-    console.log('eth event error',err)
-    process.exit(1)
-  })
-  .resume()
 
   //write model events to the event reducer, this will output api events
   emitter.on('models',async args=>{
@@ -136,7 +117,6 @@ module.exports = async (config)=>{
       process.exit(1)
     }
   })
-
 
   //this is mainly for auth stuff to know when someones authenticated
   emitter.on('actions',async ([channel,type,...args])=>{
@@ -161,6 +141,7 @@ module.exports = async (config)=>{
     }
   })
 
+  libs.socket = await Socket(config,libs)
   //take api events and write to socket channels
   emitter.on('api',async ([channel,...args])=>{
     try{
@@ -172,89 +153,131 @@ module.exports = async (config)=>{
     }
   })
 
-  //we need to init this with our last known block
-  const lastBlock = await libs.blocks.latest()
-  
-  if(config.forceLatestBlock){
-    if(lastBlock) await libs.blocks.setDone(lastBlock.id)
-    await libs.ethers.start()
-  }else if(config.defaultStartBlock){
-    await libs.ethers.start(parseInt(config.defaultStartBlock || 0))
-  }else if(lastBlock){
-    //have to put this after we bind eth events
-    await libs.ethers.start(lastBlock.number)
-  }else{
-    await libs.ethers.start(0)
-  }
+  const eventlogStream = libs.eventlogs.readStream()
 
-  loop(async x=>{
-    const commands = await libs.commands.getDone(false)
-    let id 
-    if(commands.length){
-      id = lodash.uniqueId(['processing',commands.length,'commands',''].join(' '))
-      console.log(id)
-      console.time(id)
+  const logBench = Benchmark()
+  const cmdBench = Benchmark()
+  loop(x=>{
+    // cmdBench.print()
+    cmdBench.clear()
+    // logBench.print()
+    logBench.clear()
+  },1000)
+
+  //this needs to be processed first
+  await libs.eventlogs.readStream(false)
+    .sortBy((a,b)=>{
+      return a.id < b.id ? -1 : 1
+    })
+    .doto(x=>logBench.new())
+    .map(async event=>{
+      console.log('running event',event)
+      const result = await libs.engines.eventlogs.tick(event)
+      return libs.eventlogs.setDone(event.id)
+    })
+    .map(highland)
+    .parallel(100)
+    .doto(x=>logBench.completed())
+    .last()
+    .toPromise(Promise)
+
+
+  let cmdStream = await libs.commands.readStream(false)
+  await cmdStream
+    .sortBy((a,b)=>{
+      return a.id < b.id ? -1 : 1
+    })
+    // .doto(x=>console.log(x.id))
+    .doto(x=>{
+      if(x.state !== 'Start') return
+      // console.log('new',x.type,x.id)
+      cmdBench.new()
+    })
+    .doto(libs.engines.commands.optimized.write)
+    .last()
+    .toPromise(Promise)
+
+  libs.engines.commands.optimized.resume()
+
+  const alarms = new Map()
+
+  emitter.on('models',([table,event,data])=>{
+    if(table !== 'commands') return
+    if(event === 'wake'){
+      // console.log('running wake cmd',data.id)
+      return libs.engines.commands.optimized.write(data)
     }
-    const result = await highland(lodash.orderBy(commands,['id'],['asc']))
-      .map(libs.engines.commands.runToDone)
-      .flatMap(highland)
-      .collect()
-      .toPromise(Promise)
-
-    if(id) console.timeEnd(id)
-    return result
-  },config.cmdTickRate).catch(err=>{
-    console.log('command engine error',err)
-    process.exit(1)
-  })
-
-  let lastProcessed = 0
-  //loop over unprocessed blocks
-  loop(async x=>{
-    let block = await libs.blocks.next()
-
-    do{
-      if(block == null) return
-      if(lastProcessed){
-        assert(lastProcessed === block.number-1,'Block processed out of order: ' + lastProcessed + ' vs ' + block.number)
+    if(event !== 'change') return
+    // console.log('cmd model',data)
+    if(data.done){
+      cmdBench.completed()
+      return
+    }
+    const now = Date.now()
+    if(lodash.isBoolean(data.yield)){
+      if(data.yield){
+        return libs.engines.commands.optimized.write(data)
       }
-      lastProcessed = block.number
-      console.log('processing block',block.number)
-      const result = await libs.engines.blocks.tick(block)
-      await libs.blocks.setDone(block.id)
-      block = await libs.blocks.next()
-    }while(block)
-
-  },1000).catch(err=>{
-    console.log('block engine error',err)
-    process.exit(1)
+    }
+    if(lodash.isNumber(data.yield)){
+      // console.log('yielding')
+      if(data.yield <= now){
+        return libs.engines.commands.optimized.write(data)
+      }else{
+        // console.log('setting alarm')
+        return alarms.set(data.id,data.yield)
+      }
+    }
+    if(data.state !== 'Start') return
+    cmdBench.new()
+    // console.log('new',data.type,data.id)
+    libs.engines.commands.optimized.write(data)
   })
 
+  //these wake commands after they yield
   loop(async x=>{
-    const events = await libs.eventlogs.getDone(false)
-    return highland(lodash.orderBy(events,['id'],['asc']))
+    alarms.forEach((value,key)=>{
+      if(value < Date.now()){
+        alarms.delete(key)
+        libs.commands.wake(key).then(res=>{
+          // console.log('command woke',key)
+        }).catch(err=>{
+          console.log('err waking cmd',err.message)
+        })
+      }
+    })
+  },1000).catch(err=>{
+    console.log('alarm loop err',err)
+    process.exit(1)
+  })
+  loop(async x=>{
+    return libs.eventlogs.readStream(false)
+      .sortBy((a,b)=>{
+        return a.id < b.id ? -1 : 1
+      })
+      // .batch(1000)
+      .doto(x=>logBench.new())
+      // .flatten()
       .map(async event=>{
+        console.log('running event',event._id)
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })
-      .flatMap(highland)
-      .collect()
+      .map(highland)
+      .parallel(10)
+      .doto(x=>logBench.completed())
+      .last()
       .toPromise(Promise)
-  },1000).catch(err=>{
+
+  },5000).catch(err=>{
     console.log('event engine error',err)
     process.exit(1)
   })
 
-  // disable for now
-  // loop(async x=>{
-  //   const tokens = await libs.tokens.list()
-  //   const commands = await libs.engines.minting.tick(tokens)
-  //   return Promise.map(commands,props=>libs.commands.createType('transaction',props))
+  loop(async x=>{
+    emitter.emit('models','blocks','change',await libs.blocks.latest())
+  },1000)
 
-  // },config.mintingTickRate).catch(err=>{
-  //   console.log('minting engine error',err)
-  //   process.exit(1)
-  // })
 
   return libs
 }

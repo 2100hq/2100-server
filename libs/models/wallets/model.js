@@ -5,6 +5,7 @@ const Schema = require('./schema')
 const Validate = require('../validate')
 const {walletId} = require('../../utils')
 const bn = require('bignumber.js')
+// const bn = require('big.js')
 
 //wallets should be processed in wei strings
 module.exports = function(config,table,emit=x=>x) {
@@ -48,8 +49,8 @@ module.exports = function(config,table,emit=x=>x) {
     }else{
       assert(amount.isInteger(), 'amount required to be a number!')
     }
-    assert(amount.isGreaterThan(0),'Withdraw amount must be above 0')
-    assert(amount.isLessThanOrEqualTo(wallet.balance),'Withdraw amount exceeds balance')
+    assert(amount.gt(0),'Withdraw amount must be above 0')
+    assert(amount.lte(wallet.balance),'Withdraw amount exceeds balance')
     return wallet
   }
 
@@ -74,7 +75,7 @@ module.exports = function(config,table,emit=x=>x) {
       assert(amount.isInteger(), 'amount required to be a number!')
     }
     // going to allow balances to be negative for now....
-    // assert(amount.isGreaterThanOrEqualTo(0), 'balance must be 0 or greater')
+    assert(amount.gte(0), 'balance must be 0 or greater')
     wallet.balance = amount.toString()
     return set(wallet)
   }

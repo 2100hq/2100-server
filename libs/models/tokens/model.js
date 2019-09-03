@@ -35,7 +35,7 @@ module.exports = function(config,table,emit=x=>x) {
     }
 
     await table.set(result.id,result)
-    emit('set',result)
+    emit('change',result)
     return result
   }
 

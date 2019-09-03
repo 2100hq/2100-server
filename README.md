@@ -13,13 +13,22 @@ Other notes
 - API design is open
 
 ## Starting
-Install [rethinkdb](https://hub.docker.com/_/rethinkdb/).
+Install [mongodb by docker](https://hub.docker.com/_/mongo) or 
+[ubuntu](https://www.digitalocean.com/community/tutorials/how-to-install-mongodb-on-ubuntu-18-04).
+
+optionally install pm2. `npm install pm2 -g`
 
 `npm install`
 
 `touch .env` - edit your .env based on env section
 
-`npm start`
+If using pm2:
+- `pm2 start ecosystem.config.js`
+
+If using node:
+- `npm run auth` - runs the auth server
+- `npm run blocks` - runs the blocks and log getter
+- `npm start` - runs main 2100 app
 
 ## ENV
 This parseEnv file will dynamically parse envs if they start with a lowercase letter or number.
@@ -29,13 +38,16 @@ Just slightly less friction for adding new envs.
 ```
 # internal name of service to run
 service=2100           
-# set your database name
-rethink.db=2100        
+
+# set mongo database uri
+mongo.uri=mongodb://user:pass@localhost:port/database?authSource=admin
+
 # set the public socket api port
 socket.port=9312       
 
-# set auth host
+# set auth host and port
 auth.host=ws://localhost:9315
+auth.socket.port=9315
 
 # set your rate speed for processing all commands 
 cmdTickRate=1000       
@@ -49,7 +61,16 @@ ethers.provider.type=JsonRpcProvider
 ethers.provider.url=                 
 
 # optional, otherwise start at latest block on chain
-defaultStartBlock=8182562  
+defaultStartBlock=0
+
+# optional, block watcher starts from latest block in chain. block watcher requires restart.
+forceLatestBlock=true
+
+# optional, disable any block rewards, block service requires restart if running
+disableBlockRewards=true
+
+# optional, disable auth, 2100 service requires restart
+disableAuth=true
 
 # default total supply measured in wei (will change to eth in future)
 tokens.supply=2100000000000000000000

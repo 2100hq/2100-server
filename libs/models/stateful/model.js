@@ -21,7 +21,10 @@ module.exports = (config, table, emit=x=>x) => {
     // console.log('set state',value.state,previous.state)
     if(previous){
       //only emit change if state changes, this will reduce number of emissions
-      if(value.state !== previous.state || value.done !== previous.done) emit('change',value)
+      if( value.state !== previous.state 
+        || value.done !== previous.done
+        || value.yield !== previous.yield
+      ) emit('change',value)
     }
     return value
   }
@@ -74,6 +77,15 @@ module.exports = (config, table, emit=x=>x) => {
     return set({...cmd,...update},cmd)
   }
 
+  async function wake(id){
+    const cmd = await get(id)
+    const update = {
+      yield:null
+    }
+    emit('wake',cmd)
+    return set({...cmd,...update},cmd)
+  }
+
   return {
     ...table,
     create,
@@ -85,5 +97,7 @@ module.exports = (config, table, emit=x=>x) => {
     defaults,
     validate,
     yield,
+    wake,
+    emit,
   }
 }

@@ -38,19 +38,4 @@ module.exports = (config,{commands,blocks,getWallets})=>{
       return commands.success(cmd.id,'Withdraw Success')
     },
   }
-  // async 'Wait For Confirmations'(cmd){
-  //   const block = await blocks.latest()
-  //   // console.log('latest block',block.number,cmd.blockNumber,cmd.confirmations)
-  //   if(Number(block.number) >= Number(cmd.blockNumber) + Number(cmd.confirmations || 1)){
-  //     return commands.setState(cmd.id,'Withdraw')
-  //   }else{
-  //     return commands.yield(cmd.id)
-  //   }
-  // },
-  // async Withdraw(cmd){
-  //   const locked = (await getWallets('locked')).getOrCreate(cmd.fromAddress,cmd.tokenid)
-  //   const available = (await getWallets('available')).getOrCreate(cmd.fromAddress,cmd.tokenid)
-  //   const total = locked.balance + available.balance
-  // }
-
 }

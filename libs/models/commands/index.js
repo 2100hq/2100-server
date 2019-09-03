@@ -1,8 +1,9 @@
 module.exports = {
   Model:require('./model'),
-  Mongo:require('./mongo'),
   Rethink:require('./rethink'),
+  Mongo:require('./mongo'),
   Schema:require('./schema'),
   Defaults:require('./defaults'),
   Types:require('./types'),
+  Cache:require('./cache'),
 }
