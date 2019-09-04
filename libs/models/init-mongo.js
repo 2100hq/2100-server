@@ -68,7 +68,10 @@ module.exports = async (config={},{con},emit)=>{
       mint:Coupons.Model({},await Coupons.Mongo({table:'mint_coupons'},con),(...args)=>emit('coupons.mint',...args)),
     },
     stats:{
-      stakes:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes',...args)) 
+      stakes:{
+        latest:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes.latest',...args)) ,
+        history:Stats.Model(config,await Stats.Mongo({table:'stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
+      },
     }
   }
 

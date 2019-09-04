@@ -1,11 +1,12 @@
 const assert = require('assert')
 
-module.exports = (config,{query,commands,users,signer,coupons,blocks}) => {
+module.exports = (config,{query,commands,users,signer,coupons,blocks,tokens}) => {
   assert(query,'requires query model')
   assert(commands,'requires commands model')
   assert(users,'requires users model')
   assert(blocks,'requires blocks')
   assert(coupons,'requires coupons model')
+  assert(tokens,'requires tokens model')
 
   return user =>{
     assert(user,'You must be logged in')

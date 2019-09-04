@@ -122,6 +122,7 @@ module.exports = async (config)=>{
     }
     try{
       //stats collector
+      // console.log(...args)
       await libs.processStats.write(args)
     }catch(err){
       console.log('stats event error',err)
@@ -285,8 +286,13 @@ module.exports = async (config)=>{
     process.exit(1)
   })
 
+  let latestBlock 
   loop(async x=>{
-    emitter.emit('models','blocks','change',await libs.blocks.latest())
+    const block = await libs.blocks.latest()
+    if(latestBlock == null || block.id != latestBlock.id){
+      latestBlock = block
+      emitter.emit('models',['blocks','change',latestBlock])
+    }
   },1000)
 
 

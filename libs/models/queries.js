@@ -100,9 +100,10 @@ module.exports = (config,libs)=>{
 
   async function allStakesDetailedStats(){
     const tokens = await libs.tokens.active.list()
-    return Promise.map(tokens,token=>{
-      return libs.stats.stakes.get(token.id)
-    })
+    return Promise.reduce(tokens,async (result,token)=>{
+      result[token.id] = (await libs.stats.stakes.latest.get(token.id)).stats
+      return result
+    },{})
   }
 
   function getTokenByName(token){
@@ -169,11 +170,15 @@ module.exports = (config,libs)=>{
   }
 
   async function allStakesDetailedStats(){
-    const stats = await libs.stats.stakes.list()
+    const stats = await libs.stats.stakes.latest.list()
     return stats.reduce((result,stat)=>{
       result[stat.id] = stat.stats
       return result
     },{})
+  }
+
+  async function stakeHistoryStats(tokenid,start,end){
+    return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`)).map(x=>x.stats)
   }
 
   async function privateState(userid){
@@ -232,7 +237,7 @@ module.exports = (config,libs)=>{
       },
       //need number of stakers and total
       stakes:{ 
-        ...(await allStakesDetailedStats())
+        latest: await allStakesDetailedStats(),
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
@@ -281,5 +286,6 @@ module.exports = (config,libs)=>{
     getUserStakeOnToken,
     getAvailableBalance,
     ownedTokens,
+    stakeHistoryStats,
   }
 }

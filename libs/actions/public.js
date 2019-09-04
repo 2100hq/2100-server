@@ -1,4 +1,5 @@
 const assert = require('assert')
+const Promise = require('bluebird')
 
 module.exports = (config,libs) => user =>{
   function echo(x){
@@ -38,6 +39,24 @@ module.exports = (config,libs) => user =>{
   async function getTokenOwner(tokenid){
     return (await libs.tokens.active.get(tokenid)).ownerAddress
   }
+  async function getStakeHistory(tokenid,blockStart,blockEnd){
+    const block = await libs.blocks.latest()
+    if(!blockStart) blockStart = block.number - 50
+    if(!blockEnd) blockEnd = block.number
+    console.log({tokenid,blockStart,blockEnd})
+    return libs.query.stakeHistoryStats(tokenid,blockStart,blockEnd)
+  }
+
+  async function getAllStakeHistory(blockStart,blockEnd){
+    const block = await libs.blocks.latest()
+    if(!blockStart) blockStart = block.number - 50
+    if(!blockEnd) blockEnd = block.number
+    const tokens = await libs.tokens.active.list()
+    return Promise.reduce(tokens,async (result,token)=>{
+      result[token.id] = await libs.query.stakeHistoryStats(token.id,blockStart,blockEnd)
+      return result
+    },{})
+  }
 
   return {
     echo,
@@ -49,6 +68,8 @@ module.exports = (config,libs) => user =>{
     ownedTokens,
     isOwner,
     getTokenOwner,
+    getStakeHistory,
+    getAllStakeHistory,
   }
 }
 
