@@ -3,7 +3,7 @@ const assert = require('assert')
 const Http = require('http')
 const Socket = require('socket.io')
 
-module.exports = async (config, libs) => {
+module.exports = async (config, libs,emit=x=>x) => {
   const {actions,events,query,users,auth} = libs
   assert(actions, 'requires actions')
   assert(actions.private, 'requires private actions')
@@ -25,8 +25,10 @@ module.exports = async (config, libs) => {
 
   io.on('connection', socket => {
 
+    emit('connect',socket.id)
     socket.on('disconnect', function() {
       // console.log('disconnect',socket.user)
+      emit('disconnect',socket.id)
     })
 
     // console.log('socket online',socket.id)

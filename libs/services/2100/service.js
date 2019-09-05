@@ -153,7 +153,16 @@ module.exports = async (config)=>{
     }
   })
 
-  libs.socket = await Socket(config,libs)
+  let usercount = 0
+  libs.socket = await Socket(config,libs,(...args)=>emitter.emit('socket',args))
+
+  emitter.on('socket',([channel,socketid])=>{
+    console.log('usercount',usercount)
+    if(channel === 'connect') usercount++
+    if(channel === 'disconnect') usercount--
+    emitter.emit('models',['usercount','change',usercount])
+  })
+
   //take api events and write to socket channels
   emitter.on('api',async ([channel,...args])=>{
     try{

@@ -212,7 +212,7 @@ global stats schema
 }
 ```
 
-**getGlobalHistoryStats(blockStart:number,blockEnd:number):globalStats[]**
+**getGlobalHistoryStats(blockStart:number,blockEnd:number):globalStats[]**    
 Return latest global stats across blocks.
 
 ### Private Actions
