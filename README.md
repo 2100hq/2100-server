@@ -171,7 +171,7 @@ listening to the private channel.
 ### Public Actions
 Public actions mainly have system stats. 
 
-**getStakeHistory(tokenid:string,blockStart:number,blockEnd:number):stakeStats[]**
+**getStakeHistory(tokenid:string,blockStart:number,blockEnd:number):stakeStats[]**   
 Returns stats for a token based on staking.
 
 ```
@@ -191,10 +191,10 @@ Returns stats for a token based on staking.
 }
 ```
 
-**getAllStakeHistory(blockStart:number,blockEnd:number):{[tokenid]:stakeStats[]}**
+**getAllStakeHistory(blockStart:number,blockEnd:number):{[tokenid]:stakeStats[]}**   
 Get stake stats for every token
 
-**getGlobalStats()=>globalStats**
+**getGlobalStats():globalStats**   
 Return latest global stats
 
 ```
