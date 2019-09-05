@@ -243,6 +243,7 @@ module.exports = (config,libs)=>{
         pending:lodash.keyBy((await listPendingTokens()),'id'),
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
+      usercount:0,
       //need number of stakers and total
       stakes:{ 
         latest: await allStakesDetailedStats(),
