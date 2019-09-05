@@ -172,13 +172,13 @@ module.exports = (config,libs)=>{
   async function allStakesDetailedStats(){
     const stats = await libs.stats.stakes.latest.list()
     return stats.reduce((result,stat)=>{
-      result[stat.id] = stat.stats
+      result[stat.id] = stat
       return result
     },{})
   }
 
   async function stakeHistoryStats(tokenid,start,end){
-    return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`)).map(x=>x.stats)
+    return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`))
   }
 
   async function globalStats(){

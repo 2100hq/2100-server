@@ -39,11 +39,12 @@ module.exports = (config,libs) => user =>{
   async function getTokenOwner(tokenid){
     return (await libs.tokens.active.get(tokenid)).ownerAddress
   }
+
   async function getStakeHistory(tokenid,blockStart,blockEnd){
     const block = await libs.blocks.latest()
     if(!blockStart) blockStart = block.number - 50
     if(!blockEnd) blockEnd = block.number
-    console.log({tokenid,blockStart,blockEnd})
+    // console.log({tokenid,blockStart,blockEnd})
     return libs.query.stakeHistoryStats(tokenid,blockStart,blockEnd)
   }
 
