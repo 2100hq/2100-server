@@ -181,6 +181,14 @@ module.exports = (config,libs)=>{
     return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`)).map(x=>x.stats)
   }
 
+  async function globalStats(){
+    return libs.stats.global.latest.get('latest')
+  }
+
+  async function globalHistoryStats(start,end){
+    return libs.stats.global.history.between(start,end)
+  }
+
   async function privateState(userid){
     return {
       myWallets:{
@@ -246,7 +254,6 @@ module.exports = (config,libs)=>{
         primaryToken:config.primaryToken,
         disableAuth:config.disableAuth || false,
       },
-
     }
   }
 
@@ -287,5 +294,7 @@ module.exports = (config,libs)=>{
     getAvailableBalance,
     ownedTokens,
     stakeHistoryStats,
+    globalStats,
+    globalHistoryStats,
   }
 }

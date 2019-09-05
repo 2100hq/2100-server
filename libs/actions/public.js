@@ -58,6 +58,17 @@ module.exports = (config,libs) => user =>{
     },{})
   }
 
+  async function getGlobalStats(){
+    return libs.query.globalStats()
+  }
+
+  async function getGlobalHistoryStats(blockStart,blockEnd){
+    const block = await libs.blocks.latest()
+    if(!blockStart) blockStart = block.number - 50
+    if(!blockEnd) blockEnd = block.number
+    return libs.query.globalHistoryStats(blockStart.toString(),blockEnd.toString())
+  }
+
   return {
     echo,
     state,
@@ -70,6 +81,8 @@ module.exports = (config,libs) => user =>{
     getTokenOwner,
     getStakeHistory,
     getAllStakeHistory,
+    getGlobalStats,
+    getGlobalHistoryStats,
   }
 }
 

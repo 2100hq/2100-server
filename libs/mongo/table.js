@@ -64,7 +64,7 @@ module.exports = async (db,schema) =>{
     return { _id: id, id }
   }
   function count(props){
-    return col.count(props)
+    return col.countDocuments(props)
   }
   function streamify(cursor){
     return cursor
