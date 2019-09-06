@@ -76,6 +76,9 @@ module.exports = (config,libs,emit)=>{
     if(table === 'coupons.create'){
       return emit('public',['coupons','create',data.id],data)
     }
+    if(table === 'usercount'){
+      return emit('public',['usercount'],data)
+    }
     // emit('public',[table,data.id],data)
   }
   

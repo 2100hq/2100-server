@@ -100,9 +100,10 @@ module.exports = (config,libs)=>{
 
   async function allStakesDetailedStats(){
     const tokens = await libs.tokens.active.list()
-    return Promise.map(tokens,token=>{
-      return libs.stats.stakes.get(token.id)
-    })
+    return Promise.reduce(tokens,async (result,token)=>{
+      result[token.id] = (await libs.stats.stakes.latest.get(token.id)).stats
+      return result
+    },{})
   }
 
   function getTokenByName(token){
@@ -169,11 +170,23 @@ module.exports = (config,libs)=>{
   }
 
   async function allStakesDetailedStats(){
-    const stats = await libs.stats.stakes.list()
+    const stats = await libs.stats.stakes.latest.list()
     return stats.reduce((result,stat)=>{
-      result[stat.id] = stat.stats
+      result[stat.id] = stat
       return result
     },{})
+  }
+
+  async function stakeHistoryStats(tokenid,start,end){
+    return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`))
+  }
+
+  async function globalStats(){
+    return libs.stats.global.latest.get('latest')
+  }
+
+  async function globalHistoryStats(start,end){
+    return libs.stats.global.history.between(start,end)
   }
 
   async function privateState(userid){
@@ -230,9 +243,10 @@ module.exports = (config,libs)=>{
         pending:lodash.keyBy((await listPendingTokens()),'id'),
         disabled:lodash.keyBy((await listDisabledTokens()),'id'),
       },
+      usercount:0,
       //need number of stakers and total
       stakes:{ 
-        ...(await allStakesDetailedStats())
+        latest: await allStakesDetailedStats(),
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
@@ -241,7 +255,6 @@ module.exports = (config,libs)=>{
         primaryToken:config.primaryToken,
         disableAuth:config.disableAuth || false,
       },
-
     }
   }
 
@@ -281,5 +294,8 @@ module.exports = (config,libs)=>{
     getUserStakeOnToken,
     getAvailableBalance,
     ownedTokens,
+    stakeHistoryStats,
+    globalStats,
+    globalHistoryStats,
   }
 }

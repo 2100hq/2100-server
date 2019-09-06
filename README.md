@@ -168,6 +168,53 @@ listening to the private channel.
   }
 }
 ```
+### Public Actions
+Public actions mainly have system stats. 
+
+**getStakeHistory(tokenid:string,blockStart:number,blockEnd:number):stakeStats[]**   
+Returns stats for a token based on staking.
+
+```
+//stakeStats
+{
+  id:string, //id of stat
+  created:number, //date created
+  updated:number, //date updated
+  stats:{
+    id:tokenid,
+    total:number //total dai staked across all users for this token
+    rank:number //the rank of this token based on total staked compared to all other tokens
+    stakers:{  //stakers percentages
+      [key:userid]:value:percentage
+    }
+  }
+}
+```
+
+**getAllStakeHistory(blockStart:number,blockEnd:number):{[tokenid]:stakeStats[]}**   
+Get stake stats for every token
+
+**getGlobalStats():globalStats**   
+Return latest global stats
+
+```
+global stats schema
+{
+  id:string, //id of stat
+  created:number, //date created
+  updated:number, //date updated
+  stats:{
+    tokenCount:number,//total tokens active in system
+    userCount:number, //total registered users
+    totalDai:string,  //total dai deposited
+    totalStaking:string,  //total dai staking across all tokensj:wa
+  }
+}
+```
+
+**getGlobalHistoryStats(blockStart:number,blockEnd:number):globalStats[]**    
+Return latest global stats across blocks.
+
 ### Private Actions
 Private actions are scoped the the socket private channel and can only be called once authenticated
 

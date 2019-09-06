@@ -2,10 +2,11 @@ const Promise = require('bluebird')
 const assert = require('assert')
 const highland = require('highland')
 module.exports = async (db,schema) =>{
-  const {table,indices=[],compound=[]} = schema
+  const {table,indices=[],compound=[],...options} = schema
 
-  function createCollection(name){
-    return db.createCollection(name).catch(err=>{
+  function createCollection(name,opts){
+    console.log('mongo collection options',name,opts)
+    return db.createCollection(name,opts).catch(err=>{
       console.log(err.message)
     })
   }
@@ -36,7 +37,7 @@ module.exports = async (db,schema) =>{
     })
   }
   
-  await createCollection(table)
+  await createCollection(table,options)
   const col = db.collection(table)
   await createIndexes(col,indices)
   await createCompoundIndexes(col,compound)
@@ -64,7 +65,7 @@ module.exports = async (db,schema) =>{
     return { _id: id, id }
   }
   function count(props){
-    return col.count(props)
+    return col.countDocuments(props)
   }
   function streamify(cursor){
     return cursor

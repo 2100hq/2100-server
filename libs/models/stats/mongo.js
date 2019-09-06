@@ -17,6 +17,15 @@ module.exports = async (config, con) => {
       return table.getBy({},{skip:from}).toArray()
       // return table.run(table.table().orderBy('id').slice(from).coerceTo('array'))
     },
+    between(start,end){
+      console.log({start,end})
+      return table.query().find({
+        _id:{
+          $gte:start,
+          $lt:end
+        }
+      }).toArray()
+    },
     async latest(){
       const [last] = await table.query().find().sort({_id:-1}).limit(1).toArray()
       return last
