@@ -11,7 +11,9 @@ module.exports = async (config, con) => {
     compound:[
       {name:'typeDone',fields:['type','done']},
       {name:'userDone',fields:['userid','done']}
-    ]
+    ],
+    capped:true,
+    size:4294967296,
   }
 
   const table = await Table(con, schema)

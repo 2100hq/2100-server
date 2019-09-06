@@ -7,6 +7,8 @@ module.exports = async (config, con) => {
   const schema = {
     table: config.table,
     indices:['done'],
+    capped:true,
+    size:1073741824,
   }
 
   const table = await Table(con, schema)
