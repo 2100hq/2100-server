@@ -12,7 +12,7 @@ module.exports = async (config, con) => {
       {name:'typeDone',fields:['type','done']},
       {name:'userDone',fields:['userid','done']}
     ],
-    capped:true,
+    // capped:true,
     size:4294967296,
   }
 
