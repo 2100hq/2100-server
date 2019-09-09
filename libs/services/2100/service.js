@@ -136,16 +136,20 @@ module.exports = async (config)=>{
     if(channel !== 'auth') return
     try{
       if(type === 'login'){
-          const [socketid,userid] = args
-          await libs.socket.join(socketid,userid)
-          await libs.socket.private(userid,[],await libs.query.privateState(userid))
-          return
+        const [socketid,userid] = args
+        await libs.socket.join(socketid,userid)
+        await libs.socket.private(userid,[],await libs.query.privateState(userid))
+        const user = await libs.users.get(userid)
+        if(!user.claimed){
+          await libs.actions.private(user,'claimFakeDai')
+        }
+        return
       }
       if(type === 'logout'){
-          const [socketid,userid] = args
-          await libs.socket.leave(socketid,userid)
-          await libs.socket.private(userid,[],{})
-          return
+        const [socketid,userid] = args
+        await libs.socket.leave(socketid,userid)
+        await libs.socket.private(userid,[],{})
+        return
       }
     }catch(err){
       console.log('action error: ' + type)
