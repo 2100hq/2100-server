@@ -101,7 +101,6 @@ exports.tweetTemplates = {
   'humanitydao': "I'm applying to the @HumanityDAO registry! My Ethereum address is publicAddress"
 }
 exports.validateTweet = async (url,publicAddress,template) =>{
-  console.log('validateTweet',{url,publicAddress,template})
   let name = exports.parseTwitterUser(url)
   assert(name,'Unable get Twitter username')
   name = name.toLowerCase()
