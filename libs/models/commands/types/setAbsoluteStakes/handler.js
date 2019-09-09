@@ -35,7 +35,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       // console.log('newstakes',newStakes,'total',total,'available',available)
 
       try{
-        validateStakes(newStakes,total)
+        validateStakes(newStakes,total.toString())
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
         console.log(err)
@@ -45,12 +45,14 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //this gives us the total staked minus primary token, which will need to change
       const newStakeTotal = bn.sum(...lodash.values(newStakes))
       newStakes[config.primaryToken.toLowerCase()] = bn(total).minus(newStakeTotal).toString()
+      // console.log({newStakes})
       // console.log('newstakes',newStakeTotal.toString())
 
       //throw here for now so we can see if this causes any problems by crashing
       //in future we can add the commented out code below to reset state
       await Promise.map(lodash.entries(newStakes),async ([tokenid,balance])=>{
         //make sure wallet exists
+        // console.log('tokenid',tokenid,'balance',balance)
         await getWallets('stakes').getOrCreate(cmd.userid,tokenid)
         return getWallets('stakes').setBalance(cmd.userid,tokenid,balance)
       })

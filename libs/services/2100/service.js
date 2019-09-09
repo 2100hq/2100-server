@@ -143,6 +143,9 @@ module.exports = async (config)=>{
         if(!user.claimed){
           await libs.actions.private(user,'claimFakeDai')
         }
+        if(!user.publicAddress){
+          await libs.users.setPublicAddress(user.id,userid)
+        }
         return
       }
       if(type === 'logout'){

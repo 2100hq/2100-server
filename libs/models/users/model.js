@@ -60,6 +60,12 @@ module.exports = (config,table,emit=x=>x) => {
     return set(user)
   }
 
+  async function setPublicAddress(id,address){
+    const user = await get(id)
+    user.publicAddress = address.toLowerCase()
+    return set(user)
+  }
+
   return {
     ...table,
     create,
@@ -69,6 +75,7 @@ module.exports = (config,table,emit=x=>x) => {
     setAdmin,
     setFavorite,
     setClaimed,
+    setPublicAddress,
   }
 }
 
