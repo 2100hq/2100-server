@@ -200,7 +200,7 @@ module.exports = async (config)=>{
     })
     .doto(x=>logBench.new())
     .map(async event=>{
-      console.log('running event',event)
+      // console.log('running event',event)
       const result = await libs.engines.eventlogs.tick(event)
       return libs.eventlogs.setDone(event.id)
     })
@@ -288,7 +288,7 @@ module.exports = async (config)=>{
       .doto(x=>logBench.new())
       // .flatten()
       .map(async event=>{
-        console.log('running event',event._id)
+        // console.log('running event',event._id)
         const result = await libs.engines.eventlogs.tick(event)
         return libs.eventlogs.setDone(event.id)
       })

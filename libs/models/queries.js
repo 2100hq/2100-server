@@ -172,7 +172,7 @@ module.exports = (config,libs)=>{
   async function allStakesDetailedStats(){
     const stats = await libs.stats.stakes.latest.list()
     return stats.reduce((result,stat)=>{
-      result[stat.id] = stat
+      result[stat.id] = stat.stats
       return result
     },{})
   }
@@ -246,7 +246,8 @@ module.exports = (config,libs)=>{
       usercount:0,
       //need number of stakers and total
       stakes:{ 
-        latest: await allStakesDetailedStats(),
+        ...(await allStakesDetailedStats())
+        // latest: await allStakesDetailedStats(),
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),

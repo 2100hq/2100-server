@@ -37,7 +37,7 @@ module.exports = function(config,table,emit=x=>x) {
   }
 
   async function setDone(id){
-    console.log('setting done',id)
+    // console.log('setting done',id)
     const result = await get(id)
     result.done = true
     return set(result)
