@@ -32,7 +32,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
         ...currentStakes,
         ...cmd.stakes
       }
-      // console.log('newstakes',newStakes,'total',total,'available',available.balance)
+      // console.log('newstakes',newStakes,'total',total,'available',available)
 
       try{
         validateStakes(newStakes,total)
