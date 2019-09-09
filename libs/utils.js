@@ -97,14 +97,15 @@ exports.matchTweet = (tweet,match)=>{
 }
 
 exports.tweetTemplates = {
-  ['2100']: 'Add my token to @2100hq and use publicAddress as the owner address',
+  '2100': 'Add me to @2100hq using the Ethereum address publicAddress',
   'humanitydao': "I'm applying to the @HumanityDAO registry! My Ethereum address is publicAddress"
 }
-exports.validateTweet = async (url,publicAddress,twitterType) =>{
+exports.validateTweet = async (url,publicAddress,template) =>{
+  console.log('validateTweet',{url,publicAddress,template})
   let name = exports.parseTwitterUser(url)
   assert(name,'Unable get Twitter username')
   name = name.toLowerCase()
-  const text = exports.tweetTemplates[twitterType].replace(/publicAddress/, publicAddress)
+  const text = template.replace(/publicAddress/, publicAddress)
   const tweet = await exports.parseTweet(url)
   const match = exports.matchTweet(tweet,text)
   assert(match,'Tweet does not match required text')
