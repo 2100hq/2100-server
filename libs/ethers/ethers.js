@@ -9,7 +9,14 @@ module.exports = async (config,libs,emit=x=>x) => {
   // console.log({defaultStartBlock})
   // assert(defaultStartBlock,'requires starting block')
 
-  const provider = new ethers.providers[config.provider.type](config.provider.url,config.provider.network)
+
+  let provider 
+  if(config.provider.type){
+    provider = new ethers.providers[config.provider.type](config.provider.url,config.provider.network)
+  }else{
+    provider = new ethers.getDefaultProvider()
+  }
+
 
   // if(defaultStartBlock) provider.resetEventsBlock(defaultStartBlock)
 

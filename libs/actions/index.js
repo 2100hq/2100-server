@@ -17,6 +17,7 @@ module.exports = (name, config, libs,emit)=>{
     console.time(id)
     try{
       const result = await scope[action](...args)
+      console.log(result)
       console.timeEnd(id)
       return result
     }catch(err){
