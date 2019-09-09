@@ -52,8 +52,8 @@ module.exports = (config,libs,emit)=>{
   }
 
   async function publicEvent([table,method,data]){
-    if(table == 'stats.stakes'){
-      // console.log(table,method,data)
+    if(table == 'stats.stakes.latest'){
+      // console.log('stats.stakes.latest',table,method,data)
       emit('public',['stakes',data.id],data.stats)
     }
     if(table.includes('wallets')){

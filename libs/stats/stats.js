@@ -41,7 +41,7 @@ module.exports = (config,libs,emit=x=>x) =>{
   async function write([table,method,data]){
     if(table == 'wallets.stakes'){
       const stats = await libs.query.detailedStakes(data.tokenid)
-      // console.log({stats,data})
+      // console.log('wallets.stakes',{stats,data})
       return libs.stats.stakes.latest.set({id:data.tokenid,stats})
     }
     // if(table == 'wallets.available'){
