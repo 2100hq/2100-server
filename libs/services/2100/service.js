@@ -305,7 +305,7 @@ module.exports = async (config)=>{
     const block = await libs.blocks.latest()
     if(latestBlock == null || block.id != latestBlock.id){
       latestBlock = block
-      emitter.emit('models',['blocks','change',latestBlock])
+      emitter.emit('models',['blocks','change',block])
     }
   },1000)
 
