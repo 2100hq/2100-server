@@ -63,6 +63,21 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return tokens.active.setDescription(tokenid,description)
     }
 
+    async function claimFakeDai(){
+      assert(!user.claimed,'You have already claimed your dai')
+      const {claimAmount} = config
+      assert(claimAmount,'Admin has not set a claim amount')
+      const cmd = await commands.createType('deposit',{
+        toAddress:user.id,
+        tokenid:config.primaryToken,
+        toWalletType:'available',
+        value:claimAmount,
+        userid:user.id,
+      })
+      await users.setClaimed(user.id)
+      return cmd
+    }
+
     return {
       me,
       myCommandHistory,
@@ -71,6 +86,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       setFavorite,
       setTokenDescription,
       verifyTwitter,
+      claimFakeDai,
     }
   }
 }

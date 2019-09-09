@@ -93,6 +93,7 @@ module.exports = async (config)=>{
     'transferCreatorReward',    //handle crediting creator rewards
     'createTokenByTweet',    //user creating a token by tweet
     'createTokenByName',    //admin creating token by name
+    'deposit',
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)

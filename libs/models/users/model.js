@@ -40,6 +40,12 @@ module.exports = (config,table,emit=x=>x) => {
     return set(user)
   }
 
+  async function setClaimed(id,claimed=true){
+    const user = await get(id)
+    user.claimed = claimed
+    return set(user)
+  }
+
   async function setFavorite(id,address,favorite=true){
     assert(id,'requires user id')
     assert(address,'requires token address')
@@ -62,6 +68,7 @@ module.exports = (config,table,emit=x=>x) => {
     getOrCreate,
     setAdmin,
     setFavorite,
+    setClaimed,
   }
 }
 

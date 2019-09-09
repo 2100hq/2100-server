@@ -3,7 +3,7 @@ module.exports = config => {
     toAddress:{type:'string'},
     tokenid:'string',
     toWalletType:{type:'string'},
-    value:{type:'number',positive:true},
+    value:{type:'string',number:true,positive:true},
   }
 }
 

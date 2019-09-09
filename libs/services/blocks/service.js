@@ -11,18 +11,19 @@ const highland = require('highland')
 const Promise = require('bluebird')
 const assert = require('assert')
 const lodash = require('lodash')
-const ControllerContract = require('2100-contracts/build/contracts/Controller')
+// removing references to on chain contracts
+// const ControllerContract = require('2100-contracts/build/contracts/Controller')
 
 //contracts we want to listen for events on
 const contracts = [
-  ControllerContract,
+  // ControllerContract,
 ]
 
 module.exports = async config =>{
 
   //set a default for now to our dev chain id
   config.chainid = config.chainid || '2100'
-  config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
+  // config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
   assert(config.primaryToken,'requires primary token address or symbol')
 
   config.contracts = contracts.map((json)=>{

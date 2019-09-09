@@ -112,7 +112,10 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
   }
 
   async function getEvents(block){
-    const events = await getLogEvents(contracts[0],block)
+    let events = []
+    if(contracts.length){
+      events = await getLogEvents(contracts[0],block)
+    }
     // console.log('disabledblockrewareds',disableBlockRewards)
     if(disableBlockRewards) return events
     // console.log('generating rewards')
