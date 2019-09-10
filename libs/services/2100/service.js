@@ -165,7 +165,7 @@ module.exports = async (config)=>{
   libs.socket = await Socket(config,libs,(...args)=>emitter.emit('socket',args))
 
   emitter.on('socket',([channel,socketid])=>{
-    console.log('usercount',usercount)
+    // console.log('usercount',usercount)
     if(channel === 'connect') usercount++
     if(channel === 'disconnect') usercount--
     emitter.emit('models',['usercount','change',usercount])
@@ -187,7 +187,7 @@ module.exports = async (config)=>{
   const logBench = Benchmark()
   const cmdBench = Benchmark()
   loop(x=>{
-    // cmdBench.print()
+    if(config.benchmarks) cmdBench.print()
     cmdBench.clear()
     // logBench.print()
     logBench.clear()

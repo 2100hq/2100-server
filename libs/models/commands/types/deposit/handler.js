@@ -11,8 +11,8 @@ module.exports = (config,{commands,getWallets,blocks})=>{
       const wallets = await getWallets(cmd.toWalletType)
       await wallets.getOrCreate(cmd.toAddress,cmd.tokenid)
       return wallets.deposit(cmd.toAddress,cmd.tokenid,cmd.value).then(async wallet=>{
-        console.log('deposited',cmd)
-        const block = await blocks.latest()
+        // console.log('deposited',cmd)
+        const block = (await blocks.latest()) || {number:0}
         await commands.createType('rebalanceStakes',{userid:cmd.toAddress,blockNumber:block.number})
         return commands.success(cmd.id,'Deposit Success',{balance:wallet.balance})
       }).catch(err=>{

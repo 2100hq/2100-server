@@ -17,7 +17,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
     },
     async 'Set Stakes'(cmd){
       const stakes = await getWallets('stakes').getByUser(cmd.userid)
-      const total = bn.sum(...stakes.map(x=>x.balance))
+      const total = bn.sum(...stakes.map(x=>x.balance),0)
       const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
 
       //convert array of stakes to [tokenid]:balance object

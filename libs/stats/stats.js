@@ -70,7 +70,7 @@ module.exports = (config,libs,emit=x=>x) =>{
         return libs.stats.stakes.history.set({id:[id,data.number].join('!'),stats:{id,total,stakers,rank:index}})
       })
       await globalStats()
-      await globalStatsHistory(await libs.blocks.latest())
+      if(data) await globalStatsHistory(data)
     }
   }
 

@@ -73,6 +73,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       console.log('system',socket.userid)
       if(socket.userid == null) return cb('Please Login')
       if(config.systemAddress == null) return cb('System address has not been set')
+      console.log('action',action,'userid',socket.userid,'systemaddress',config.systemAddress)
       libs.users.getOrCreate(socket.userid).then(async user=>{
         assert(user.id.toLowerCase() === config.systemAddress.toLowerCase(),'Not Authorized')
         cb(null, await actions.system(user,action, ...args))
