@@ -168,6 +168,34 @@ listening to the private channel.
   }
 }
 ```
+
+### Socket Event State Updates
+Once connected to the public or private channel, events will come in to update state in the form
+
+`events=[[path,data],[path,data]]`
+
+You can use the socket/client library to automatically set state for you. But the code looks something
+like this:
+
+```
+  let state = {}
+  function updateState(channel,[path,data]){
+    if(path.length){
+      if(data===null){
+        lodash.unset(state[channel],path)
+      }else{
+        lodash.set(state[channel],path,data)
+      }
+    }else{
+      state[channel] = data
+    }
+  }
+
+  socket.on('public',events=>events.forEach(event=>updateState('public',event)))
+```
+
+
+
 ### Public Actions
 Public actions mainly have system stats. 
 
