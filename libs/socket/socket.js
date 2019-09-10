@@ -2,6 +2,7 @@ const lodash = require('lodash')
 const assert = require('assert')
 const Http = require('http')
 const Socket = require('socket.io')
+const highland = require('highland')
 
 module.exports = async (config, libs,emit=x=>x) => {
   const {actions,events,query,users,auth} = libs
