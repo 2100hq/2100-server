@@ -34,6 +34,7 @@ module.exports = async config =>{
 
   const socket = await SocketClient(config.bots['2100'].host)
   const wallet = new ethers.Wallet(config.signer.privateKey,provider)
+
   //system wallet nonce
   let nonce = undefined
   const adminActions = {
@@ -51,13 +52,17 @@ module.exports = async config =>{
   await adminActions.system.call('setAdmin',{userid:config.systemAddress,isAdmin:true})
 
   function updateState(channel,state){
-    return (...args)=>{
-      // console.log(channel,...args)
-      if(args[0].length){
-        lodash.set(state[channel],...args)
-      }else{
-        state[channel] = args[1]
-      }
+    return (events)=>{
+      console.log(channel,events)
+      events.forEach(([path,data])=>{
+        console.log('updatestate',{channel,path,data})
+        if(path.length){
+          lodash.set(state[channel],path,data)
+        }else{
+          state[channel] = data
+        }
+      })
+      // console.log(state[channel])
     }
   }
 

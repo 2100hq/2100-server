@@ -18,7 +18,7 @@ module.exports = (config,libs,emit)=>{
     // console.log(table,method,data)
     switch(table){
       case 'commands':{
-        if(data.type == 'transferStakeReward') return
+        // if(data.type == 'transferStakeReward') return
         if(data.done){
           emit('private',data.userid,['myCommandHistory',data.id],data)
         }
@@ -54,7 +54,7 @@ module.exports = (config,libs,emit)=>{
 
   async function publicEvent([table,method,data]){
     if(table == 'stats.stakes.latest'){
-      console.log('stats.stakes.latest',table,method,data)
+      // console.log('stats.stakes.latest',table,method,data)
       emit('public',['stakes',data.id],data.stats)
     }
     if(table.includes('wallets')){
