@@ -124,7 +124,7 @@ module.exports = async (config)=>{
     try{
       //stats collector
       // console.log(...args)
-      await libs.processStats.write(args)
+      // await libs.processStats.write(args)
     }catch(err){
       console.log('stats event error',err)
       process.exit(1)
@@ -138,8 +138,8 @@ module.exports = async (config)=>{
       if(type === 'login'){
         const [socketid,userid] = args
         await libs.socket.join(socketid,userid)
+        const user = await libs.users.getOrCreate(userid)
         await libs.socket.private(userid,[],await libs.query.privateState(userid))
-        const user = await libs.users.get(userid)
         if(!user.claimed){
           await libs.actions.private(user,'claimFakeDai')
         }
@@ -155,7 +155,7 @@ module.exports = async (config)=>{
         return
       }
     }catch(err){
-      console.log('action error: ' + type)
+      console.log('action error: ' + type,...args)
       console.log(err)
       process.exit(1)
     }

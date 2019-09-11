@@ -9,7 +9,7 @@ module.exports = (config,table,emit=x=>x) => {
   const validate = Validate(Schema())
 
   async function create(props) {
-    if(props.id) assert(!await table.has(props.id), 'User already exists with this id')
+    if(props.id) assert(!(await table.has(props.id)), 'User already exists with this id')
     return set(props)
   }
 

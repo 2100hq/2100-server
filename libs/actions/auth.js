@@ -46,9 +46,9 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     //do socket things on login
     //update socket userid
     socket.userid = publicAddress
-    emit('login',socket.id,publicAddress)
     //get or create the user
     await users.getOrCreate(publicAddress)
+    emit('login',socket.id,publicAddress)
     return tokenid
   }
 
@@ -88,6 +88,7 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
       return fakeLogin(...args)
     }else{
       return login(...args)
+       
     }
 
   }

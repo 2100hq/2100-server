@@ -24,13 +24,18 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return query.privateState(user.id)
     }
 
-    async function stake(stakes){
+    async function stakeAll(stakes){
       assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
       const {balance} = await getWallets('available').getOrCreate(user.id,config.primaryToken)
       // console.log('stake',stakes,balance)
       validateStakes(stakes,balance)
       const {number} = await blocks.latest()
       return commands.createType('setAbsoluteStakes',{userid:user.id,stakes,blockNumber:number})
+    }
+
+    async function stake(stakes){
+      assert(Object.keys(stakes).length === 1,'Can only stake single token a time')
+      return stakeAll(stakes)
     }
 
     async function verifyTwitter({link,tweetType='2100',description=''}){
@@ -84,6 +89,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       myCommandHistory,
       state,
       stake,
+      stakeAll,
       setFavorite,
       setTokenDescription,
       verifyTwitter,

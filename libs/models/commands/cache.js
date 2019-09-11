@@ -12,7 +12,7 @@ module.exports = (config, table, emit=x=>x) =>{
         return cache.get(id)
       }
       // console.log('miss')
-      const result = table.get(id)
+      const result = await table.get(id)
       if(result) cache.set(id,result)
       return result
     },

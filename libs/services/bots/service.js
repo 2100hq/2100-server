@@ -118,10 +118,10 @@ module.exports = async config =>{
   config.bots.end = parseInt(config.bots.end)
   const count = config.bots.end - config.bots.start
   assert(count > 0,'must specify at least one bot')
-  let bots = await Promise.all(lodash.times(count,index=>{
+  let bots = await Promise.mapSeries(lodash.times(count),index=>{
     index = index + config.bots.start
     return initBot({host:config['2100'].host,mnemonic:config.bots.mnemonic,index})
-  }))
+  })
 
 
   const handler = Handler(config)

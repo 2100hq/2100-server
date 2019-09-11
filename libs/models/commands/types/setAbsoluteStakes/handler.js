@@ -20,6 +20,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       const total = bn.sum(...stakes.map(x=>x.balance),0)
       const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
 
+      // console.log({stakes})
       //convert array of stakes to [tokenid]:balance object
       const currentStakes = stakes.reduce((result,wallet)=>{
         if(wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase()) return result
@@ -32,10 +33,10 @@ module.exports = (config,{commands,getWallets,tokens})=>{
         ...currentStakes,
         ...cmd.stakes
       }
-      // console.log('newstakes',newStakes,'total',total,'available',available)
+      // console.log('newstakes',newStakes,'total',total,'available',available,'currentStakes',currentStakes)
 
       try{
-        // validateStakes(newStakes,total.toString())
+        validateStakes(newStakes,total.toString())
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
         console.log(err)

@@ -81,7 +81,7 @@ module.exports = (config,libs)=>{
         },{})
         const unstake = lodash.mapValues(stakes,x=>'0')
         if(lodash.size(unstake)){
-          const cmd = await state.actions.private.call('stake',unstake).catch(err=>{
+          const cmd = await state.actions.private.call('stakeAll',unstake).catch(err=>{
             console.log(err.message,unstake)
             throw err
           })
@@ -108,7 +108,7 @@ module.exports = (config,libs)=>{
           return result
 
         },newStakes)
-        const cmd = await state.actions.private.call('stake',newStakes)
+        const cmd = await state.actions.private.call('stakeAll',newStakes)
         state.log(cmd)
         return 'End'
       },
@@ -117,7 +117,7 @@ module.exports = (config,libs)=>{
         const available = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
         const stakes = lodash.get(state.server.private,'myStakes',{})
         let total = ethers.utils.bigNumberify(available)
-        console.log({stakes})
+        // console.log({stakes})
         total = total.add(0,...Object.values(stakes))
 
         const newStakes = {}
@@ -129,7 +129,7 @@ module.exports = (config,libs)=>{
           total = total.sub(size)
           return result
         },newStakes)
-        const cmd = await state.actions.private.call('stake',newStakes)
+        const cmd = await state.actions.private.call('stakeAll',newStakes)
         state.log(cmd)
         return 'Check Stakes'
       },
@@ -162,12 +162,12 @@ module.exports = (config,libs)=>{
           // return 'Fixed Stakes'
         }
         if(lodash.size(stakes)){
-          state.unstakeTime = moment().add(parseInt((Math.random() * 60)),'seconds').valueOf()
+          state.unstakeTime = moment().add(parseInt((Math.random() * 5)),'seconds').valueOf()
           return 'Wait Randomize Stakes'
           // return 'Fixed Stakes'
         }
-        // return 'ChooseAction'
         return 'Wait Randomize Stakes'
+        // return 'ChooseAction'
       },
       End(){
         return 'End'
