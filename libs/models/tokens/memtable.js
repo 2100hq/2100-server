@@ -36,7 +36,7 @@ module.exports = async (config, table, emit=x=>x) =>{
     set,
     getByOwner,
     getByName,
-    hasAll,
+    // hasAll,
   }
 
 }
