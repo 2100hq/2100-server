@@ -4,7 +4,7 @@ const Promise = require('bluebird')
 const bn = require('bignumber.js')
 //should be run in the transaction queue
 //like anything which reads or writes wallets
-const {validateStakes} = require('../../../../utils')
+const {validateStakes,diffStakes} = require('../../../../utils')
 module.exports = (config,{commands,getWallets,tokens})=>{
   assert(commands,'requires commands table')
   assert(getWallets,'requires getWallets function')
@@ -45,12 +45,16 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //this gives us the total staked minus primary token, which will need to change
       const newStakeTotal = bn.sum(...lodash.values(newStakes))
       newStakes[config.primaryToken.toLowerCase()] = bn(total).minus(newStakeTotal).toString()
+
+      const diff = diffStakes(currentStakes,newStakes)
+      // console.log({currentStakes,newStakes,diff})
+
       // console.log({newStakes})
       // console.log('newstakes',newStakeTotal.toString())
 
       //throw here for now so we can see if this causes any problems by crashing
       //in future we can add the commented out code below to reset state
-      await Promise.map(lodash.entries(newStakes),async ([tokenid,balance])=>{
+      await Promise.map(lodash.entries(diff),async ([tokenid,balance])=>{
         //make sure wallet exists
         // console.log('tokenid',tokenid,'balance',balance)
         await getWallets('stakes').getOrCreate(cmd.userid,tokenid)

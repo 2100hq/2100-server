@@ -23,6 +23,15 @@ exports.validateStakes = (stakes,max=1,min=0)=>{
   return stakes
 }
 
+exports.diffStakes = (prev,next)=>{
+  const keys = lodash.uniq([...Object.keys(prev),...Object.keys(next)])
+  return keys.reduce((result,key)=>{
+    if(prev[key] == next[key]) return result
+    result[key] = next[key]
+    return result
+  },{})
+}
+
 exports.Benchmark = (benchmarks={})=>{
   benchmarks = {
     new:0,
