@@ -10,18 +10,18 @@ module.exports = (config,{handlers,commands})=>{
   const {runToDone} = Commands(config,{handlers,commands})
 
 
-  // const bench = BenchTimer()
+  // const bench = BenchTimer({})
   // loop(x=>{
-  //   console.log(name,'avg cmd time',bench.avg().toFixed(2), 'on', bench.length(),'commands')
+  //   console.log('avg cmd time',bench.avg().toFixed(2), 'on', bench.length(),'commands')
   // },1000)
 
   stream
-    // .doto(x=>console.time(['command',x.type,x.id].join('.')))
+    .doto(x=>console.time(['command',x.type,x.id].join('.')))
     // .doto(x=>bench.start())
     .map(runToDone)
     .flatMap(highland)
     // .doto(x=>bench.end())
-    // .doto(x=>console.timeEnd(['command',x.type,x.id].join('.')))
+    .doto(x=>console.timeEnd(['command',x.type,x.id].join('.')))
     .errors((err,next)=>{
       console.log('command stream error',err)
       process.exit(1)
