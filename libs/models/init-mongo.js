@@ -17,16 +17,16 @@ module.exports = async (config={},{con},emit)=>{
   const models = {
     wallets:{
       available:Wallets.Model({},
-        Commands.Cache(config, await Wallets.Mongo({table:'available'},con)),
+        await Wallets.Memtable(config, await Wallets.Mongo({table:'available'},con)),
         // await Wallets.Mongo({table:'available'},con),
         (...args)=>emit('wallets.available',...args)),
       locked:Wallets.Model({},
-        Commands.Cache(config, await Wallets.Mongo({table:'locked'},con)),
+        await Wallets.Memtable(config, await Wallets.Mongo({table:'locked'},con)),
         // await Wallets.Mongo({table:'locked'},con),
         (...args)=>emit('wallets.locked',...args)),
       //this is not an mistype, stakes are an instance of wallets
       stakes:Wallets.Model({},
-        Commands.Cache(config, await Wallets.Mongo({table:'stakes'},con)),
+        await Wallets.Memtable(config, await Wallets.Mongo({table:'stakes'},con)),
         // await Wallets.Mongo({table:'stakes'},con),
         (...args)=>emit('wallets.stakes',...args)),
     },

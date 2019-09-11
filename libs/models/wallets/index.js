@@ -4,4 +4,5 @@ module.exports = {
   Defaults:require('./defaults'),
   Schema:require('./schema'),
   Rethink:require('./rethink'),
+  Memtable:require('./memtable')
 }
