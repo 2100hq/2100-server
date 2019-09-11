@@ -28,6 +28,8 @@ module.exports = async (config, table, emit=x=>x) =>{
 
   return {
     ...table,
+    get,
+    set,
     getByUser,
     getByToken,
   }
