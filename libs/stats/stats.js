@@ -9,7 +9,7 @@ module.exports = (config,libs,emit=x=>x) =>{
 
   async function globalStatsHistory(block){
     const latest = await libs.stats.global.latest.get('latest')
-    return libs.stats.global.history.set({id:block.number.toString(),stats:latest.stats})
+    if(latest) return libs.stats.global.history.set({id:block.number.toString(),stats:latest.stats})
   }
 
   async function globalStats(){
