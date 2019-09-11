@@ -70,12 +70,13 @@ module.exports = async (db,schema) =>{
   function streamify(cursor){
     return cursor
   }
-  function insertMany(docs=[]){
+  async function insertMany(docs=[]){
     docs = docs.map(x=> {
       x._id = x.id
       return x
     })
-    return col.insertMany(docs)
+    await col.insertMany(docs)
+    return docs
   }
   function drop(){
     return col.deleteMany({})
