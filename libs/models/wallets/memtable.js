@@ -32,8 +32,8 @@ module.exports = async (config, table, emit=x=>x) =>{
     return cache.get(id)
   }
   async function set(id,data){
-    // await table.set(id,data)
-    saveStream.write(data)
+    await table.set(id,data)
+    // saveStream.write(data)
     return cache.set(data)
   }
   function getByUser(userid){
