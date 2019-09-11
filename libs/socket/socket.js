@@ -106,7 +106,7 @@ module.exports = async (config, libs,emit=x=>x) => {
 
     stream
       // .doto(args=>console.log(...args))
-      .batchWithTimeOrCount(100,500)
+      .batchWithTimeOrCount(50,500)
       .errors((err,push)=>{
         console.log(err)
         process.exit(1)
@@ -122,7 +122,7 @@ module.exports = async (config, libs,emit=x=>x) => {
 
 
   publicStream
-    .batchWithTimeOrCount(100,500)
+    .batchWithTimeOrCount(50,500)
     .errors((err,push)=>{
       console.log(err)
       process.exit(1)
@@ -134,7 +134,7 @@ module.exports = async (config, libs,emit=x=>x) => {
     
 
   adminStream
-    .batchWithTimeOrCount(100,500)
+    .batchWithTimeOrCount(50,500)
     .errors((err,push)=>{
       console.log(err)
       process.exit(1)
