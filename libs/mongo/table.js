@@ -86,8 +86,12 @@ module.exports = async (db,schema) =>{
   function list(){
     return col.find({}).toArray()
   }
+  function readStream(){
+    return highland(col.find({}))
+  }
 
   return {
-    set,get,getBy,has,delete:del,streamify,count,drop,insertMany,query,list
+    set,get,getBy,has,delete:del,streamify,count,drop,insertMany,query,list,
+    readStream,
   }
 }
