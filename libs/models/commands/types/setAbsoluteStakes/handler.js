@@ -35,7 +35,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       // console.log('newstakes',newStakes,'total',total,'available',available)
 
       try{
-        validateStakes(newStakes,total.toString())
+        // validateStakes(newStakes,total.toString())
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
         console.log(err)
