@@ -5,7 +5,7 @@ const lodash = require('lodash')
 const Promise = require('bluebird')
 
 const Socket = require('../../socket')
-const SocketClient = require('../../socket/client')
+const SocketClient = require('../../socket/client/socket')
 const Engines = require('./engines')
 const Actions = require('./actions')
 const Handlers = require('./handlers')
