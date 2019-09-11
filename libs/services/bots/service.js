@@ -32,15 +32,20 @@ module.exports = async config =>{
   const provider = new ethers.providers.JsonRpcProvider(config.ethers.provider.url)
   provider.on('error',console.log)
 
-  const socket = await SocketClient(config.bots['2100'].host)
+  const apiConfig = {
+    host:config.bots['2100'].host,
+    channels:['public','private','admin','auth','system' ]
+  }
+  const adminActions = await SocketClient(apiConfig)
   const wallet = new ethers.Wallet(config.signer.privateKey,provider)
+
   //system wallet nonce
   let nonce = undefined
-  const adminActions = {
-    admin : socket('admin'),
-    system : socket('system'),
-    auth : socket('auth'),
-  }
+  // const adminActions = {
+  //   admin : socket('admin'),
+  //   system : socket('system'),
+  //   auth : socket('auth'),
+  // }
 
   // const [controller,fakedai] = contracts.map(contract=>{
   //   return new ethers.Contract(contract.networks[config.chainid].address,contract.abi,wallet)
@@ -51,13 +56,17 @@ module.exports = async config =>{
   await adminActions.system.call('setAdmin',{userid:config.systemAddress,isAdmin:true})
 
   function updateState(channel,state){
-    return (...args)=>{
-      // console.log(channel,...args)
-      if(args[0].length){
-        lodash.set(state[channel],...args)
-      }else{
-        state[channel] = args[1]
-      }
+    return (events)=>{
+      console.log(channel,events)
+      events.forEach(([path,data])=>{
+        console.log('updatestate',{channel,path,data})
+        if(path.length){
+          lodash.set(state[channel],path,data)
+        }else{
+          state[channel] = data
+        }
+      })
+      // console.log(state[channel])
     }
   }
 
@@ -76,12 +85,13 @@ module.exports = async config =>{
     const [controller,fakedai] = contracts.map(contract=>{
       return new ethers.Contract(contract.networks[config.chainid].address,contract.abi,wallet)
     })
-    const socket = await SocketClient(config.bots['2100'].host)
-    const actions =  {
-      public: socket('public',updateState('public',server)),
-      private: socket('private',updateState('private',server)),
-      auth:socket('auth'),
-    }
+    const actions = await SocketClient(apiConfig,server)
+    // const socket = await SocketClient(config.bots['2100'].host)
+    // const actions =  {
+    //   public: socket('public',updateState('public',server)),
+    //   private: socket('private',updateState('private',server)),
+    //   auth:socket('auth'),
+    // }
 
     tokenid = await initAuth(actions.auth,wallet)
 
@@ -91,7 +101,7 @@ module.exports = async config =>{
       fakedai,
       wallet,
       tokenName,
-      socket,
+      // socket,
       actions,
       adminActions,
       numstakes:config.bots.numstakes,

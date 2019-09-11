@@ -8,62 +8,10 @@ module.exports = (config,libs)=>{
     const {privateKey} = config
     return {
       async Start(state){
-        // await state.actions.auth.call('authenticate',undefined,state.wallet.address.toLowerCase())
         // return 'Unstake'
         return 'Wait Deposit'
+        // return 'Start'
       },
-      async 'Wait Deposit'(state){
-      },
-      // async 'Check Eth'(state){
-      //   const balance = await state.wallet.getBalance()
-      //   state.log('mybalance',balance.toString())
-      //   if(balance.gt(0)){
-      //     return 'ChooseAction'
-      //   }
-      //   const systbalance = await wallet.getBalance()
-      //   const seed = ethers.utils.parseEther('0.0001')
-      //   state.log('system balance',systbalance.toString())
-      //   if(balance.gte(seed)){
-      //     throw new Error('you need a system account with some eth')
-      //   }
-
-      //   const tx = await wallet.sendTransaction({
-      //     to:state.wallet.address,
-      //     value:seed,
-      //     nonce,
-      //   })
-      //   await tx.wait()
-      //   nonce = nonce || tx.nonce
-      //   nonce ++
-      //   return 'Approve'
-         
-      // },
-      // async Approve(state){
-      //   const approve = await state.fakedai.approve(controller.address,ethers.utils.bigNumberify(2).pow(256).sub(1),{ gasLimit:2e6, gasPrice:1 }) 
-      //   state.log(approve)
-      //   await approve.wait().then(x=>{
-      //     state.log('approved')
-      //   }).catch(err=>{
-      //     state.log(err.message)
-      //   })
-      //   return 'ChooseAction'
-      // },
-      // async Log(state){
-      //   state.log(state.server.private)
-      // },
-      // async Faucet(state){
-      //   const primary = await state.fakedai.balanceOf(state.wallet.address)
-      //   const systembal = await state.fakedai.balanceOf(config.systemAddress)
-      //   const available = state.server.private.myWallets.available[state.server.public.primaryToken] || 0
-      //   const faucet = ethers.utils.parseEther(config.bots.faucet)
-      //   state.log({primary:primary.toString(),available,systembal:systembal.toString(),faucet:faucet.toString()})
-      //   const tx = await fakedai.transfer(state.wallet.address,faucet,{nonce})
-      //   state.log(tx)
-      //   await tx.wait()
-      //   nonce = nonce || tx.nonce
-      //   nonce ++
-      //   return 'ChooseAction'
-      // },
       async ChooseAction(state){
         // const primaryBalance = await fakedai.balanceOf(state.wallet.address)
         // state.log('balance',state.server.public)
@@ -71,19 +19,6 @@ module.exports = (config,libs)=>{
         // state.log(state.server.public)
         const available = ethers.utils.bigNumberify(balance)
         state.log({available:available.toString()})
-        // const approved = await fakedai.allowance(state.wallet.address,controller.address)
-        // state.log({approved:approved.toString()})
-        // if(approved.eq(0)){
-        //   return 'Approve'
-        // }
-
-        // if(primaryBalance.eq(0) && available.eq('0')){
-        //   return 'Faucet'
-        // }
-        // if(primaryBalance.gt(0) && available.eq('0')){
-        //   state.log('primary balance',primaryBalance.toString())
-        //   return 'Deposit'
-        // }
         if(available.gt(0)){
           return 'Check My Token'
         }
@@ -95,34 +30,8 @@ module.exports = (config,libs)=>{
         if(lodash.size(myTokens)){
           return 'Check Stakes'
         }
-        // if(state.couponSubmitted){
-        //   return 'Check My Token'
-        // }
-        // const pending = state.server.public.tokens.pending[state.tokenName]
-
-        // if(pending){
-        //   return 'Confirm My Token'
-        // }
-
         return 'Create My Token'
       },
-      // async 'Confirm My Token'(state){
-      //   const coupon = lodash.find(state.server.public.coupons.create,{name:state.tokenName})
-      //   if(!coupon) return 'Check My Token'
-      //   state.log('coupon',coupon)
-      //   const result = await state.controller.create(
-      //     coupon.data.symbol,
-      //     coupon.data.messageId,
-      //     coupon.data.v,
-      //     coupon.data.r,
-      //     coupon.data.s,
-      //     { gasLimit:2e6, gasPrice:1 }
-      //   )
-      //   state.log('tx',result)
-      //   await result.wait().catch(err=>state.log(err.message))
-      //   state.couponSubmitted = true
-      //   return 'Check My Token'
-      // },
       async 'Create My Token'(state){
         return state.adminActions.admin.call('createTokenByName',{name:state.tokenName,ownerAddress:state.wallet.address.toLowerCase(),creatorAddress:state.wallet.address.toLowerCase()}).then(x=>{
           state.log(x)

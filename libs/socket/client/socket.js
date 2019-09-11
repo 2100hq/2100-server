@@ -3,7 +3,7 @@ const assert = require('assert')
 module.exports = async (host,emit=x=>x) => {
   assert(host,'requires socket host address')
   const socket = io(host)
-  
+
   const events = ['connect','error','connect_error','connect_timeout','reconnect','reconnect_error','reconnect_failed']
   events.forEach(name=>{
     socket.on(name,(...args)=>emit(name,...args))
@@ -19,7 +19,9 @@ module.exports = async (host,emit=x=>x) => {
 
   return (channel,cb) => {
 
-    if(cb) socket.on(channel,cb)
+    if(cb){ 
+      socket.on(channel,cb)
+    }
 
     function call(action,...args){
       return new Promise((res,rej)=>{
@@ -30,6 +32,7 @@ module.exports = async (host,emit=x=>x) => {
       })
     }
 
+
     function listen(cb){
       socket.on(channel,cb)
     }
@@ -39,4 +42,3 @@ module.exports = async (host,emit=x=>x) => {
     }
   }
 }
-

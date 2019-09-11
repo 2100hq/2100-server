@@ -24,6 +24,10 @@ module.exports = async (config, libs,emit=x=>x) => {
 
   io.listen(config.socket.port)
 
+  const userStreams = new Map()
+  const publicStream = highland()
+  const adminStream = highland()
+
   io.on('connection', socket => {
 
     emit('connect',socket.id)
@@ -34,8 +38,9 @@ module.exports = async (config, libs,emit=x=>x) => {
 
     // console.log('socket online',socket.id)
     query.publicState().then( state=>{
-      console.log('public state',socket.id)
-      io.emit('public',[],state)
+      // console.log('public state',state)
+      // publicStream.write([[],state])
+      socket.emit('public',[[[],state]])
     }).catch(err=>{
       console.log('error getting public state',err)
     })
@@ -94,6 +99,51 @@ module.exports = async (config, libs,emit=x=>x) => {
     })
   })
 
+
+  function getUserStream(userid,io){
+    if(userStreams.has(userid)) return userStreams.get(userid)
+    const stream = highland()
+
+    stream
+      // .doto(args=>console.log(...args))
+      .batchWithTimeOrCount(100,500)
+      .errors((err,push)=>{
+        console.log(err)
+        process.exit(1)
+      })
+      .each(batch=>{
+        // console.log('private',userid,batch)
+        io.to(userid).emit('private',batch)
+      })
+
+    userStreams.set(userid,stream)
+    return stream
+  }
+
+
+  publicStream
+    .batchWithTimeOrCount(100,500)
+    .errors((err,push)=>{
+      console.log(err)
+      process.exit(1)
+    })
+    .each(batch=>{
+      // console.log('public',batch)
+      io.emit('public',batch)
+    })
+    
+
+  adminStream
+    .batchWithTimeOrCount(100,500)
+    .errors((err,push)=>{
+      console.log(err)
+      process.exit(1)
+    })
+    .each(batch=>{
+      console.log('admin',batch.length)
+      io.to('admin').emit('admin',batch)
+    })
+
   return {
     leave(sessionid,channel){
       assert(io.sockets.connected[sessionid],'session not connected')
@@ -112,13 +162,15 @@ module.exports = async (config, libs,emit=x=>x) => {
       }))
     },
     private(userid,...args){
-      io.to(userid).emit('private',...args)
+      getUserStream(userid,io).write(args)
     },
     public(...args){
-      io.emit('public',...args)
+      publicStream.write(args)
+      // io.emit('public',...args)
     },
     admin(...args){
-      io.to('admin').emit('admin',...args)
+      adminStream.write(args)
+      // io.to('admin').emit('admin',...args)
     },
   }
 }

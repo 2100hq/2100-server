@@ -14,7 +14,7 @@ exports.regexTwitter = /^[a-z0-9_]{1,15}$/
 
 //validate stakes ad up to 1 or less and that they are positive
 exports.validateStakes = (stakes,max=1,min=0)=>{
-  console.log('validate stakes',stakes,max,min)
+  // console.log('validate stakes',stakes,max,min)
   assert(lodash.size(stakes) > 0,'Requires at least 1 stake')
   assert(lodash.every(lodash.values(stakes),lodash.isString),'Stakes must be denoted as numerical strings')
   assert(bn.sum(...lodash.values(stakes)).isLessThanOrEqualTo(max),'Stakes exceed available balance')
