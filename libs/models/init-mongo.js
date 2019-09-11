@@ -35,17 +35,17 @@ module.exports = async (config={},{con},emit)=>{
     tokens:{
       active:Tokens.Model(
         config.tokens,
-        await Tokens.Mongo({table:'active_tokens'},con),
+        await Tokens.Memtable(config, await Tokens.Mongo({table:'active_tokens'},con)),
         (...args)=>emit('tokens.active',...args)
       ),
       pending:Tokens.Model(
         {...config.tokens,type:'Pending'},
-        await Tokens.Mongo({table:'pending_tokens'},con),
+        await Tokens.Memtable(config, await Tokens.Mongo({table:'pending_tokens'},con)),
         (...args)=>emit('tokens.pending',...args)
       ),          
       disabled:Tokens.Model(
         config.tokens,
-        await Tokens.Mongo({table:'disabled_tokens'},con),
+        await Tokens.Memtable(config, await Tokens.Mongo({table:'disabled_tokens'},con)),
         (...args)=>emit('tokens.disabled',...args)
       )          
     },

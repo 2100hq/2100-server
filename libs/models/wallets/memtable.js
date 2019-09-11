@@ -3,8 +3,8 @@ module.exports = async (config, table, emit=x=>x) =>{
 
   const cache = Memtable({
     indexes:[
-      {name:'tokenid',requried:true,unique:false,index:'tokenid'},
-      {name:'userid',requried:true,unique:false,index:'userid'},
+      {name:'tokenid',required:true,unique:false,index:'tokenid'},
+      {name:'userid',required:true,unique:false,index:'userid'},
     ],
   })
 
