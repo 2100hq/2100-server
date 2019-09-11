@@ -11,8 +11,7 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function set(props) {
     const result = validate(defaults(props))
-    //disable saving stats for now
-    // await table.set(result.id,result)
+    await table.set(result.id,result)
     emit('change',result)
     return result
   }
