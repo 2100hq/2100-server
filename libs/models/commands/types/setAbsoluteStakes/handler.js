@@ -25,26 +25,33 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       console.timeEnd(querytimer)
 
       console.time(processtime)
-      const total = bn.sum(...stakes.map(x=>x.balance),0)
-      const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
+      // const total = bn.sum(...stakes.filter(x=>x.balance != '0').map(x=>x.balance),0)
+      // const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
 
       // console.log({stakes})
       //convert array of stakes to [tokenid]:balance object
-      const currentStakes = stakes.reduce((result,wallet)=>{
-        if(wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase()) return result
-        result[wallet.tokenid] = wallet.balance
-        return result
-      },{})
+      const {total,currentStakes,newStakes,newStakeTotal} = stakes.reduce(({total,currentStakes,newStakes,newStakeTotal},wallet)=>{
+        if(wallet.balance != '0'){
+          total = total.plus(wallet.balance)
+        }
+        if(wallet.tokenid.toLowerCase() != config.primaryToken.toLowerCase()){
+          currentStakes[wallet.tokenid] = wallet.balance
+          newStakes[wallet.tokenid] = cmd.stakes[wallet.tokenid] || wallet.balance || '0'
+          newStakeTotal = newStakeTotal.plus(newStakes[wallet.tokenid])
+        }
 
-      //new stakes but we need to adjust the primary token balance
-      const newStakes = {
-        ...currentStakes,
-        ...cmd.stakes
-      }
+        return {total,currentStakes,newStakes,newStakeTotal}
+      },{total:bn(0),currentStakes:{},newStakes:{},newStakeTotal:bn(0)})
+
+      ////new stakes but we need to adjust the primary token balance
+      //const newStakes = {
+      //  ...currentStakes,
+      //  ...cmd.stakes
+      //}
       // console.log('newstakes',newStakes,'total',total,'available',available,'currentStakes',currentStakes)
 
       try{
-        validateStakes(newStakes,total.toString())
+        validateStakes(newStakes,total)
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
         console.timeEnd(processtime)
@@ -53,8 +60,8 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       }
 
       //this gives us the total staked minus primary token, which will need to change
-      const newStakeTotal = bn.sum(...lodash.values(newStakes))
-      newStakes[config.primaryToken.toLowerCase()] = bn(total).minus(newStakeTotal).toString()
+      // const newStakeTotal = bn.sum(...lodash.values(newStakes))
+      newStakes[config.primaryToken.toLowerCase()] = total.minus(newStakeTotal).toString()
 
       const diff = diffStakes(currentStakes,newStakes)
       console.timeEnd(processtime)
