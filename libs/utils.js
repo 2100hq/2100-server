@@ -17,7 +17,7 @@ exports.validateStakes = (stakes,max=1,min=0)=>{
   // console.log('validate stakes',stakes,max,min)
   assert(lodash.size(stakes) > 0,'Requires at least 1 stake')
   assert(lodash.every(lodash.values(stakes),lodash.isString),'Stakes must be denoted as numerical strings')
-  assert(bn.sum(...lodash.values(stakes)).isLessThanOrEqualTo(max),'Stakes exceed available balance')
+  // assert(bn.sum(...lodash.values(stakes)).isLessThanOrEqualTo(max),'Stakes exceed available balance')
   assert(lodash.every(stakes,value=>bn(value).isInteger()),'Stakes must be an integer')
   assert(lodash.every(stakes,value=>bn(value).isGreaterThanOrEqualTo(min)),'Stakes must be 0 or greater')
   return stakes

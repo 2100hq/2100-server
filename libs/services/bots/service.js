@@ -33,7 +33,7 @@ module.exports = async config =>{
   provider.on('error',console.log)
 
   const apiConfig = {
-    host:config.bots['2100'].host,
+    host:config.bots.host,
     channels:['public','private','admin','auth','system' ]
   }
   const adminActions = await SocketClient(apiConfig)
@@ -120,7 +120,7 @@ module.exports = async config =>{
   assert(count > 0,'must specify at least one bot')
   let bots = await Promise.mapSeries(lodash.times(count),index=>{
     index = index + config.bots.start
-    return initBot({host:config['2100'].host,mnemonic:config.bots.mnemonic,index})
+    return initBot({host:config.bots.host,mnemonic:config.bots.mnemonic,index})
   })
 
 

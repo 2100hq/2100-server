@@ -121,17 +121,44 @@ module.exports = (config,libs)=>{
         total = total.add(0,...Object.values(stakes))
 
         const newStakes = {}
-        tokens.reduce((result,token)=>{
-          const {minimumStake} = token
-          if(total.lt(minimumStake)) return result
-          const size = ethers.utils.bigNumberify(minimumStake).mul(parseInt(Math.random() * 10))
-          result[token.id] = size.toString()
-          total = total.sub(size)
-          return result
-        },newStakes)
-        const cmd = await state.actions.private.call('stakeAll',newStakes)
-        state.log(cmd)
-        return 'Check Stakes'
+        for( let [key,value] of Object.entries(stakes)){
+          // console.log(state.server.public)
+          if(value == '0') break
+          if(state.server.public.config.primaryToken == key) break
+          state.log('existing stake',key,value)
+          newStakes[key] = '0'
+        }
+
+        lodash.times(parseInt(config.bots.numstakes),i=>{
+          const selection = lodash.sample(tokens)
+          // console.log('selection',selection)
+          if(state.server.public.config.primaryToken === selection.id) return
+          const {minimumStake} = selection
+          if(total.lt(minimumStake)) return 
+          newStakes[selection.id] = ethers.utils.bigNumberify(newStakes[selection.id] || 0).add(minimumStake).toString()
+          total = total.sub(newStakes[selection.id])
+        })
+
+        // tokens.reduce((result,token)=>{
+        //   const {minimumStake} = token
+        //   if(total.lt(minimumStake)) return result
+        //   const size = ethers.utils.bigNumberify(minimumStake).mul(parseInt(Math.random() * 10))
+        //   result[token.id] = size.toString()
+        //   total = total.sub(size)
+        //   return result
+        // },newStakes)
+        state.log('setting stakes',newStakes)
+        if(Object.keys(newStakes).length){
+          const cmd = await state.actions.private.call('stakeAll',newStakes).catch(err=>{
+            console.log(err)
+          })
+          state.log(cmd)
+        }
+        if(parseInt(config.bots.numstakes) >= 1){
+          return 'Check Stakes'
+        }else{
+          return 'End'
+        }
       },
       async 'Wait Unstake'(state){
         if(state.unstakeTime == null){
@@ -155,6 +182,7 @@ module.exports = (config,libs)=>{
       async 'Check Stakes'(state){
         const available = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
         const stakes = lodash.get(state.server.private,'myStakes',{})
+        // state.log('stakes',stakes)
         if(!state.iterations) state.iterations = 0
         state.iterations ++
         if(ethers.utils.bigNumberify(available).gt(0) && lodash.size(stakes) === 0){
@@ -162,7 +190,8 @@ module.exports = (config,libs)=>{
           // return 'Fixed Stakes'
         }
         if(lodash.size(stakes)){
-          state.unstakeTime = moment().add(parseInt((Math.random() * 5)),'seconds').valueOf()
+          state.unstakeTime = moment().add(parseInt((Math.random() * parseInt(config.bots.stakeretry))),'ms').valueOf()
+          // state.log('unstake time',state.unstakeTime,config.bots)
           return 'Wait Randomize Stakes'
           // return 'Fixed Stakes'
         }

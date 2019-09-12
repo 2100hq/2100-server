@@ -52,6 +52,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
 
       try{
         validateStakes(newStakes,total)
+        assert(newStakeTotal.isLessThanOrEqualTo(total),'Stakes exceed available balance')
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
         console.timeEnd(processtime)

@@ -25,7 +25,7 @@ module.exports = (config,{handlers,commands})=>{
       //needs read/writes to staking and dai wallet per token
       case 'rebalanceStakes':
       case 'setAbsoluteStakes':{
-        const stream = getOrCreateStream('primaryToken')
+        const stream = getOrCreateStream(cmd.userid)
         stream.write(cmd)
         break
       }
