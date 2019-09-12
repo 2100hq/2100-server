@@ -35,20 +35,20 @@ module.exports = (config,{commands,getWallets,tokens})=>{
           total = total.plus(wallet.balance)
         }
         if(wallet.tokenid.toLowerCase() != config.primaryToken.toLowerCase()){
-          currentStakes[wallet.tokenid] = wallet.balance
+          currentStakes[wallet.tokenid] = wallet.balance || '0'
           newStakes[wallet.tokenid] = cmd.stakes[wallet.tokenid] || wallet.balance || '0'
           newStakeTotal = newStakeTotal.plus(newStakes[wallet.tokenid])
         }
 
         return {total,currentStakes,newStakes,newStakeTotal}
-      },{total:bn(0),currentStakes:{},newStakes:{},newStakeTotal:bn(0)})
+      },{total:bn(0),currentStakes:{},newStakes:cmd.stakes,newStakeTotal:bn(0)})
 
       ////new stakes but we need to adjust the primary token balance
       //const newStakes = {
       //  ...currentStakes,
       //  ...cmd.stakes
       //}
-      // console.log('newstakes',newStakes,'total',total,'available',available,'currentStakes',currentStakes)
+      // console.log('newstakes',newStakes,'total',total,'currentStakes',currentStakes)
 
       try{
         validateStakes(newStakes,total)
