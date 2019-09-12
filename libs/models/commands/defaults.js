@@ -4,7 +4,9 @@ module.exports = config =>{
   return props => {
     return {
       id: id(),
+      created:Date.now(),
       ...props,
+      updated:Date.now(),
     }
   }
 }

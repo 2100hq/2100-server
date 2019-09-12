@@ -99,6 +99,10 @@ module.exports = async (config, libs,emit=x=>x) => {
         })
     })
   })
+  let {batch=500,batchTime=500} = config
+
+  batch = parseInt(batch)
+  batchTime= parseInt(batchTime)
 
 
   function getUserStream(userid,io){
@@ -107,7 +111,7 @@ module.exports = async (config, libs,emit=x=>x) => {
 
     stream
       // .doto(args=>console.log(...args))
-      .batchWithTimeOrCount(50,500)
+      .batchWithTimeOrCount(batchTime,batch)
       .errors((err,push)=>{
         console.log(err)
         process.exit(1)
@@ -123,7 +127,7 @@ module.exports = async (config, libs,emit=x=>x) => {
 
 
   publicStream
-    .batchWithTimeOrCount(50,500)
+    .batchWithTimeOrCount(batchTime,batch)
     .errors((err,push)=>{
       console.log(err)
       process.exit(1)
@@ -135,7 +139,7 @@ module.exports = async (config, libs,emit=x=>x) => {
     
 
   adminStream
-    .batchWithTimeOrCount(50,500)
+    .batchWithTimeOrCount(batchTime,batch)
     .errors((err,push)=>{
       console.log(err)
       process.exit(1)

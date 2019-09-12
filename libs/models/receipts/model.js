@@ -20,26 +20,32 @@ module.exports = (config,table,emit=x=>x) => {
     return props
   }
 
-  async function getOrCreate(id,visited){
-    if(await table.has(id)){
-      return table.get(id)
-    }else{
-      return create({
-        id,visited
-      })
-    }
+  async function createAll(many=[]){
+    many = many.map(item=>validate(defaults(item)))
+    await table.insert(many)
+    many.forEach(x=>emit('change',x))
+    return many
   }
 
-  async function mark(id,visited=true){
-    return getOrCreate(id,visited)
-  }
+  // async function getOrCreate(id,visited){
+  //   if(await table.has(id)){
+  //     return table.get(id)
+  //   }else{
+  //     return create({
+  //       id,visited
+  //     })
+  //   }
+  // }
+
+  // async function mark(id,visited=true){
+  //   return getOrCreate(id,visited)
+  // }
 
   return {
     ...table,
     create,
-    getOrCreate,
+    createAll,
     set,
-    mark,
   }
 }
 

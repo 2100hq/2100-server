@@ -1,8 +1,9 @@
 const assert = require('assert')
 const Promise = require('bluebird')
 const bn = require('bignumber.js')
-module.exports = (config,{commands,getWallets,tokens,blocks})=>{
+module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
   assert(commands,'requires commands')
+  assert(receipts,'requires receipts')
   assert(getWallets,'requires wallets')
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires tokens.active')
@@ -48,36 +49,53 @@ module.exports = (config,{commands,getWallets,tokens,blocks})=>{
 
       await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString())
 
-      const receipts = await Promise.map(allowedStakes,async stake=>{
+      const r = await Promise.map(allowedStakes,async stake=>{
         const amount=bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
         const userWallet = await getWallets('available').getOrCreate(stake.userid,cmd.tokenid)
         await getWallets('available').deposit(stake.userid,cmd.tokenid,amount)
         // console.log('processing stake',stake.id)
-        const receipt = await commands.format('transferStakeReward',{
+        return {
+          type:'transferStakeReward',
           tokenid:cmd.tokenid,
           userid:stake.userid,
           blockNumber:block.number,
+          created:Date.now(),
           done:true,
           amount,
-        })
+        }
+        // const receipt = await commands.format('transferStakeReward',{
+        //   tokenid:cmd.tokenid,
+        //   userid:stake.userid,
+        //   blockNumber:block.number,
+        //   done:true,
+        //   amount,
+        // })
         // console.log(receipt)
         return receipt
       })
 
-      if(receipts.length){
+      if(r.length){
         const userWallet = await getWallets('available').getOrCreate(cmd.ownerAddress,cmd.tokenid)
         await getWallets('available').deposit(cmd.ownerAddress,cmd.tokenid,ownerReward.toString())
-        const ownerReceipt = await commands.format('transferOwnerReward',{
+        // const ownerReceipt = await commands.format('transferOwnerReward',{
+          // tokenid:cmd.tokenid,
+          // userid:cmd.ownerAddress,
+          // blockNumber:block.number,
+          // amount:ownerReward.toString(),
+          // done:true,
+        // })
+        const ownerReceipt = {
+          type:'transferOwnerReward',
           tokenid:cmd.tokenid,
           userid:cmd.ownerAddress,
           blockNumber:block.number,
           amount:ownerReward.toString(),
           done:true,
-        })
-        receipts.push(ownerReceipt)
+        }
+        r.push(ownerReceipt)
       }
 
-      await commands.createAll(receipts)
+      await receipts.createAll(r)
       //const receipts = await Promise.map(allowedStakes,async stake=>{
       //  // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
       //  const command = await commands.createType('transferStakeReward',{
