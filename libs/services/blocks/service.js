@@ -26,6 +26,8 @@ module.exports = async config =>{
   // config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
   assert(config.primaryToken,'requires primary token address or symbol')
 
+  config.skipBlocks = parseInt(config.skipBlocks || 0)
+
   config.contracts = contracts.map((json)=>{
     assert(json.contractName,'contract abi requires contractName')
     assert(json.networks,'contract abi requires networks')

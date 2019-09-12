@@ -1,5 +1,6 @@
 const assert = require('assert')
 const Promise = require('bluebird')
+const bn = require('bignumber.js')
 
 module.exports = (config,{commands,eventlogs})=>{
   assert(config.confirmations,'requires confirmations count')
@@ -49,7 +50,7 @@ module.exports = (config,{commands,eventlogs})=>{
     RewardStakers(event){
       return commands.format('generateStakeRewards',{
         blockNumber:event.blockNumber,
-        ...event.values
+        ...event.values,
       })
     },
     Owner(event){

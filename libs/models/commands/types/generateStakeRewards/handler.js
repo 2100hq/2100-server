@@ -121,7 +121,8 @@ module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
 
       // await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString())
 
-       return commands.success(cmd.id,'Rewards Generated',{})
+      // console.log('generated rewards',cmd.reward)
+      return commands.success(cmd.id,'Rewards Generated',{})
     },
   }
 }

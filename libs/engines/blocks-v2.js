@@ -2,6 +2,7 @@ const lodash = require('lodash')
 const assert = require('assert')
 const Promise = require('bluebird')
 const highland = require('highland')
+const bn = require('bignumber.js')
 
 const {stringifyValues} = require('../utils')
 
@@ -21,6 +22,11 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
     // console.log('active',activeTokens)
     //should also probably filter unstaked tokens but maybe later
     const rewards = await Promise.map(activeTokens,(token,index)=>{
+        let reward = bn(token.reward)
+        // console.log('skip blocks',config.skipBlocks,reward.toString())
+        if(config.skipBlocks > 0){
+          reward = reward.multipliedBy(config.skipBlocks)
+        }
       // console.log(block.number,{index,startIndex},contract.contractAddress)
       return eventlogs.format({
         blockHash:block.hash,
@@ -39,7 +45,7 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
           minimumStake:token.minimumStake || '1',
           ownerShare:token.ownerShare,
           ownerAddress:token.ownerAddress,
-          reward:token.reward,
+          reward:reward.toString(),
         }
       })
 
@@ -120,8 +126,12 @@ module.exports = (config,{eventlogs,ethers,tokens})=>{
     if(disableBlockRewards) return events
     // console.log('generating rewards')
     //hope contract 0 is 2100 controller contract
-    const rewards = await processStakeRewards(block,contracts[0],events.length)
-    events.push(...rewards)
+    // console.log('blocks',block.number,((block.number%config.skipBlocks) === 0),config.skipBlocks)
+    if(config.skipBlocks === 0 || ((block.number%config.skipBlocks) === 0)){
+      console.log('stake rewards',block.number)
+      const rewards = await processStakeRewards(block,contracts[0],events.length)
+      events.push(...rewards)
+    }
     return events
 
   }

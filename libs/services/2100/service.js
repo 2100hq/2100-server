@@ -37,6 +37,7 @@ module.exports = async (config)=>{
   assert(config.confirmations,'requires confirmations')
 
   config.primaryToken = config.primaryToken || ControllerContract.networks[config.chainid].address
+  config.skipBlocks = parseInt(config.skipBlocks || 0)
 
   assert(config.primaryToken,'requires primary token address or symbol')
 
