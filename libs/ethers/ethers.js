@@ -3,7 +3,7 @@ const lodash = require('lodash')
 const assert = require('assert')
 
 module.exports = async (config,libs,emit=x=>x) => {
-  assert(config.provider.type,'requires provider type')
+  // assert(config.provider.type,'requires provider type')
 
 
   // console.log({defaultStartBlock})
