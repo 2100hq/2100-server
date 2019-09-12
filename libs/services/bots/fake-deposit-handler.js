@@ -158,16 +158,16 @@ module.exports = (config,libs)=>{
         if(!state.iterations) state.iterations = 0
         state.iterations ++
         if(ethers.utils.bigNumberify(available).gt(0) && lodash.size(stakes) === 0){
-          // return 'Randomize Stakes'
-          return 'Fixed Stakes'
+          return 'Randomize Stakes'
+          // return 'Fixed Stakes'
         }
         if(lodash.size(stakes)){
           state.unstakeTime = moment().add(parseInt((Math.random() * 5)),'seconds').valueOf()
-          // return 'Wait Randomize Stakes'
-          return 'Fixed Stakes'
+          return 'Wait Randomize Stakes'
+          // return 'Fixed Stakes'
         }
-        // return 'Wait Randomize Stakes'
-        return 'ChooseAction'
+        return 'Wait Randomize Stakes'
+        // return 'ChooseAction'
       },
       End(){
         return 'End'

@@ -16,12 +16,12 @@ module.exports = (config,{handlers,commands})=>{
   // },1000)
 
   stream
-    .doto(x=>console.time(['command',x.type,x.id].join('.')))
+    // .doto(x=>console.time(['command',x.type,x.id].join('.')))
     // .doto(x=>bench.start())
     .map(runToDone)
     .flatMap(highland)
     // .doto(x=>bench.end())
-    .doto(x=>console.timeEnd(['command',x.type,x.id].join('.')))
+    // .doto(x=>console.timeEnd(['command',x.type,x.id].join('.')))
     .errors((err,next)=>{
       console.log('command stream error',err)
       process.exit(1)

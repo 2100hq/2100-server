@@ -16,7 +16,15 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       return commands.setState(cmd.id,'Set Stakes')
     },
     async 'Set Stakes'(cmd){
+      const processtime = [cmd.id,cmd.type,'processtime'].join('.')
+      const querytimer = [cmd.id,cmd.type,'querytime'].join('.')
+      const writetimer = [cmd.id,cmd.type,'writetime'].join('.')
+
+      console.time(querytimer)
       const stakes = await getWallets('stakes').getByUser(cmd.userid)
+      console.timeEnd(querytimer)
+
+      console.time(processtime)
       const total = bn.sum(...stakes.map(x=>x.balance),0)
       const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
 
@@ -39,6 +47,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
         validateStakes(newStakes,total.toString())
         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
       }catch(err){
+        console.timeEnd(processtime)
         console.log(err)
         return commands.failure(cmd.id,err.message)
       }
@@ -48,11 +57,13 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       newStakes[config.primaryToken.toLowerCase()] = bn(total).minus(newStakeTotal).toString()
 
       const diff = diffStakes(currentStakes,newStakes)
+      console.timeEnd(processtime)
       // console.log({currentStakes,newStakes,diff})
 
       // console.log({newStakes})
       // console.log('newstakes',newStakeTotal.toString())
 
+      console.time(writetimer)
       //throw here for now so we can see if this causes any problems by crashing
       //in future we can add the commented out code below to reset state
       await Promise.map(lodash.entries(diff),async ([tokenid,balance])=>{
@@ -72,7 +83,9 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //  })
       //}
 
-      return commands.success(cmd.id,'Stakes Updated',{newStakes})
+      const result = await commands.success(cmd.id,'Stakes Updated',{newStakes})
+      console.timeEnd(writetimer)
+      return result
     },
   }
 }
