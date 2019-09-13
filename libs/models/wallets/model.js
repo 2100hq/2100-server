@@ -70,9 +70,9 @@ module.exports = function(config,table,emit=x=>x) {
     const wallet = await get(userid,tokenid)
     amount = bn(amount)
     if(allowFloats){
-      assert(amount.isFinite(), 'amount required to be a number!')
+      assert(amount.isFinite(), 'amount required to be a number: ' + amount)
     }else{
-      assert(amount.isInteger(), 'amount required to be a number!')
+      assert(amount.isInteger(), 'amount required to be an integer: ' + amount)
     }
     // going to allow balances to be negative for now....
     assert(amount.gte(0), 'balance must be 0 or greater')

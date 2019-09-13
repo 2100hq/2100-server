@@ -1,5 +1,6 @@
 const test = require('tape')
 const utils = require('../libs/utils')
+const ethers = require('ethers')
 
 test('utils',t=>{
   t.test('regexAddress',t=>{
@@ -33,4 +34,14 @@ test('utils',t=>{
     t.ok(result)
     t.end()
   })
+
+  t.test('string to int',t=>{
+    let amount = '10000000000000'
+    const num = utils.stringToInt(amount)
+    const val = utils.intToString(num)
+    console.log({amount,num,val,len:amount.length})
+    t.equal(amount,val)
+    t.end()
+  })
+
 })

@@ -6,6 +6,7 @@ const bn = require('bignumber.js')
 const axios = require('axios')
 const cheerio = require('cheerio')
 const URL = require('url');
+const ethers = require('ethers')
 
 exports.regexAddress = /^0x[a-f0-9]+$/
 exports.regexLowerNum = /^[a-z0-9]+$/
@@ -17,9 +18,31 @@ exports.validateStakes = (stakes,max=1,min=0)=>{
   // console.log('validate stakes',stakes,max,min)
   assert(lodash.size(stakes) > 0,'Requires at least 1 stake')
   assert(lodash.every(lodash.values(stakes),lodash.isString),'Stakes must be denoted as numerical strings')
-  // assert(bn.sum(...lodash.values(stakes)).isLessThanOrEqualTo(max),'Stakes exceed available balance')
+  assert(bn.sum(...lodash.values(stakes)).isLessThanOrEqualTo(max),'Stakes exceed available balance')
   assert(lodash.every(stakes,value=>bn(value).isInteger()),'Stakes must be an integer')
   assert(lodash.every(stakes,value=>bn(value).isGreaterThanOrEqualTo(min)),'Stakes must be 0 or greater')
+  return stakes
+}
+
+exports.stringToInt = (val,mul=100000)=>{
+  // console.log('stringtoint',val)
+  if(val === '0') return 0
+  if(val) return parseInt(parseFloat(ethers.utils.formatEther(val)) * mul)
+  // if(val) return parseInt(val.slice(0,length))
+}
+
+exports.intToString = (val,div=100000) =>{
+
+  if(val === 0) return '0'
+  if(val) return ethers.utils.parseEther((val/div).toString()).toString()
+  // if(val) return pad(val.toString(),decimals,'0')
+}
+
+exports.validateStakesInt = (stakes,max=1,min=0)=>{
+  stakes = Object.values(stakes)
+  assert(stakes.length > 0,'Requires at least 1 stake')
+  assert(lodash.every(stakes,lodash.isFinite),'Stakes must be denoted as numbers')
+  assert(lodash.every(stakes,value=>value>=min),'Stakes must be 0 or greater')
   return stakes
 }
 
@@ -143,7 +166,7 @@ exports.stakeid = (userid,tokenid) =>{
 }
 
 exports.blockid = (number)=>{
-  return pad(16,number,'0')
+  return pad(number,16,'0')
 }
 exports.eventid = (address,number,index)=>{
   assert(address,'requires contract address')

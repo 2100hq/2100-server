@@ -4,7 +4,7 @@ const Promise = require('bluebird')
 const bn = require('bignumber.js')
 //should be run in the transaction queue
 //like anything which reads or writes wallets
-const {validateStakes,diffStakes} = require('../../../../utils')
+const {validateStakes,validateStakesInt,diffStakes,stringToInt,intToString} = require('../../../../utils')
 module.exports = (config,{commands,getWallets,tokens})=>{
   assert(commands,'requires commands table')
   assert(getWallets,'requires getWallets function')
@@ -29,40 +29,75 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       // const available = stakes.find(wallet=>wallet.tokenid.toLowerCase() === config.primaryToken.toLowerCase())
 
       // console.log({stakes})
+      // console.log('newstakes',lodash.mapValues(cmd.stakes,value=>{
+      //   console.log('value',stringToInt(value))
+      //   return stringToInt(value)
+      // }))
       //convert array of stakes to [tokenid]:balance object
       const {total,currentStakes,newStakes,newStakeTotal} = stakes.reduce(({total,currentStakes,newStakes,newStakeTotal},wallet)=>{
-        if(wallet.balance != '0'){
-          total = total.plus(wallet.balance)
-        }
+        const balance = stringToInt(wallet.balance)
+
+        // console.log({newStakes})
+        total = total + balance
+
         if(wallet.tokenid.toLowerCase() != config.primaryToken.toLowerCase()){
-          currentStakes[wallet.tokenid] = wallet.balance || '0'
-          newStakes[wallet.tokenid] = cmd.stakes[wallet.tokenid] || wallet.balance || '0'
-          newStakeTotal = newStakeTotal.plus(newStakes[wallet.tokenid])
+          currentStakes[wallet.tokenid] = balance
+          if(newStakes[wallet.tokenid] === undefined){
+            newStakes[wallet.tokenid] = balance || 0
+          }
+          // console.log({newStakes})
+          newStakeTotal = newStakeTotal + newStakes[wallet.tokenid]
         }
+        // console.log({balance,total,newStakes,currentStakes,newStakeTotal})
 
         return {total,currentStakes,newStakes,newStakeTotal}
-      },{total:bn(0),currentStakes:{},newStakes:cmd.stakes,newStakeTotal:bn(0)})
+      },{total:0,currentStakes:{},newStakes:lodash.mapValues(cmd.stakes,val=>stringToInt(val)),newStakeTotal:0})
+
+      // const {total,currentStakes,newStakes,newStakeTotal} = stakes.reduce(({total,currentStakes,newStakes,newStakeTotal},wallet)=>{
+      //   if(wallet.balance != '0'){
+      //     total = total.plus(wallet.balance)
+      //   }
+
+      //   if(wallet.tokenid.toLowerCase() != config.primaryToken.toLowerCase()){
+      //     currentStakes[wallet.tokenid] = wallet.balance || '0'
+      //     newStakes[wallet.tokenid] = cmd.stakes[wallet.tokenid] || wallet.balance || '0'
+      //     newStakeTotal = newStakeTotal.plus(newStakes[wallet.tokenid])
+      //   }
+
+      //   return {total,currentStakes,newStakes,newStakeTotal}
+      // },{total:bn(0),currentStakes:{},newStakes:cmd.stakes,newStakeTotal:bn(0)})
 
       ////new stakes but we need to adjust the primary token balance
       //const newStakes = {
       //  ...currentStakes,
       //  ...cmd.stakes
       //}
-      // console.log('newstakes',newStakes,'total',total,'currentStakes',currentStakes)
+      // console.log({total,currentStakes,newStakes,newStakeTotal})
 
-      try{
-        validateStakes(newStakes,total)
-        assert(newStakeTotal.isLessThanOrEqualTo(total),'Stakes exceed available balance')
-        assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
-      }catch(err){
-        console.timeEnd(processtime)
-        console.log(err)
-        return commands.failure(cmd.id,err.message)
-      }
+       try{
+         validateStakesInt(newStakes,total)
+         assert(newStakeTotal <= total,'Stakes exceed available balance')
+         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
+       }catch(err){
+         console.timeEnd(processtime)
+         console.log(err)
+         return commands.failure(cmd.id,err.message)
+       }
+      
+//       try{
+//         validateStakesInt(newStakes,total)
+//         assert(newStakeTotal.isLessThanOrEqualTo(total),'Stakes exceed available balance')
+//         assert(await tokens.active.hasAll(lodash.keys(newStakes)),'Unable to stake on a token that is not active')
+//       }catch(err){
+//         console.timeEnd(processtime)
+//         console.log(err)
+//         return commands.failure(cmd.id,err.message)
+//       }
 
       //this gives us the total staked minus primary token, which will need to change
       // const newStakeTotal = bn.sum(...lodash.values(newStakes))
-      newStakes[config.primaryToken.toLowerCase()] = total.minus(newStakeTotal).toString()
+      // newStakes[config.primaryToken.toLowerCase()] = total.minus(newStakeTotal).toString()
+      newStakes[config.primaryToken.toLowerCase()] = total - newStakeTotal
 
       const diff = diffStakes(currentStakes,newStakes)
       console.timeEnd(processtime)
@@ -76,6 +111,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //in future we can add the commented out code below to reset state
       await Promise.map(lodash.entries(diff),async ([tokenid,balance])=>{
         //make sure wallet exists
+        balance = intToString(balance)
         // console.log('tokenid',tokenid,'balance',balance)
         await getWallets('stakes').getOrCreate(cmd.userid,tokenid)
         return getWallets('stakes').setBalance(cmd.userid,tokenid,balance)
