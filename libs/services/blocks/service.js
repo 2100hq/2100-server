@@ -80,7 +80,10 @@ module.exports = async config =>{
       if(await libs.blocks.has(data)) return 
       // console.log('latest',data)
       const block = await libs.ethers.getBlock(data)
-      await libs.blocks.create(block)
+      await libs.blocks.create({
+        number:block.number,
+        hash:block.hash,
+      })
     })
     .flatMap(highland)
     .errors(err=>{
