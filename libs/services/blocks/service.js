@@ -117,7 +117,7 @@ module.exports = async config =>{
         return (!(await libs.eventlogs.has(log.id)))
       })
       //batch insert
-      // console.log('inerting events',filtered.length)
+      console.log('inerting events',filtered.length)
       await libs.eventlogs.insert(filtered)
       await libs.blocks.setDone(block.id)
       done()
