@@ -50,25 +50,25 @@ module.exports = (config,libs,emit=x=>x) =>{
     //   return libs.stats.stakes.latest.set({id:data.tokenid,stats})
     // }
     if(table == 'blocks'){
-      // // console.log('new block',data)
-      // const stats = await libs.stats.stakes.latest.list()
-      // // console.log('got stats',stats)
-      // const summed = await Promise.map(stats,async stat=>{
-      //   const total = bn.sum(...Object.values(stat.stats))
-      //   return {
-      //     total:total.toString(),
-      //     stakers:lodash.mapValues(stat.stats,(value,userid)=>{
-      //       return bn(value).dividedBy(total).toString()
-      //     }),
-      //     id:stat.id,
-      //   }
-      // })
-      // const ordered = lodash.orderBy(summed,['total','created'],['desc','asc'])
+      // console.log('new block',data)
+      const stats = await libs.stats.stakes.latest.list()
+      // console.log('got stats',stats)
+      const summed = await Promise.map(stats,async stat=>{
+        const total = bn.sum(...Object.values(stat.stats))
+        return {
+          total:total.toString(),
+          stakers:lodash.mapValues(stat.stats,(value,userid)=>{
+            return bn(value).dividedBy(total).toString()
+          }),
+          id:stat.id,
+        }
+      })
+      const ordered = lodash.orderBy(summed,['total','created'],['desc','asc'])
 
-      // await Promise.map(ordered,({total,stakers,id},index)=>{
-      //   // console.log('stats history',{id,total})
-      //   return libs.stats.stakes.history.set({id:[id,data.number].join('!'),stats:{id,total,stakers,rank:index}})
-      // })
+      await Promise.map(ordered,({total,stakers,id},index)=>{
+        // console.log('stats history',{id,total})
+        return libs.stats.stakes.history.set({id:[id,data.number].join('!'),stats:{id,total,stakers,rank:index}})
+      })
       await globalStats()
       if(data) await globalStatsHistory(data)
     }
