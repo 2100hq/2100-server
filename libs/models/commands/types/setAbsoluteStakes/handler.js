@@ -20,9 +20,9 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       const querytimer = [cmd.id,cmd.type,'querytime'].join('.')
       const writetimer = [cmd.id,cmd.type,'writetime'].join('.')
 
-      console.time(querytimer)
+      // console.time(querytimer)
       const stakes = await getWallets('stakes').getByUser(cmd.userid)
-      console.timeEnd(querytimer)
+      // console.timeEnd(querytimer)
 
       console.time(processtime)
       // const total = bn.sum(...stakes.filter(x=>x.balance != '0').map(x=>x.balance),0)
@@ -106,7 +106,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       // console.log({newStakes})
       // console.log('newstakes',newStakeTotal.toString())
 
-      console.time(writetimer)
+      // console.time(writetimer)
       //throw here for now so we can see if this causes any problems by crashing
       //in future we can add the commented out code below to reset state
       await Promise.map(lodash.entries(diff),async ([tokenid,balance])=>{
@@ -128,7 +128,7 @@ module.exports = (config,{commands,getWallets,tokens})=>{
       //}
 
       const result = await commands.success(cmd.id,'Stakes Updated',{newStakes})
-      console.timeEnd(writetimer)
+      // console.timeEnd(writetimer)
       return result
     },
   }

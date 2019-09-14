@@ -182,7 +182,7 @@ module.exports = (config,libs)=>{
   }
 
   async function globalStats(){
-    return libs.stats.global.latest.get('latest')
+    return ( await libs.stats.global.latest.get('latest')).stats
   }
 
   async function globalHistoryStats(start,end){
@@ -251,6 +251,11 @@ module.exports = (config,libs)=>{
       },
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
+      },
+      stats:{
+        global:{
+          latest:await globalStats()
+        },
       },
       config:{
         primaryToken:config.primaryToken,

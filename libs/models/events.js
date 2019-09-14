@@ -54,6 +54,9 @@ module.exports = (config,libs,emit)=>{
   }
 
   async function publicEvent([table,method,data]){
+    if(table == 'stats.global.latest'){
+      emit('public',['stats','global','latest',],data.stats)
+    }
     if(table == 'stats.stakes.latest'){
       // console.log('stats.stakes.latest',table,method,data)
       emit('public',['stakes',data.id],data.stats)

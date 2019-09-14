@@ -117,12 +117,12 @@ module.exports = (config,libs)=>{
         const available = lodash.get(state.server.private,['myWallets','available',state.server.public.config.primaryToken,'balance'],'0')
         const stakes = lodash.get(state.server.private,'myStakes',{})
         let total = ethers.utils.bigNumberify(available)
-        console.log({stakes})
+        // console.log({stakes})
         total = total.add(0,...Object.values(stakes))
 
         const newStakes = {}
         for( let [key,value] of Object.entries(stakes)){
-          console.log('checking existing stakes',key,value)
+          // console.log('checking existing stakes',key,value)
           if(value == '0') break
           if(state.server.public.config.primaryToken == key) break
           state.log('existing stake',key,value)
