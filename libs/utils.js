@@ -166,7 +166,7 @@ exports.stakeid = (userid,tokenid) =>{
 }
 
 exports.blockid = (number)=>{
-  return pad(number,16,'0')
+  return pad(number.toString(),16,'0')
 }
 exports.eventid = (address,number,index)=>{
   assert(address,'requires contract address')

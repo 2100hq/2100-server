@@ -80,6 +80,7 @@ module.exports = async config =>{
       if(await libs.blocks.has(data)) return 
       // console.log('latest',data)
       const block = await libs.ethers.getBlock(data)
+      // console.log('blockstream block',{number:block.number,hash:block.hash})
       await libs.blocks.create({
         number:block.number,
         hash:block.hash,
@@ -87,7 +88,7 @@ module.exports = async config =>{
     })
     .flatMap(highland)
     .errors(err=>{
-      console.log('eth event error',err)
+      console.log('blockstream event',err)
       process.exit(1)
     })
     .resume()
