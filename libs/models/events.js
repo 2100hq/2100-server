@@ -61,6 +61,10 @@ module.exports = (config,libs,emit)=>{
       // console.log('stats.stakes.latest',table,method,data)
       emit('public',['stakes',data.id],data.stats)
     }
+    if(table == 'stats.earned.latest'){
+      // console.log('stats.earned.latest',table,method,data)
+      emit('public',['stats','earned','latest',data.id],data.stats)
+    }
     if(table.includes('wallets')){
       return 
     }
