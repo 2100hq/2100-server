@@ -44,11 +44,12 @@ module.exports = (config,libs,emit=x=>x) =>{
       // console.log('wallets.stakes',{stats,data})
       return libs.stats.stakes.latest.set({id:data.tokenid,stats})
     }
-    // if(table == 'wallets.available'){
-    //   const stats = await libs.query.detailedStakes(data.tokenid)
-    //   // console.log({stats,data})
-    //   return libs.stats.stakes.latest.set({id:data.tokenid,stats})
-    // }
+    if(table == 'wallets.available'){
+      // console.log({stats,data})
+      const stats = await libs.stats.earned.latest.get(data.tokenid)
+      stats.stats[data.userid] = data.balance
+      return libs.stats.earned.latest.set({id:data.tokenid,stats:stats.stats})
+    }
     if(table == 'blocks'){
       // console.log('new block',data)
       const stats = await libs.stats.stakes.latest.list()
@@ -76,10 +77,15 @@ module.exports = (config,libs,emit=x=>x) =>{
 
   async function init(){
     const stats = await libs.query.allStakesDetailed()
-    // console.log(libs.stats.stakes)
+    const balances = await libs.query.allAvailableBalances()
     await Promise.map(Object.entries(stats),([key,stats])=>{
       return libs.stats.stakes.latest.set({id:key,stats})
     })
+
+    await Promise.map(Object.entries(balances),([key,stats])=>{
+      return libs.stats.earned.latest.set({id:key,stats})
+    })
+
     return globalStats()
   }
 

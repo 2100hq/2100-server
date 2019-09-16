@@ -139,6 +139,15 @@ module.exports = (config,libs)=>{
     return (await libs.getWallets('available').get(userid,tokenid)).balance
   }
 
+  async function allAvailableBalances(){
+    const wallets = libs.getWallets('available')
+    return (await wallets.list()).reduce((result,wallet)=>{
+      if(result[wallet.tokenid] == null) result[wallet.tokenid] = {}
+      result[wallet.tokenid][wallet.userid] = wallet.balance
+      return result
+    },{})
+  }
+
   async function getUser(userid){
     assert(userid,'requires user id')
     const user = await libs.users.get(userid)
@@ -185,6 +194,14 @@ module.exports = (config,libs)=>{
 
   async function globalStats(){
     return ( await libs.stats.global.latest.get('latest')).stats
+  }
+  async function earnedStats(){
+    const all = await libs.stats.earned.latest.list()
+
+    return all.reduce((result,stats)=>{
+      result[stats.id] = stats.stats
+      return result
+    },{})
   }
 
   async function globalHistoryStats(start,end){
@@ -258,6 +275,9 @@ module.exports = (config,libs)=>{
         global:{
           latest:await globalStats()
         },
+        earned:{
+          latest:await earnedStats()
+        },
       },
       config:{
         primaryToken:config.primaryToken,
@@ -306,5 +326,6 @@ module.exports = (config,libs)=>{
     globalStats,
     globalHistoryStats,
     userRewardHistory,
+    allAvailableBalances,
   }
 }
