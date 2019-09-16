@@ -116,12 +116,10 @@ module.exports = async config =>{
     .map(async ([block,done])=>{
       const logs = await libs.engines.blocks.getEvents(block)
 
-      // console.log('inerting events',logs.length)
       const filtered = await Promise.filter(logs,async log=>{
         return (!(await libs.eventlogs.has(log.id)))
       })
       //batch insert
-      console.log('inerting events',filtered.length)
       await libs.eventlogs.insert(filtered)
       await libs.blocks.setDone(block.id)
       done()

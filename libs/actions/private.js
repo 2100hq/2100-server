@@ -16,8 +16,12 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       return user
     }
 
-    function myCommandHistory({start=0,length=50}){
+    function myCommandHistory({start=0,length=50}={}){
       return query.userCommandHistory(user.id,start,length)
+    }
+
+    function myRewardHistory({start=0,length=50}={}){
+      return query.userRewardHistory(user.id,start,length)
     }
 
     function state(){
@@ -87,6 +91,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
     return {
       me,
       myCommandHistory,
+      myRewardHistory,
       state,
       stake,
       stakeAll,

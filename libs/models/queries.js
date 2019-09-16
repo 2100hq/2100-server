@@ -159,7 +159,9 @@ module.exports = (config,libs)=>{
   async function userCommandHistory(userid,start=0,length){
     return libs.commands.getUserDone(userid,true,start,length)
   }
-
+  async function userRewardHistory(userid,start=0,length){
+    return libs.receipts.getUserDone(userid,true,start,length)
+  }
 
   async function listCreateCoupons(){
     return libs.coupons.create.list()
@@ -303,5 +305,6 @@ module.exports = (config,libs)=>{
     stakeHistoryStats,
     globalStats,
     globalHistoryStats,
+    userRewardHistory,
   }
 }

@@ -140,7 +140,7 @@ module.exports = async (config)=>{
         const [socketid,userid] = args
         await libs.socket.join(socketid,userid)
         const user = await libs.users.getOrCreate(userid)
-        await libs.socket.private(userid,[],await libs.query.privateState(userid))
+        await libs.socket.private(userid,[],await libs.query.privateState(userid),socketid)
         if(!user.claimed){
           await libs.actions.private(user,'claimFakeDai')
         }

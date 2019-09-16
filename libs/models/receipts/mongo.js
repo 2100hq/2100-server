@@ -2,17 +2,19 @@ const assert = require('assert')
 const Table = require('../../mongo/table')
 const highland = require('highland')
 
-module.exports = async (config, con) => {
+module.exports = async (config={}, con) => {
   assert(config.table, 'requires table name')
 
   const schema = {
-    table: config.table,
     indices:['userid'],
-    capped:true,
-    size:4294967296,
+    ...config,
   }
 
   const table = await Table(con, schema)
+
+  function getUserDone(userid,done=false,start=0,length,desc=true){
+    return table.getBy({userid,done},{skip:start,limit:length})
+  }
 
   async function readStream(done=false){
     return highland(await table.getBy({done}))
@@ -30,6 +32,7 @@ module.exports = async (config, con) => {
   return {
     ...table,
     readStream,
+    getUserDone,
     insert,
   }
 

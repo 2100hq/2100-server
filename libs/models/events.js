@@ -18,8 +18,8 @@ module.exports = (config,libs,emit)=>{
     // console.log(table,method,data)
     switch(table){
       case 'commands':{
-        if(data.type == 'transferStakeReward') return
-        if(data.type == 'transferOwnerReward') return
+        // if(data.type == 'transferStakeReward') return
+        // if(data.type == 'transferOwnerReward') return
         if(data.done){
           emit('private',data.userid,['myCommandHistory',data.id],data)
         }
