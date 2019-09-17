@@ -76,7 +76,7 @@ module.exports = async (config={},{con},emit)=>{
     stats:{
       stakes:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes.latest',...args)) ,
-        history:Stats.Model(config,await Stats.Mongo({capped:true,size:1073741824,table:'stats_stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
+        history:Stats.Model(config,await Stats.Mongo({/*capped:true,size:1073741824,*/table:'stats_stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
       },
       earned:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.earned.latest',...args)) ,
