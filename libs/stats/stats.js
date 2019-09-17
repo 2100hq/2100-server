@@ -16,7 +16,7 @@ module.exports = (config,libs,emit=x=>x) =>{
     const tokens = await libs.tokens.active.list()
     const userCount = await libs.users.count()
     const dai = await libs.wallets.available.list()
-    const totalDai = bn.sum(...dai.map(x=>x.balance)).toString()
+    const totalDai = bn.sum(...dai.map(x=>x.balance)).toString(10)
 
     const stats = await libs.stats.stakes.latest.list()
 
@@ -57,9 +57,9 @@ module.exports = (config,libs,emit=x=>x) =>{
       const summed = await Promise.map(stats,async stat=>{
         const total = bn.sum(...Object.values(stat.stats))
         return {
-          total:total.toString(),
+          total:total.toString(10),
           stakers:lodash.mapValues(stat.stats,(value,userid)=>{
-            return bn(value).dividedBy(total).toString()
+            return bn(value).dividedBy(total).toString(10)
           }),
           id:stat.id,
         }

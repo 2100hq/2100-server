@@ -47,10 +47,10 @@ module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
 
       const block = await blocks.latest()
 
-      await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString())
+      await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString(10))
 
       const r = await Promise.map(allowedStakes,async stake=>{
-        const amount=bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
+        const amount=bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString(10)
         const userWallet = await getWallets('available').getOrCreate(stake.userid,cmd.tokenid)
         await getWallets('available').deposit(stake.userid,cmd.tokenid,amount)
         // console.log('processing stake',stake.id)
@@ -76,7 +76,7 @@ module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
 
       if(r.length){
         const userWallet = await getWallets('available').getOrCreate(cmd.ownerAddress,cmd.tokenid)
-        await getWallets('available').deposit(cmd.ownerAddress,cmd.tokenid,ownerReward.toString())
+        await getWallets('available').deposit(cmd.ownerAddress,cmd.tokenid,ownerReward.toString(10))
         // const ownerReceipt = await commands.format('transferOwnerReward',{
           // tokenid:cmd.tokenid,
           // userid:cmd.ownerAddress,
@@ -89,39 +89,13 @@ module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
           tokenid:cmd.tokenid,
           userid:cmd.ownerAddress,
           blockNumber:block.number,
-          amount:ownerReward.toString(),
+          amount:ownerReward.toString(10),
           done:true,
         }
         r.push(ownerReceipt)
       }
 
       await receipts.createAll(r)
-      //const receipts = await Promise.map(allowedStakes,async stake=>{
-      //  // console.log(bn(stake.balance).dividedBy(total).times(publicReward).toString())
-      //  const command = await commands.createType('transferStakeReward',{
-      //    tokenid:cmd.tokenid,
-      //    userid:stake.userid,
-      //    blockNumber:block.number,
-      //    amount:bn(stake.balance).dividedBy(total).times(publicReward).integerValue(bn.ROUND_DOWN).toString()
-      //  })
-      //  return command.id
-      //})
-
-      ////apply owner reward only if there were stakes
-      //if(receipts.length){
-      //  const ownerReceipt = await commands.createType('transferOwnerReward',{
-      //    tokenid:cmd.tokenid,
-      //    userid:cmd.ownerAddress,
-      //    blockNumber:block.number,
-      //    amount:ownerReward.toString(),
-      //  })
-
-      //  receipts.push(ownerReceipt.id)
-      //}
-
-      // await getWallets('available').withdraw(cmd.tokenid,cmd.tokenid,reward.toString())
-
-      // console.log('generated rewards',cmd.reward)
       return commands.success(cmd.id,'Rewards Generated',{})
     },
   }

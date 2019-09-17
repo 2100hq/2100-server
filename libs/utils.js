@@ -8,6 +8,7 @@ const cheerio = require('cheerio')
 const URL = require('url');
 const ethers = require('ethers')
 
+exports.bn = bn
 exports.regexAddress = /^0x[a-f0-9]+$/
 exports.regexLowerNum = /^[a-z0-9]+$/
 exports.regexLowerUrl = /^[a-z0-9_-]+$/
