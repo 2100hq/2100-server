@@ -46,11 +46,9 @@ module.exports = (config,libs,emit=x=>x) =>{
     }
     if(table == 'wallets.available'){
       // console.log({stats,data})
-      const stats = await libs.stats.earned.latest.get(data.tokenid)
-      if(stats){
-        stats.stats[data.userid] = data.balance
-        return libs.stats.earned.latest.set({id:data.tokenid,stats:stats.stats})
-      }
+      const stats = (await libs.stats.earned.latest.get(data.tokenid)) || {stats:{}}
+      stats.stats[data.userid] = data.balance
+      return libs.stats.earned.latest.set({id:data.tokenid,stats:stats.stats})
     }
     if(table == 'blocks'){
       // console.log('new block',data)
