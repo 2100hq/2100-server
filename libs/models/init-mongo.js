@@ -83,7 +83,7 @@ module.exports = async (config={},{con},emit)=>{
       },
       global:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.global.latest',...args)) ,
-        history:Stats.Model(config,await Stats.Mongo({capped:true,size:1073741824,table:'stats_global_history'},con),(...args)=>emit('stats.global.history',...args)) 
+        history:Stats.Model(config,await Stats.Mongo({/*capped:true,size:1073741824,*/table:'stats_global_history'},con),(...args)=>emit('stats.global.history',...args)) 
     
       },
     }
