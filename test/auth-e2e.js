@@ -1,7 +1,7 @@
 require('dotenv').config()
 const test = require('tape')
 const config = require('../libs/parseEnv')(process.env)
-const Client = require('../libs/socket/client')
+const Client = require('../libs/socket/client/socket')
 
 //must be running auth server
 test('auth',t=>{

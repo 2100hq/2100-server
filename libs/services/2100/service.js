@@ -136,6 +136,13 @@ module.exports = async (config)=>{
   emitter.on('actions',async ([channel,type,...args])=>{
     if(channel !== 'auth') return
     try{
+      if(type === 'join'){
+        //args=sessionid, channel
+        await libs.socket.join(...args)
+        if(args[1] == 'stats'){
+          libs.socket.emit(args[0],'stats',[[[],await libs.query.statsState()]])
+        }
+      }
       if(type === 'login'){
         const [socketid,userid] = args
         await libs.socket.join(socketid,userid)
@@ -167,6 +174,7 @@ module.exports = async (config)=>{
     if(channel === 'connect') usercount++
     if(channel === 'disconnect') usercount--
     emitter.emit('models',['usercount','change',usercount])
+    console.log('online',usercount)
   })
 
   //take api events and write to socket channels

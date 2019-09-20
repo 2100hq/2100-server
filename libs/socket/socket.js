@@ -27,6 +27,7 @@ module.exports = async (config, libs,emit=x=>x) => {
   const userStreams = new Map()
   const publicStream = highland()
   const adminStream = highland()
+  const statsStream = highland()
 
   io.on('connection', socket => {
 
@@ -126,6 +127,17 @@ module.exports = async (config, libs,emit=x=>x) => {
   }
 
 
+  statsStream
+    .batchWithTimeOrCount(batchTime,batch)
+    .errors((err,push)=>{
+      console.log(err)
+      process.exit(1)
+    })
+    .each(batch=>{
+      // console.log('stats',batch)
+      io.to('stats').emit('stats',batch)
+    })
+
   publicStream
     .batchWithTimeOrCount(batchTime,batch)
     .errors((err,push)=>{
@@ -163,8 +175,15 @@ module.exports = async (config, libs,emit=x=>x) => {
       const socket = io.sockets.connected[sessionid]
       return new Promise((res,rej)=>socket.join(channel,err=>{
         if(err) return rej(err)
+        // console.log('joined',sessionid,channel)
         res()
       }))
+    },
+    emit(sessionid,channel,data){
+      assert(io.sockets.connected[sessionid],'session not connected')
+      const socket = io.sockets.connected[sessionid]
+      // console.log('emitting',sessionid,channel,data)
+      socket.emit(channel,data)
     },
     private(userid,...args){
       getUserStream(userid,io).write(args)
@@ -172,6 +191,9 @@ module.exports = async (config, libs,emit=x=>x) => {
     public(...args){
       publicStream.write(args)
       // io.emit('public',...args)
+    },
+    stats(...args){
+      statsStream.write(args) 
     },
     admin(...args){
       adminStream.write(args)

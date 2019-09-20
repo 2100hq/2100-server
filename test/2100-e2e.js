@@ -8,21 +8,21 @@ const ethers = require('ethers')
 //must be running auth server
 test('auth',t=>{
   let client,tokenid,actions,wallet,provider
+  let state = {}
   t.test('init',async t=>{
     provider = new ethers.providers.JsonRpcProvider(config.ethers.provider.url)
     wallet = new ethers.Wallet(config.test.privateKey,provider)
-    client = (await Client('ws://localhost:' + config.socket.port))
-    actions = {
-      private:client('private'),
-      public:client('public'),
-      auth:client('auth'),
-      admin:client('admin'),
-    }
+    actions = (await Client({host:'ws://localhost:' + config.socket.port,channels:['private','public','admin','auth','stats']},state))
+    // actions = {
+    //   private:client('private'),
+    //   public:client('public'),
+    //   auth:client('auth'),
+    //   admin:client('admin'),
+    // }
     t.ok(client)
     t.end()
   })
   t.test('token',async t=>{
-    console.log(actions.auth)
     tokenid = await actions.auth.call('token')
     console.log(tokenid)
     t.end()
@@ -31,7 +31,7 @@ test('auth',t=>{
     const signed = await wallet.signMessage('2100 Login: ' + tokenid) 
     const result = await actions.auth.call('authenticate',signed,wallet.address,tokenid)
     // const result = await actions.auth.call('authenticate',undefined,wallet.address)
-    t.ok(result.id)
+    // t.ok(result.id)
     t.end()
   })
   // t.test('validate',async t=>{
@@ -56,6 +56,16 @@ test('auth',t=>{
     }
     t.end()
   })
+  t.test('joinStats',async t=>{
+    const result = await actions.auth.call('joinStats')
+    t.end()
+  })
+  t.test('check stats',t=>{
+    setTimeout(x=>{
+      console.log('stas',state.stats)
+      t.end()
+    },100)
+  })
   // t.test('createActiveToken',async t=>{
   //   const me = await actions.private.call('me')
   //   const token = {
@@ -67,13 +77,13 @@ test('auth',t=>{
   //   console.log(result)
   //   t.end()
   // })
-  t.test('verifyTwitter',async t=>{
-    const me = await actions.private.call('me')
-    const link = 'https://twitter.com/Twenty1Hundr3d/status/1166746884872052736'
-    const result = await actions.private.call('verifyTwitter',link,'first').catch(t.end)
-    console.log(result)
-    t.end()
-  })
+  // t.test('verifyTwitter',async t=>{
+  //   const me = await actions.private.call('me')
+  //   const link = 'https://twitter.com/Twenty1Hundr3d/status/1166746884872052736'
+  //   const result = await actions.private.call('verifyTwitter',{link,description:'first'}).catch(t.end)
+  //   console.log(result)
+  //   t.end()
+  // })
   t.test('logout',async t=>{
     const result = await actions.auth.call('logout',tokenid)
     t.ok(result)

@@ -208,6 +208,17 @@ module.exports = (config,libs)=>{
     return libs.stats.global.history.between(start,end)
   }
 
+  async function statsState(){
+    return {
+      global:{
+        latest:await globalStats()
+      },
+      earned:{
+        latest:await earnedStats()
+      },
+    }
+  }
+
   async function privateState(userid){
     return {
       myWallets:{
@@ -271,14 +282,6 @@ module.exports = (config,libs)=>{
       coupons:{
         create:lodash.keyBy(await listCreateCoupons(),'id'),
       },
-      stats:{
-        global:{
-          latest:await globalStats()
-        },
-        earned:{
-          latest:await earnedStats()
-        },
-      },
       config:{
         primaryToken:config.primaryToken,
         disableAuth:config.disableAuth || false,
@@ -327,5 +330,6 @@ module.exports = (config,libs)=>{
     globalHistoryStats,
     userRewardHistory,
     allAvailableBalances,
+    statsState,
   }
 }
