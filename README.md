@@ -90,13 +90,15 @@ signer.privateKey=
 # public address of the system user, this is the first user who can create admins
 # it will be assigned when authenticated
 systemAddress=
+# Fake DAI that can be claimed
+claimAmount=1000000000000000000
 ```
 ## Auth Service ##
 This should run as a seperate application service. 
 
 ### Start
 First update env then
-`npm run start-auth` or `service=auth node start`
+`npm run auth` or `service=auth node start`
 
 ### ENV
 You can add this to the same env as 2100.
