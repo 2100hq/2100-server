@@ -12,7 +12,12 @@ test('auth',t=>{
   t.test('init',async t=>{
     provider = new ethers.providers.JsonRpcProvider(config.ethers.provider.url)
     wallet = new ethers.Wallet(config.test.privateKey,provider)
-    actions = (await Client({host:'ws://localhost:' + config.socket.port,channels:['private','public','admin','auth','stats']},state))
+    actions = (await Client({
+      host:'ws://localhost:' + config.socket.port,
+      channels:['private','public','admin','auth','stats']
+    },state,(channel,update,state)=>{
+      console.log(update.earned)
+    }))
     // actions = {
     //   private:client('private'),
     //   public:client('public'),
@@ -60,12 +65,12 @@ test('auth',t=>{
     const result = await actions.auth.call('joinStats')
     t.end()
   })
-  t.test('check stats',t=>{
-    setTimeout(x=>{
-      console.log('stas',state.stats)
-      t.end()
-    },100)
-  })
+  // t.test('check stats',t=>{
+    // setInterval(x=>{
+      // console.log('stas',state.stats.earned)
+      // t.end()
+    // },1000)
+  // })
   // t.test('createActiveToken',async t=>{
   //   const me = await actions.private.call('me')
   //   const token = {

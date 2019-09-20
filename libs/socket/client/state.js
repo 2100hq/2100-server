@@ -10,7 +10,7 @@ module.exports = (state,emit=x=>x) => (channel) => {
     }else{
       state[channel] = data
     }
-    emit(channel,state)
+    emit(channel,state[channel],state)
   }
 }
 
