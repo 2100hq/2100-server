@@ -141,9 +141,6 @@ module.exports = async (config)=>{
         await libs.socket.join(socketid,userid)
         const user = await libs.users.getOrCreate(userid)
         await libs.socket.private(userid,[],await libs.query.privateState(userid),socketid)
-        if(!user.claimed){
-          await libs.actions.private(user,'claimFakeDai')
-        }
         if(!user.publicAddress){
           await libs.users.setPublicAddress(user.id,userid)
         }

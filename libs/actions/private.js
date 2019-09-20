@@ -77,6 +77,9 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
       assert(!user.claimed,'You have already claimed your dai')
       const {claimAmount} = config
       assert(claimAmount,'Admin has not set a claim amount')
+      const owns = await tokens.active.getByOwner(user.id)
+      assert(owns.length,'You need to link a twitter account before claiming DAI')
+
       const cmd = await commands.createType('deposit',{
         toAddress:user.id,
         tokenid:config.primaryToken,
