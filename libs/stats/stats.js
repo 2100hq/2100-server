@@ -51,6 +51,8 @@ module.exports = (config,libs,emit=x=>x) =>{
       return libs.stats.earned.latest.set({id:data.tokenid,stats:stats.stats})
     }
     if(table == 'blocks'){
+      //empty blocks somehow
+      if(data == null) return
       // console.log('new block',data)
       const stats = await libs.stats.stakes.latest.list()
       // console.log('got stats',stats)
@@ -68,7 +70,10 @@ module.exports = (config,libs,emit=x=>x) =>{
 
       await Promise.map(ordered,({total,stakers,id},index)=>{
         // console.log('stats history',{id,total})
-        return libs.stats.stakes.history.set({id:[id,data.number].join('!'),stats:{id,total,stakers,rank:index}})
+        return libs.stats.stakes.history.set({
+          id:[id,data.number].join('!'),
+          stats:{id,total,stakers,rank:index}
+        })
       })
       await globalStats()
       if(data) await globalStatsHistory(data)

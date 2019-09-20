@@ -31,6 +31,8 @@ module.exports = (config,{commands,tokens,getWallets,coupons,blocks})=>{
       }
 
       const block = await blocks.latest()
+      //if block is empty crash and wait for at least 1 block to come in
+      assert(block,'latest block not found, make sure block listener is running and at least 1 block has come in')
 
       const token = await tokens.active.create({
         id:name,

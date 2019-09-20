@@ -9,7 +9,7 @@ module.exports = (config,libs)=>{
     return {
       async Start(state){
         // return 'Unstake'
-        return 'Wait Deposit'
+        return 'Check My Token'
         // return 'Start'
       },
       async ChooseAction(state){
@@ -28,7 +28,7 @@ module.exports = (config,libs)=>{
         const myTokens = state.server.private.myTokens
         console.log('myTokens',myTokens)
         if(lodash.size(myTokens)){
-          return 'Check Stakes'
+          return 'Claim Dai'
         }
         return 'Create My Token'
       },
@@ -39,6 +39,16 @@ module.exports = (config,libs)=>{
         }).catch(err=>{
           console.log(err.message)
           return 'Check My Token'
+        })
+      },
+      async 'Claim Dai'(state){
+        return state.actions.private.call('claimFakeDai')
+        .then(result=>{
+          return 'Check Stakes'
+        })
+        .catch(err=>{
+          console.log(err.message)
+          return 'Check Stakes'
         })
       },
       async Deposit(state){
