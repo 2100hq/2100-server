@@ -1,7 +1,7 @@
 const assert = require('assert')
 const lodash = require('lodash')
 const {validateStakes, validateTweet,tweetTemplates} = require('../utils')
-module.exports = (config,{query,getWallets,commands,tokens,blocks,users}) => {
+module.exports = (config,{query,getWallets,commands,tokens,blocks,users,socket}) => {
   assert(tokens,'requires tokens')
   assert(tokens.active,'requires active tokens')
   assert(getWallets,'requires tokens')

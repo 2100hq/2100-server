@@ -27,6 +27,10 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
       return users.getOrCreate(publicAddress)
   }
 
+  function joinStats(){
+    emit('join',socket.id,'stats')
+  }
+
   async function login(signed,publicAddress,tokenid=socket.tokenid){
     assert(auth,'auth server not enabled')
     assert(!socket.userid, 'you are already logged in')
@@ -106,5 +110,6 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     token,
     validate,
     user,
+    joinStats,
   }
 }

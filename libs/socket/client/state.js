@@ -1,6 +1,6 @@
 const lodash = require('lodash')
 module.exports = (state,emit=x=>x) => (channel) => {
-  return ([path,data])=>{
+  return ([path=[],data])=>{
     if(path.length){
       if(data===null){
         lodash.unset(state[channel],path)
