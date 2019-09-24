@@ -157,7 +157,7 @@ module.exports = async (config, libs,emit=x=>x) => {
       process.exit(1)
     })
     .each(batch=>{
-      console.log('admin',batch.length)
+      // console.log('admin',batch.length)
       io.to('admin').emit('admin',batch)
     })
 
@@ -175,14 +175,14 @@ module.exports = async (config, libs,emit=x=>x) => {
       const socket = io.sockets.connected[sessionid]
       return new Promise((res,rej)=>socket.join(channel,err=>{
         if(err) return rej(err)
-        console.log('joined',sessionid,channel)
+        // console.log('joined',sessionid,channel)
         res()
       }))
     },
     emit(sessionid,channel,...args){
       assert(io.sockets.connected[sessionid],'session not connected')
       const socket = io.sockets.connected[sessionid]
-      console.log('emitting',sessionid,channel,...args)
+      // console.log('emitting',sessionid,channel,...args)
       socket.emit(channel,...args)
     },
     private(userid,...args){
