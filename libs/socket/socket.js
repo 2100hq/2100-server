@@ -118,8 +118,8 @@ module.exports = async (config, libs,emit=x=>x) => {
         process.exit(1)
       })
       .each(batch=>{
-        // console.log('private',userid,batch)
-        io.to(userid).emit('private',batch)
+        // console.log('private',userid,batch.length)
+        io.to(userid.toLowerCase()).emit('private',batch)
       })
 
     userStreams.set(userid,stream)
@@ -175,18 +175,19 @@ module.exports = async (config, libs,emit=x=>x) => {
       const socket = io.sockets.connected[sessionid]
       return new Promise((res,rej)=>socket.join(channel,err=>{
         if(err) return rej(err)
-        // console.log('joined',sessionid,channel)
+        console.log('joined',sessionid,channel)
         res()
       }))
     },
-    emit(sessionid,channel,data){
+    emit(sessionid,channel,...args){
       assert(io.sockets.connected[sessionid],'session not connected')
       const socket = io.sockets.connected[sessionid]
-      // console.log('emitting',sessionid,channel,data)
-      socket.emit(channel,data)
+      console.log('emitting',sessionid,channel,...args)
+      socket.emit(channel,...args)
     },
     private(userid,...args){
-      getUserStream(userid,io).write(args)
+      // console.log('writing private',userid,...args)
+      getUserStream(userid.toLowerCase(),io).write(args)
     },
     public(...args){
       publicStream.write(args)

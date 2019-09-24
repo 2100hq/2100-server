@@ -16,20 +16,14 @@ test('auth',t=>{
       host:'ws://localhost:' + config.socket.port,
       channels:['private','public','admin','auth','stats']
     },state,(channel,update,state)=>{
-      console.log(update.earned)
+      // console.log(update.earned)
     }))
-    // actions = {
-    //   private:client('private'),
-    //   public:client('public'),
-    //   auth:client('auth'),
-    //   admin:client('admin'),
-    // }
-    t.ok(client)
+    t.ok(actions)
     t.end()
   })
   t.test('token',async t=>{
     tokenid = await actions.auth.call('token')
-    console.log(tokenid)
+    // console.log(tokenid)
     t.end()
   })
   t.test('authenticate',async t=>{
@@ -39,61 +33,80 @@ test('auth',t=>{
     // t.ok(result.id)
     t.end()
   })
-  // t.test('validate',async t=>{
-  //   const result = await actions.auth.call('validate',tokenid)
+  t.test('validate',async t=>{
+    const result = await actions.auth.call('validate',tokenid)
+    t.ok(result)
+    t.end()
+  })
+  t.test('private state',async t=>{
+    const result = await actions.private.call('state')
+    t.ok(result)
+    t.end()
+  })
+  // t.test('me',async t=>{
+  //   const result = await actions.private.call('me')
+  //   // console.log(result)
   //   t.ok(result)
   //   t.end()
   // })
-  t.test('me',async t=>{
-    const result = await actions.private.call('me')
-    console.log(result)
-    t.ok(result)
-    t.end()
-  })
-  t.test('setDescription',async t=>{
-    const state = await actions.private.call('state')
-    console.log(state.myTokens)
-    const token = Object.values(state.myTokens)[0]
-    if(token){
-      const result = await actions.private.call('setTokenDescription',token.id,'test')
-      console.log(result)
-      t.ok(result)
-    }
-    t.end()
-  })
+  // t.test('setDescription',async t=>{
+  //   const state = await actions.private.call('state')
+  //   // console.log(state.myTokens)
+  //   const token = Object.values(state.myTokens)[0]
+  //   if(token){
+  //     const result = await actions.private.call('setTokenDescription',token.id,'test')
+  //     // console.log(result)
+  //     t.ok(result)
+  //   }
+  //   t.end()
+  // })
   t.test('joinStats',async t=>{
     const result = await actions.auth.call('joinStats')
+    await actions.public.call('getStats')
     t.end()
   })
-  // t.test('check stats',t=>{
-    // setInterval(x=>{
-      // console.log('stas',state.stats.earned)
-      // t.end()
-    // },1000)
-  // })
-  // t.test('createActiveToken',async t=>{
-  //   const me = await actions.private.call('me')
-  //   const token = {
-  //     name:'test9',
-  //     creatorAddress:me.id,
-  //     ownerAddress:me.id,
-  //   }
-  //   const result = await actions.admin.call('createToken',token).catch(t.end)
+  // // t.test('check stats',t=>{
+  //   // setInterval(x=>{
+  //     // console.log('stas',state.stats.earned)
+  //     // t.end()
+  //   // },1000)
+  // // })
+  // // t.test('createActiveToken',async t=>{
+  // //   const me = await actions.private.call('me')
+  // //   const token = {
+  // //     name:'test9',
+  // //     creatorAddress:me.id,
+  // //     ownerAddress:me.id,
+  // //   }
+  // //   const result = await actions.admin.call('createToken',token).catch(t.end)
+  // //   console.log(result)
+  // //   t.end()
+  // // })
+  // // t.test('verifyTwitter',async t=>{
+  // //   const me = await actions.private.call('me')
+  // //   const link = 'https://twitter.com/Twenty1Hundr3d/status/1166746884872052736'
+  // //   const result = await actions.private.call('verifyTwitter',{link,description:'first'}).catch(t.end)
+  // //   console.log(result)
+  // //   t.end()
+  // // })
+  // t.test('dump',async t=>{
+  //   console.log(state.private.myWallets.available)
+  //   const tokens = Object.values(state.private.myWallets.available)
+  //   const token = tokens[1]
+  //   console.log({token})
+  //   const result = await actions.private.call('dump',token.tokenid,'1')
   //   console.log(result)
   //   t.end()
   // })
-  // t.test('verifyTwitter',async t=>{
-  //   const me = await actions.private.call('me')
-  //   const link = 'https://twitter.com/Twenty1Hundr3d/status/1166746884872052736'
-  //   const result = await actions.private.call('verifyTwitter',{link,description:'first'}).catch(t.end)
-  //   console.log(result)
-  //   t.end()
-  // })
-  t.test('logout',async t=>{
-    const result = await actions.auth.call('logout',tokenid)
-    t.ok(result)
+  t.test('stats',async t=>{
+    console.log(state.stats)
     t.end()
   })
+  // t.test('logout',async t=>{
+  //   const result = await actions.auth.call('logout',tokenid)
+  //   t.ok(result)
+  //   t.end()
+  // })
   // t.test('login',async t=>{
   //   const signed = await wallet.signMessage('2100 Login: ' + tokenid) 
   //   const result = await actions.auth.call('login',tokenid,signed,wallet.address).catch(t.ok)

@@ -44,6 +44,7 @@ module.exports = (config,{handlers,commands})=>{
       case 'transferOwnerReward': 
       case 'transferStakeReward': 
       case 'deposit': 
+      case 'dump': 
       case 'transferCreatorReward': {
         const stream = getOrCreateStream(cmd.tokenid)
         stream.write(cmd)

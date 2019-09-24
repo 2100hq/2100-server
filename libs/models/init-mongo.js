@@ -78,6 +78,10 @@ module.exports = async (config={},{con},emit)=>{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes.latest',...args)) ,
         history:Stats.Model(config,await Stats.Mongo({/*capped:true,size:1073741824,*/table:'stats_stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
       },
+      dumps:{
+        // latest:Stats.Model(config,Cache(),(...args)=>emit('stats.dumps.latest',...args)) ,
+        latest:Stats.Model(config,await Stats.Mongo({table:'stats_dumps_latest'},con),(...args)=>emit('stats.dumps.latest',...args)) ,
+      },
       earned:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.earned.latest',...args)) ,
       },

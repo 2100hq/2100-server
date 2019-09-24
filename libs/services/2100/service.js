@@ -95,6 +95,7 @@ module.exports = async (config)=>{
     'createTokenByTweet',    //user creating a token by tweet
     'createTokenByName',    //admin creating token by name
     'deposit',
+    'dump',
   ]
 
   libs.handlers = Handlers({...config,commandTypes},libs)
@@ -147,7 +148,7 @@ module.exports = async (config)=>{
         const [socketid,userid] = args
         await libs.socket.join(socketid,userid)
         const user = await libs.users.getOrCreate(userid)
-        await libs.socket.private(userid,[],await libs.query.privateState(userid),socketid)
+        await libs.socket.emit(socketid,'private',[[[],await libs.query.privateState(userid)]])
         if(!user.publicAddress){
           await libs.users.setPublicAddress(user.id,userid)
         }

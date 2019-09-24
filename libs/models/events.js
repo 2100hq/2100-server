@@ -54,12 +54,16 @@ module.exports = (config,libs,emit)=>{
   }
 
   async function publicEvent([table,method,data]){
-    if(table == 'stats.global.latest'){
-      emit('stats',['global','latest',],data.stats)
-    }
     if(table == 'stats.stakes.latest'){
       // console.log('stats.stakes.latest',table,method,data)
       emit('public',['stakes',data.id],data.stats)
+    }
+    if(table == 'stats.global.latest'){
+      emit('stats',['global','latest',],data.stats)
+    }
+    if(table == 'stats.dumps.latest'){
+      // console.log('stats.stakes.latest',table,method,data)
+      emit('stats',['dumps','latest',data.id],data.stats)
     }
     if(table == 'stats.earned.latest'){
       // console.log('stats.earned.latest',table,method,data)

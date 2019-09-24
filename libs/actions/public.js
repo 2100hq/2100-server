@@ -69,6 +69,9 @@ module.exports = (config,libs) => user =>{
     if(!blockEnd) blockEnd = block.number
     return libs.query.globalHistoryStats(blockStart.toString(),blockEnd.toString())
   }
+  function getStats(){
+    return libs.query.statsState()
+  }
 
   return {
     echo,
@@ -84,6 +87,7 @@ module.exports = (config,libs) => user =>{
     getAllStakeHistory,
     getGlobalStats,
     getGlobalHistoryStats,
+    getStats,
   }
 }
 

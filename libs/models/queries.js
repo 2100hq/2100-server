@@ -204,9 +204,19 @@ module.exports = (config,libs)=>{
     },{})
   }
 
+  async function dumpStats(){
+    const all = await libs.stats.dumps.latest.list()
+
+    return all.reduce((result,stats)=>{
+      result[stats.id] = stats.stats
+      return result
+    },{})
+  }
+
   async function globalHistoryStats(start,end){
     return libs.stats.global.history.between(start,end)
   }
+
 
   async function statsState(){
     return {
@@ -216,6 +226,9 @@ module.exports = (config,libs)=>{
       earned:{
         latest:await earnedStats()
       },
+      dumps:{
+        latest: await dumpStats()
+      }
     }
   }
 

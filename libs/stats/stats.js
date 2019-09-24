@@ -44,6 +44,15 @@ module.exports = (config,libs,emit=x=>x) =>{
       // console.log('wallets.stakes',{stats,data})
       return libs.stats.stakes.latest.set({id:data.tokenid,stats})
     }
+    if(table == 'commands'){
+      if(!data.done) return 
+      if(data.type === 'dump'){
+        const stats = (await libs.stats.dumps.latest.get(data.tokenid)) || {stats:{total:'0'}}
+        stats.stats.total = bn(stats.stats.total).plus(data.amount).toString(10)
+        console.log(stats)
+        return libs.stats.dumps.latest.set({id:data.tokenid,stats:stats.stats})
+      }
+    }
     if(table == 'wallets.available'){
       // console.log({stats,data})
       const stats = (await libs.stats.earned.latest.get(data.tokenid)) || {stats:{}}

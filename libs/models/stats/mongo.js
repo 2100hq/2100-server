@@ -14,7 +14,7 @@ module.exports = async (config, con) => {
   return {
     ...table,
     list(from=0){
-      return table.getBy({},{skip:from}).toArray()
+      return table.getBy({},{skip:from})
       // return table.run(table.table().orderBy('id').slice(from).coerceTo('array'))
     },
     between(start,end){

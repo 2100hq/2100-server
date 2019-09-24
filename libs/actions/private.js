@@ -28,6 +28,19 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users,socket})
       return query.privateState(user.id)
     }
 
+    async function dump(tokenid,amount){
+      assert(tokenid,'requires tokenid')
+      tokenid = tokenid.toLowerCase()
+      assert(tokenid !== config.primaryToken.toLowerCase(),'You cannot dump this token: ' + tokenid)
+      assert(amount,'requires amount')
+      await getWallets('available').canWithdraw(user.id,tokenid,amount)
+      return commands.createType('dump',{
+        userid:user.id,
+        tokenid:tokenid,
+        amount
+      })
+    }
+
     async function stakeAll(stakes){
       assert(await tokens.active.hasAll(lodash.keys(stakes)),'Unable to stake on a token that is not active')
       const {balance} = await getWallets('available').getOrCreate(user.id,config.primaryToken)
@@ -102,6 +115,7 @@ module.exports = (config,{query,getWallets,commands,tokens,blocks,users,socket})
       setTokenDescription,
       verifyTwitter,
       claimFakeDai,
+      dump,
     }
   }
 }
