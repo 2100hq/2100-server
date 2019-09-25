@@ -300,6 +300,10 @@ Private actions are scoped the the socket private channel and can only be called
 **setTokenDescription(tokenid:string,description='')**
 - set the description of a token you own. 
 
+**dump(tokenid:string,amount:string):command<dump>**
+This allows you to return any token you have earned back to the pool. Returns
+a dump command which you can check for completion. 
+
 ### Admin Actions
 Special routes only admins can call.
 
