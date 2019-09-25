@@ -171,6 +171,44 @@ listening to the private channel.
 }
 ```
 
+### Public Stats State
+This is an optional channel you can get various public statistics.
+These events are emitted on the `stats` channel. See below on how to join.
+
+```
+{
+  global:{
+    latest:{
+      tokenCount:number // number of twitter tokens in system
+      userCount:number //number of public addresses every logged in
+      totalDai:number //total dai available or staking
+      totalStaking:number // total amount of dai actively staking
+    }
+  },
+  earned:{
+    latest:{
+      [tokenid]:{  //object keyed by token id, which contains every users balance
+        [userid]:number  
+      }
+    }
+  },
+  dumps:{
+    latest:{
+      [tokenid]:{
+        total:number //the total amount dumped for this token of all time
+      }
+    }
+  }
+}
+```
+### Connecting to Stats Channel
+Stats are optional and require you call the api on the socket to manually connect yourself. 
+
+**auth.joinStats()**    
+
+This will conect you and start sending updates on the `stats` socket channel.
+
+
 ### Socket Event State Updates
 Once connected to the public or private channel, events will come in to update state in the form
 
@@ -195,7 +233,6 @@ like this:
 
   socket.on('public',events=>events.forEach(event=>updateState('public',event)))
 ```
-
 
 
 ### Public Actions

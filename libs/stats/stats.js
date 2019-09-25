@@ -49,7 +49,7 @@ module.exports = (config,libs,emit=x=>x) =>{
       if(data.type === 'dump'){
         const stats = (await libs.stats.dumps.latest.get(data.tokenid)) || {stats:{total:'0'}}
         stats.stats.total = bn(stats.stats.total).plus(data.amount).toString(10)
-        console.log(stats)
+        // console.log(stats)
         return libs.stats.dumps.latest.set({id:data.tokenid,stats:stats.stats})
       }
     }
