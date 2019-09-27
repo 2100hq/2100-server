@@ -40,5 +40,8 @@ module.exports = config =>{
     getByUser(userid){
       return [...map.values()].filter(x=>x.userid == userid)
     },
+    between(start,end){
+      return [...map.values()].filter(x=>x.id >= start && x.id < end)
+    }
   }
 }

@@ -54,6 +54,12 @@ module.exports = (config,libs,emit)=>{
   }
 
   async function publicEvent([table,method,data]){
+    if(table == 'commands'){
+      if(!data.done) return
+      if(data.type != 'generateStakeRewards') return
+      // console.log('publishing stats',await libs.query.getEarnedBlockStats(data.blockNumber,data.tokenid))
+      emit('stats',['earned','block',data.tokenid], await libs.query.getEarnedBlockStats(data.blockNumber,data.tokenid))
+    }
     if(table == 'stats.global.latest'){
       emit('stats',['global','latest',],data.stats)
     }

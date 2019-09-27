@@ -80,6 +80,7 @@ module.exports = async (config={},{con},emit)=>{
       },
       earned:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.earned.latest',...args)) ,
+        blocks:Stats.Model(config,Cache(),(...args)=>emit('stats.earned.block',...args)) ,
       },
       global:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.global.latest',...args)) ,

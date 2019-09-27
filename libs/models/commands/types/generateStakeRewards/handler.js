@@ -96,7 +96,7 @@ module.exports = (config,{commands,getWallets,tokens,blocks,receipts})=>{
       }
 
       await receipts.createAll(r)
-      return commands.success(cmd.id,'Rewards Generated',{})
+      return commands.success(cmd.id,'Rewards Generated',{blockNumber:block.number})
     },
   }
 }

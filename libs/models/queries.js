@@ -208,13 +208,31 @@ module.exports = (config,libs)=>{
     return libs.stats.global.history.between(start,end)
   }
 
+  async function getEarnedBlockStats(number,tokenid){
+    const id = [number.toString(),tokenid].join('!')
+    const result = await libs.stats.earned.blocks.get(id)
+    // console.log(id,result)
+    if(result) return result.stats
+    return null
+  }
+  async function getAllEarnedBlockStats(){
+    const latest = await libs.blocks.latest()
+    const number = parseInt(latest.number) - 1
+    const start = number.toString()
+    const end = number + '!~'
+    const result = await libs.stats.earned.blocks.between(start,end)
+    // console.log('getAllEarnedBlockStats',result,start,end)
+    return result.map(x=>x.stats)
+  }
+
   async function statsState(){
     return {
       global:{
         latest:await globalStats()
       },
       earned:{
-        latest:await earnedStats()
+        latest:await earnedStats(),
+        block:lodash.keyBy(await getAllEarnedBlockStats(),'tokenid')
       },
     }
   }
@@ -331,5 +349,7 @@ module.exports = (config,libs)=>{
     userRewardHistory,
     allAvailableBalances,
     statsState,
+    getEarnedBlockStats,
+    getAllEarnedBlockStats,
   }
 }

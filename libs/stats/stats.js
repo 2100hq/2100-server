@@ -39,6 +39,32 @@ module.exports = (config,libs,emit=x=>x) =>{
 
 
   async function write([table,method,data]){
+
+    if(table == 'commands'){
+      if(!data.done) return
+      if(data.type != 'transferStakeReward' && data.type != 'transferOwnerReward') return
+
+      const id = [data.blockNumber.toString(),data.tokenid].join('!')
+      // const id = data.tokenid
+
+      const def = {
+        id,
+        stats:{
+          tokenid:data.tokenid,
+          blockNumber:data.blockNumber,
+          users:{ }
+        }
+      }
+
+      const blockStats = (await libs.stats.earned.blocks.get(id)) || def
+
+      const earned = lodash.get(blockStats,['stats','users',data.userid],'0')
+      const updatedEarned = bn(earned).plus(data.amount)
+      lodash.set(blockStats,['stats','users',data.userid],updatedEarned.toString(10))
+      // lodash.set(blockStats,['stats','blockNumber'],data.blockNumber)
+      // console.log('blockstats',blockStats)
+      return libs.stats.earned.blocks.set(blockStats)
+    }
     if(table == 'wallets.stakes'){
       const stats = await libs.query.detailedStakes(data.tokenid)
       // console.log('wallets.stakes',{stats,data})
