@@ -56,13 +56,13 @@ module.exports = function(config,table,emit=x=>x) {
 
   async function deposit(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
-    const total = bn(wallet.balance).plus(amount).toString()
+    const total = bn(wallet.balance).plus(amount).toString(10)
     return setBalance(userid,tokenid, total)
   }
 
   async function withdraw(userid,tokenid, amount) {
     const wallet = await get(userid,tokenid)
-    const total = bn(wallet.balance).minus(amount).toString()
+    const total = bn(wallet.balance).minus(amount).toString(10)
     return setBalance(userid,tokenid, total)
   }
 
@@ -76,7 +76,7 @@ module.exports = function(config,table,emit=x=>x) {
     }
     // going to allow balances to be negative for now....
     assert(amount.gte(0), 'balance must be 0 or greater')
-    wallet.balance = amount.toString()
+    wallet.balance = amount.toString(10)
     return set(wallet)
   }
 

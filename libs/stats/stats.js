@@ -21,9 +21,9 @@ module.exports = (config,libs,emit=x=>x) =>{
     const stats = await libs.stats.stakes.latest.list()
 
     const totalStaking = stats.reduce((result,{stats})=>{
-      const total = bn.sum(...Object.values(stats))
+      const total = bn.sum('0',...Object.values(stats))
       return result.plus(total)
-    },bn(0)).toString()
+    },bn('0')).toString(10)
 
 
     return libs.stats.global.latest.set({
@@ -53,11 +53,16 @@ module.exports = (config,libs,emit=x=>x) =>{
     if(table == 'blocks'){
       //empty blocks somehow
       if(data == null) return
+      //if we are skipping blocks for rewards then syncronize that with stats
+      if(config.skipBlocks !== 0 && ((data.number%config.skipBlocks) !== 0)){
+        // console.log('skipping',data.number % config.skipBlocks)
+        return
+      }
       // console.log('new block',data)
       const stats = await libs.stats.stakes.latest.list()
       // console.log('got stats',stats)
       const summed = await Promise.map(stats,async stat=>{
-        const total = bn.sum(...Object.values(stat.stats))
+        const total = bn.sum('0',...Object.values(stat.stats))
         return {
           total:total.toString(10),
           stakers:lodash.mapValues(stat.stats,(value,userid)=>{
@@ -76,7 +81,7 @@ module.exports = (config,libs,emit=x=>x) =>{
         })
       })
       await globalStats()
-      if(data) await globalStatsHistory(data)
+      await globalStatsHistory(data)
     }
   }
 
