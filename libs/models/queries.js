@@ -251,9 +251,9 @@ module.exports = (config,libs)=>{
       myTokens: lodash.keyBy(await ownedTokens(userid),'id'),
       // myCommandHistory: lodash.keyBy(await userCommandHistory(userid,0,10),'id'),
       myCommandHistory:{},
-      myCoupons:{
-        mint:lodash.keyBy(await userMintCoupons(userid),'id'),
-      },
+      // myCoupons:{
+      //   mint:lodash.keyBy(await userMintCoupons(userid),'id'),
+      // },
       me:{
         id:userid,
         publicAddress:userid,

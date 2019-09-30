@@ -40,31 +40,34 @@ module.exports = (config,libs,emit=x=>x) =>{
 
   async function write([table,method,data]){
 
-    if(table == 'commands'){
-      if(!data.done) return
-      if(data.type != 'transferStakeReward' && data.type != 'transferOwnerReward') return
+    // disable this for now. currently doesnt work. each update
+    // needs to finish write before handling next command.
+    // if(table == 'commands'){
+    //   if(!data.done) return
+    //   if(data.type != 'transferStakeReward' && data.type != 'transferOwnerReward') return
 
-      const id = [data.blockNumber.toString(),data.tokenid].join('!')
-      // const id = data.tokenid
+    //   const id = [data.blockNumber.toString(),data.tokenid].join('!')
+    //   // const id = data.tokenid
 
-      const def = {
-        id,
-        stats:{
-          tokenid:data.tokenid,
-          blockNumber:data.blockNumber,
-          users:{ }
-        }
-      }
+    //   const def = {
+    //     id,
+    //     stats:{
+    //       tokenid:data.tokenid,
+    //       blockNumber:data.blockNumber,
+    //       users:{ }
+    //     }
+    //   }
 
-      const blockStats = (await libs.stats.earned.blocks.get(id)) || def
+    //   const blockStats = (await libs.stats.earned.blocks.get(id)) || def
 
-      const earned = lodash.get(blockStats,['stats','users',data.userid],'0')
-      const updatedEarned = bn(earned).plus(data.amount)
-      lodash.set(blockStats,['stats','users',data.userid],updatedEarned.toString(10))
-      // lodash.set(blockStats,['stats','blockNumber'],data.blockNumber)
-      // console.log('blockstats',blockStats)
-      return libs.stats.earned.blocks.set(blockStats)
-    }
+    //   const earned = lodash.get(blockStats,['stats','users',data.userid],'0')
+    //   const updatedEarned = bn(earned).plus(data.amount)
+    //   lodash.set(blockStats,['stats','users',data.userid],updatedEarned.toString(10))
+    //   // lodash.set(blockStats,['stats','blockNumber'],data.blockNumber)
+    //   // console.log('blockstats',blockStats)
+    //   return libs.stats.earned.blocks.set(blockStats)
+    // }
+
     if(table == 'wallets.stakes'){
       const stats = await libs.query.detailedStakes(data.tokenid)
       // console.log('wallets.stakes',{stats,data})
@@ -99,15 +102,16 @@ module.exports = (config,libs,emit=x=>x) =>{
       })
       const ordered = lodash.orderBy(summed,['total','created'],['desc','asc'])
 
-      await Promise.map(ordered,({total,stakers,id},index)=>{
-        // console.log('stats history',{id,total})
-        return libs.stats.stakes.history.set({
-          id:[id,data.number].join('!'),
-          stats:{id,total,stakers,rank:index}
-        })
-      })
+      // await Promise.map(ordered,({total,stakers,id},index)=>{
+      //   // console.log('stats history',{id,total})
+      //   return libs.stats.stakes.history.set({
+      //     id:[id,data.number].join('!'),
+      //     stats:{id,total,stakers,rank:index}
+      //   })
+      // })
+      
       await globalStats()
-      await globalStatsHistory(data)
+      // await globalStatsHistory(data)
     }
   }
 
