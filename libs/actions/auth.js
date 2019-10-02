@@ -30,6 +30,9 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
   function joinStats(){
     emit('join',socket.id,'stats')
   }
+  function leaveStats(){
+    emit('leave',socket.id,'stats')
+  }
 
   async function login(signed,publicAddress,tokenid=socket.tokenid){
     assert(auth,'auth server not enabled')
@@ -111,5 +114,6 @@ module.exports = (config,{auth,ethers,users},emit=x=>x) => socket =>{
     validate,
     user,
     joinStats,
+    leaveStats,
   }
 }

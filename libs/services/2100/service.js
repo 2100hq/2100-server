@@ -143,6 +143,10 @@ module.exports = async (config)=>{
           libs.socket.emit(args[0],'stats',[[[],await libs.query.statsState()]])
         }
       }
+      if(type === 'leave'){
+        //args=sessionid, channel
+        await libs.socket.leave(...args)
+      }
       if(type === 'login'){
         const [socketid,userid] = args
         await libs.socket.join(socketid,userid)

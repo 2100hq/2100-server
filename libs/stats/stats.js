@@ -9,6 +9,7 @@ module.exports = (config,libs,emit=x=>x) =>{
 
   async function globalStatsHistory(block){
     const latest = await libs.stats.global.latest.get('latest')
+    if(await libs.stats.global.history.has(block.number.toString())) return
     if(latest) return libs.stats.global.history.set({id:block.number.toString(),stats:latest.stats})
   }
 
@@ -102,16 +103,21 @@ module.exports = (config,libs,emit=x=>x) =>{
       })
       const ordered = lodash.orderBy(summed,['total','created'],['desc','asc'])
 
-      // await Promise.map(ordered,({total,stakers,id},index)=>{
-      //   // console.log('stats history',{id,total})
-      //   return libs.stats.stakes.history.set({
-      //     id:[id,data.number].join('!'),
-      //     stats:{id,total,stakers,rank:index}
-      //   })
-      // })
+      await Promise.map(ordered,async ({total,stakers,id},index)=>{
+        // console.log('stats history',{id,total})
+        const statid = [id,data.number].join('!')
+
+        //do not update if id exists
+        if(await libs.stats.stakes.history.has(statid)) return
+
+        return libs.stats.stakes.history.set({
+          id:statid,
+          stats:{id,total,stakers,rank:index}
+        })
+      })
       
       await globalStats()
-      // await globalStatsHistory(data)
+      await globalStatsHistory(data)
     }
   }
 

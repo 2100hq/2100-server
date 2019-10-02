@@ -5,7 +5,7 @@ module.exports = async (config, con) => {
   assert(config.table, 'requires table name')
 
   const schema = {
-    indices:['done'],
+    indices:['created'],
     ...config,
   }
 
@@ -21,6 +21,15 @@ module.exports = async (config, con) => {
       console.log({start,end})
       return table.query().find({
         _id:{
+          $gte:start,
+          $lt:end
+        }
+      }).toArray()
+    },
+    betweenTime(start,end){
+      console.log('betweentime',start,end)
+      return table.query().find({
+        created:{
           $gte:start,
           $lt:end
         }

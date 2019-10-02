@@ -192,6 +192,10 @@ module.exports = (config,libs)=>{
     return (await libs.stats.stakes.history.between(`${tokenid}!${start}`,`${tokenid}!${end}`))
   }
 
+  async function stakeHistoryStatsByTime(tokenid,start,end){
+    return libs.stats.stakes.history.betweenTime(start,end)
+  }
+
   async function globalStats(){
     return ( await libs.stats.global.latest.get('latest')).stats
   }
@@ -344,6 +348,7 @@ module.exports = (config,libs)=>{
     getAvailableBalance,
     ownedTokens,
     stakeHistoryStats,
+    stakeHistoryStatsByTime,
     globalStats,
     globalHistoryStats,
     userRewardHistory,
