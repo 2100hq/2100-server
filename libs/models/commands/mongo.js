@@ -13,7 +13,7 @@ module.exports = async (config, con) => {
       {name:'userDone',fields:['userid','done']}
     ],
     // capped:true,
-    size:4294967296,
+    // size:4294967296,
   }
 
   const table = await Table(con, schema)

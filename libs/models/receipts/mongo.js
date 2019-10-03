@@ -16,8 +16,8 @@ module.exports = async (config={}, con) => {
     return table.getBy({userid,done},{skip:start,limit:length})
   }
 
-  async function readStream(done=false){
-    return highland(await table.getBy({done}))
+  function readStream(done=false){
+    return table.readStream({done})
     // return table.streamify(table.getAll({done}))
     // const query = table.table().getAll(done,{index:'done'})
     // return table.streamify(query)

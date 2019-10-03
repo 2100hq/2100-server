@@ -64,6 +64,11 @@ module.exports = async (db,schema) =>{
     await col.deleteOne({ _id: id })
     return { _id: id, id }
   }
+  async function deleteAll(ids=[]){
+    return col.deleteMany({
+      _id:{$in:ids}
+    })
+  }
   function count(props){
     return col.countDocuments(props)
   }
@@ -90,9 +95,12 @@ module.exports = async (db,schema) =>{
   function readStream(query={}){
     return highland(col.find(query))
   }
+  function collection(){
+    return col
+  }
 
   return {
     set,get,getBy,has,delete:del,streamify,count,drop,insertMany,query,list,
-    readStream,
+    readStream,deleteAll,collection
   }
 }
