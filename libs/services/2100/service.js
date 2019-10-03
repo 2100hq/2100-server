@@ -324,22 +324,22 @@ module.exports = async (config)=>{
   },1000)
 
   //command cleanup routine
-  const maxAge = moment().subtract(2,'days').valueOf()
+  //const maxAge = moment().subtract(2,'days').valueOf()
 
-  loop(async x=>{
-    return libs.commands.readStream(true)
-      .filter(x=>{
-        //only keep commands newer than maxage
-        return x.created < maxAge
-      })
-      .map(x=>{
-        console.log('deleting command',x.id)
-        return libs.commands.delete(x.id)
-      })
-      .flatMap(highland)
-      .last()
-      .toPromise(Promise)
-  },60*1000)
+  //loop(async x=>{
+  //  return libs.commands.readStream(true)
+  //    .filter(x=>{
+  //      //only keep commands newer than maxage
+  //      return x.created < maxAge
+  //    })
+  //    .map(x=>{
+  //      // console.log('deleting command',x.id)
+  //      return libs.commands.delete(x.id)
+  //    })
+  //    .flatMap(highland)
+  //    .last()
+  //    .toPromise(Promise)
+  //},60*1000)
 
 
   return libs
