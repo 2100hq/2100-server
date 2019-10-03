@@ -87,8 +87,8 @@ module.exports = async (db,schema) =>{
   function list(){
     return col.find({}).toArray()
   }
-  function readStream(){
-    return highland(col.find({}))
+  function readStream(query={}){
+    return highland(col.find(query))
   }
 
   return {

@@ -327,7 +327,7 @@ module.exports = async (config)=>{
   const maxAge = moment().subtract(2,'days').valueOf()
 
   loop(async x=>{
-    return (await libs.commands.readStream(true))
+    return libs.commands.readStream(true)
       .filter(x=>{
         //only keep commands newer than maxage
         return x.created < maxAge
