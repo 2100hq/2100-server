@@ -61,7 +61,7 @@ module.exports = async (db,schema) =>{
     return col.find(data,options).toArray()
   }
   async function del(id){
-    await con.deleteOne({ _id: id })
+    await col.deleteOne({ _id: id })
     return { _id: id, id }
   }
   function count(props){
