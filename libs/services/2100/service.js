@@ -3,6 +3,7 @@ const Emitter = require('events')
 const highland = require('highland')
 const lodash = require('lodash')
 const Promise = require('bluebird')
+const moment = require('moment')
 
 const Socket = require('../../socket')
 const SocketClient = require('../../socket/client/socket')
@@ -321,6 +322,24 @@ module.exports = async (config)=>{
       emitter.emit('models',['blocks','change',block])
     }
   },1000)
+
+  //command cleanup routine
+  const maxAge = moment().subtract(2,'days').valueOf()
+
+  loop(async x=>{
+    return libs.commands.readStream(true)
+      .filter(x=>{
+        //only keep commands newer than maxage
+        return x.created < maxAge
+      })
+      .map(x=>{
+        console.log('deleting command',x.id)
+        return libs.commands.delete(x.id)
+      })
+      .flatMap(highland)
+      .last()
+      .toPromise(Promise)
+  },60*1000)
 
 
   return libs

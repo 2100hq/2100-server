@@ -33,7 +33,7 @@ module.exports = async (config, con) => {
   function countDone(done=false){
     return table.count({done})
   }
-  async function readStream(done=false){
+  function readStream(done=false){
     return highland(await table.getBy({done}))
     // return table.streamify(table.getAll({done}))
     // const query = table.table().getAll(done,{index:'done'})

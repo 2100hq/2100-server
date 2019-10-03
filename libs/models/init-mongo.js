@@ -69,14 +69,14 @@ module.exports = async (config={},{con},emit)=>{
       mint:Coupons.Model({},await Coupons.Mongo({table:'mint_coupons'},con),(...args)=>emit('coupons.mint',...args)),
     },
     receipts: Receipts.Model(config, 
-      await Receipts.Mongo({capped:true,size:1073741824,table:'receipts'},con),
+      await Receipts.Mongo({capped:true,size:536870912,table:'receipts'},con),
       //pretend these are commands for now
       (...args)=>emit('commands',...args)
     ),
     stats:{
       stakes:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.stakes.latest',...args)) ,
-        history:Stats.Model(config,await Stats.Mongo({capped:true,size:1073741824,table:'stats_stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
+        history:Stats.Model(config,await Stats.Mongo({capped:true,size:536870912,table:'stats_stakes_history'},con),(...args)=>emit('stats.stakes.history',...args)) 
       },
       earned:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.earned.latest',...args)) ,
@@ -84,7 +84,7 @@ module.exports = async (config={},{con},emit)=>{
       },
       global:{
         latest:Stats.Model(config,Cache(),(...args)=>emit('stats.global.latest',...args)) ,
-        history:Stats.Model(config,await Stats.Mongo({capped:true,size:1073741824,table:'stats_global_history'},con),(...args)=>emit('stats.global.history',...args)) 
+        history:Stats.Model(config,await Stats.Mongo({capped:true,size:536870912,table:'stats_global_history'},con),(...args)=>emit('stats.global.history',...args)) 
     
       },
     }
