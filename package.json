@@ -21,7 +21,7 @@
     "express": "^4.17.1",
     "fastest-validator": "^0.6.17",
     "highland": "^2.13.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "memtable": "^2.0.0-alpha.12",
     "moment": "^2.24.0",
     "mongodb": "^3.3.2",
