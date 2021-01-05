@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "2100-contracts": "github:2100hq/2100-contracts#v0.2.3",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "bignumber.js": "^9.0.0",
     "bluebird": "^3.5.5",
     "cheerio": "^1.0.0-rc.3",
