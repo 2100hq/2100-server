@@ -18,7 +18,7 @@
     "cheerio": "^1.0.0-rc.3",
     "dotenv": "^8.0.0",
     "ethers": "^4.0.33",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fastest-validator": "^0.6.17",
     "highland": "^2.13.4",
     "lodash": "^4.17.15",
